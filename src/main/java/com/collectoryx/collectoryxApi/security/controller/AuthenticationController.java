@@ -87,7 +87,7 @@ public class AuthenticationController {
   @PostMapping("/register")
   public ResponseEntity<?> saveUser(@RequestParam("first_name") String firstName,
       @RequestParam("last_name") String lastName,
-      @RequestParam("user_name") String userName, @RequestParam("email") String email
+      @RequestParam("userName") String userName, @RequestParam("email") String email
       , @RequestParam("password") String password) {
     Map<String, Object> responseMap = new HashMap<>();
     User user = new User();
