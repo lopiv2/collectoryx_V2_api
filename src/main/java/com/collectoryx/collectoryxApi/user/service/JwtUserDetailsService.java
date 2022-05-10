@@ -4,6 +4,7 @@ import com.collectoryx.collectoryxApi.user.model.User;
 import com.collectoryx.collectoryxApi.user.repository.UserRepository;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -22,7 +23,7 @@ public class JwtUserDetailsService implements UserDetailsService {
 
   @Override
   public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-    User user = userRepository.findUserByUsername(username);
+    User user = userRepository.findByUsername(username);
     List<GrantedAuthority> authorityList = new ArrayList<>();
     authorityList.add(new SimpleGrantedAuthority("USER_ROLE"));
     return new org.springframework.security.core.userdetails.User(user.getUserName(),
