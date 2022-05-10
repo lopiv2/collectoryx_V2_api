@@ -7,4 +7,5 @@ C:\Programacion\Collectoryx\Collectoryx-Api\src\main\java\com\collectoryx\collec
 C:\Programacion\Collectoryx\Collectoryx-Api\src\main\java\com\collectoryx\collectoryxApi\util\JwtTokenUtil.java
 C:\Programacion\Collectoryx\Collectoryx-Api\src\main\java\com\collectoryx\collectoryxApi\security\controller\AuthenticationController.java
 C:\Programacion\Collectoryx\Collectoryx-Api\src\main\java\com\collectoryx\collectoryxApi\user\repository\UserRepository.java
+C:\Programacion\Collectoryx\Collectoryx-Api\src\main\java\com\collectoryx\collectoryxApi\security\rest\request\LoginRequest.java
 C:\Programacion\Collectoryx\Collectoryx-Api\src\main\java\com\collectoryx\collectoryxApi\util\JwtRequestFilter.java
