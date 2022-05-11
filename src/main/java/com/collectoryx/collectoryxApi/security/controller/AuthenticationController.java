@@ -91,6 +91,8 @@ public class AuthenticationController {
       , @RequestParam("password") String password) {
     Map<String, Object> responseMap = new HashMap<>();
     User user = new User();
+    user.setFirstName(firstName);
+    user.setLastName(lastName);
     user.setEmail(email);
     user.setPassword(new BCryptPasswordEncoder().encode(password));
     user.setRole("USER");
