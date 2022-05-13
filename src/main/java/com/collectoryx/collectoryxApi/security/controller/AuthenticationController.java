@@ -1,6 +1,7 @@
 package com.collectoryx.collectoryxApi.security.controller;
 
 import com.collectoryx.collectoryxApi.security.rest.request.LoginRequest;
+import com.collectoryx.collectoryxApi.security.rest.request.RegisterRequest;
 import com.collectoryx.collectoryxApi.user.model.User;
 import com.collectoryx.collectoryxApi.user.repository.UserRepository;
 import com.collectoryx.collectoryxApi.user.service.JwtUserDetailsService;
@@ -22,7 +23,6 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 
@@ -85,23 +85,20 @@ public class AuthenticationController {
   }
 
   @PostMapping("/register")
-  public ResponseEntity<?> saveUser(@RequestParam("first_name") String firstName,
-      @RequestParam("last_name") String lastName,
-      @RequestParam("userName") String userName, @RequestParam("email") String email
-      , @RequestParam("password") String password) {
+  public ResponseEntity<?> saveUser(@RequestBody @Valid RegisterRequest request) {
     Map<String, Object> responseMap = new HashMap<>();
     User user = new User();
-    user.setFirstName(firstName);
-    user.setLastName(lastName);
-    user.setEmail(email);
-    user.setPassword(new BCryptPasswordEncoder().encode(password));
+    user.setFirstName(request.getFirstName());
+    user.setLastName(request.getLastName());
+    user.setEmail(request.getEmail());
+    user.setPassword(new BCryptPasswordEncoder().encode(request.getPassword()));
     user.setRole("USER");
-    user.setUserName(userName);
-    UserDetails userDetails = userDetailsService.createUserDetails(userName, user.getPassword());
+    user.setUserName(request.getUserName());
+    UserDetails userDetails = userDetailsService.createUserDetails(request.getUserName(), user.getPassword());
     String token = jwtTokenUtil.generateToken(userDetails);
     userRepository.save(user);
     responseMap.put("error", false);
-    responseMap.put("username", userName);
+    responseMap.put("username", request.getUserName());
     responseMap.put("message", "Account created successfully");
     responseMap.put("token", token);
     return ResponseEntity.ok(responseMap);
