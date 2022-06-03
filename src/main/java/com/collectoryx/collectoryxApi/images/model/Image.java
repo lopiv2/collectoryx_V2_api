@@ -1,5 +1,6 @@
 package com.collectoryx.collectoryxApi.images.model;
 
+import java.util.Date;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -17,7 +18,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class Images {
+public class Image {
 
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
@@ -29,5 +30,8 @@ public class Images {
 
   @Column
   protected String path;
+
+  @Column
+  protected Date created;
 
 }

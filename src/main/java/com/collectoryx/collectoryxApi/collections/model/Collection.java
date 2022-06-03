@@ -1,6 +1,6 @@
 package com.collectoryx.collectoryxApi.collections.model;
 
-import com.collectoryx.collectoryxApi.images.model.Images;
+import com.collectoryx.collectoryxApi.images.model.Image;
 import java.util.Date;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -34,7 +34,7 @@ public class Collection {
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "image")
-  protected Images image;
+  protected Image image;
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "collection_list_id")

@@ -1,12 +1,12 @@
 package com.collectoryx.collectoryxApi.collections.rest.request;
 
 import com.collectoryx.collectoryxApi.collections.model.CollectionTypes;
-import com.collectoryx.collectoryxApi.images.model.Images;
 import javax.validation.constraints.NotEmpty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.web.multipart.MultipartFile;
 
 @Data
 @Builder
@@ -21,7 +21,6 @@ public class CollectionRequest {
   protected CollectionTypes template;
 
   @NotEmpty
-  protected Images logo;
-
+  protected MultipartFile file;
 
 }
