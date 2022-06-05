@@ -1,7 +1,7 @@
-package com.collectoryx.collectoryxApi.config.controller;
+package com.collectoryx.collectoryxApi.image.controller;
 
-import com.collectoryx.collectoryxApi.config.rest.response.ImageResponse;
-import com.collectoryx.collectoryxApi.config.service.ImageService;
+import com.collectoryx.collectoryxApi.image.rest.response.ImageResponse;
+import com.collectoryx.collectoryxApi.image.service.ImageService;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import javax.validation.constraints.NotEmpty;

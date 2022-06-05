@@ -1,8 +1,8 @@
-package com.collectoryx.collectoryxApi.config.service;
+package com.collectoryx.collectoryxApi.image.service;
 
-import com.collectoryx.collectoryxApi.config.rest.response.ImageResponse;
-import com.collectoryx.collectoryxApi.images.model.Image;
-import com.collectoryx.collectoryxApi.images.repository.ImageRepository;
+import com.collectoryx.collectoryxApi.image.rest.response.ImageResponse;
+import com.collectoryx.collectoryxApi.image.model.Image;
+import com.collectoryx.collectoryxApi.image.repository.ImageRepository;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;

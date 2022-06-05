@@ -8,12 +8,14 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <module name="Collectoryx-Api" />
+        <module name="collectoryx_V2_api" />
       </profile>
     </annotationProcessing>
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
       <module name="Collectoryx-Api" options="-parameters" />
+      <module name="collectoryx_V2_api" options="-parameters" />
     </option>
   </component>
 </project>

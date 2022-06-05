@@ -1,4 +1,4 @@
-package com.collectoryx.collectoryxApi.images.model;
+package com.collectoryx.collectoryxApi.image.model;
 
 import java.util.Date;
 import javax.persistence.Column;

@@ -1,6 +1,6 @@
-package com.collectoryx.collectoryxApi.images.repository;
+package com.collectoryx.collectoryxApi.image.repository;
 
-import com.collectoryx.collectoryxApi.images.model.Image;
+import com.collectoryx.collectoryxApi.image.model.Image;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;

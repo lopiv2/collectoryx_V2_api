@@ -1,6 +1,6 @@
 package com.collectoryx.collectoryxApi.collections.model;
 
-import com.collectoryx.collectoryxApi.images.model.Image;
+import com.collectoryx.collectoryxApi.image.model.Image;
 import java.util.Date;
 import javax.persistence.Column;
 import javax.persistence.Entity;

@@ -1,6 +1,6 @@
 package com.collectoryx.collectoryxApi.collections.model;
 
-import com.collectoryx.collectoryxApi.images.model.Image;
+import com.collectoryx.collectoryxApi.image.model.Image;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;

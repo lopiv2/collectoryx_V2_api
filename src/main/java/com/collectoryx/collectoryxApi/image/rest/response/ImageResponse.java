@@ -1,4 +1,4 @@
-package com.collectoryx.collectoryxApi.config.rest.response;
+package com.collectoryx.collectoryxApi.image.rest.response;
 
 import java.util.Date;
 import lombok.Builder;
