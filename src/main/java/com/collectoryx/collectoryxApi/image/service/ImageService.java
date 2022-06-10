@@ -26,9 +26,11 @@ public class ImageService {
     this.imageRepository = imageRepository;
   }
 
-  public void save(MultipartFile file, String path) throws IOException {
+  public void saveImage(MultipartFile file, String path) throws IOException {
     File files = new File(System.getProperty("user.dir")).getCanonicalFile();
-    System.out.println("Parent directory : " + files.getParent() + "\\images");
+    path=files.getParent() + "\\images\\"+path;
+    //System.out.println(path);
+    //System.out.println("Parent directory : " + files.getParent() + "\\images");
     Path pathFinal = Paths.get(path);
     try {
       Files.copy(file.getInputStream(), pathFinal);
@@ -47,7 +49,7 @@ public class ImageService {
         .created(new Date())
         .build();
     try {
-      save(fileName, path);
+      saveImage(fileName, path);
     } catch (IOException e) {
       e.printStackTrace();
     }
@@ -66,7 +68,7 @@ public class ImageService {
     return ImageResponse.builder()
         .id(image.getId())
         .name(image.getName())
-        .url(image.getPath())
+        .path(image.getPath())
         .created(image.getCreated())
         .build();
   }

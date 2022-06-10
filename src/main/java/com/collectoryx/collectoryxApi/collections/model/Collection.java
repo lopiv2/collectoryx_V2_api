@@ -37,7 +37,7 @@ public class Collection {
   protected Image image;
 
   @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "collection_list_id")
+  @JoinColumn(name = "collection")
   protected CollectionList collection;
 
   @ManyToOne(fetch = FetchType.LAZY)

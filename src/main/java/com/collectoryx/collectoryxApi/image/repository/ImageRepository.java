@@ -10,4 +10,6 @@ public interface ImageRepository extends JpaRepository<Image, Long> {
 
   Optional<Image> findImageByName(String imageName);
 
+  Optional<Image> findImageByPath(String imageName);
+
 }

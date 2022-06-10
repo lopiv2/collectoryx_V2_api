@@ -12,7 +12,7 @@ public class ImageResponse {
 
   private String name;
 
-  private String url;
+  private String path;
 
   private Date created;
 

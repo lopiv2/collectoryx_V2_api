@@ -19,4 +19,8 @@ public class CollectionRequest {
   @NotEmpty
   protected CollectionTypes template;
 
+  @NotEmpty
+  protected String file;
+
+
 }

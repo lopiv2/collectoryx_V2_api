@@ -38,6 +38,6 @@ public class CollectionMetadata {
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "collection")
-  private Collection collection;
+  private CollectionList collection;
 
 }
