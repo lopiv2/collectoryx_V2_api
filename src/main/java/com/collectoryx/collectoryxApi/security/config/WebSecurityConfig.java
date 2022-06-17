@@ -26,7 +26,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
   private final UserDetailsService jwtUserDetailsService;
   private final JwtRequestFilter jwtRequestFilter;
 
-  public WebSecurityConfig(UserDetailsService jwtUserDetailsService, JwtRequestFilter jwtRequestFilter) {
+  public WebSecurityConfig(UserDetailsService jwtUserDetailsService,
+      JwtRequestFilter jwtRequestFilter) {
     this.jwtUserDetailsService = jwtUserDetailsService;
     this.jwtRequestFilter = jwtRequestFilter;
   }
@@ -44,18 +45,22 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
   @Override
   protected void configure(HttpSecurity httpSecurity) throws Exception {
-    httpSecurity.csrf().disable().authorizeRequests().antMatchers("/*").permitAll().anyRequest().authenticated().and().exceptionHandling().authenticationEntryPoint((request, response, authException) -> {
-      Map<String, Object> responseMap = new HashMap<>();
-      ObjectMapper mapper = new ObjectMapper();
-      response.setStatus(401);
-      responseMap.put("error", true);
-      responseMap.put("message", "Unauthorized");
-      response.setHeader("content-type", "application/json");
-      String responseMsg = mapper.writeValueAsString(responseMap);
-      response.getWriter().write(responseMsg);
-    }).and().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and().addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
+    httpSecurity.csrf().disable().authorizeRequests().antMatchers("/**")
+        .permitAll().anyRequest()
+        .authenticated().and().exceptionHandling()
+        .authenticationEntryPoint((request, response, authException) -> {
+          Map<String, Object> responseMap = new HashMap<>();
+          ObjectMapper mapper = new ObjectMapper();
+          response.setStatus(401);
+          responseMap.put("error", true);
+          responseMap.put("message", "Unauthorized");
+          response.setHeader("content-type", "application/json");
+          String responseMsg = mapper.writeValueAsString(responseMap);
+          response.getWriter().write(responseMsg);
+        }).and().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
+        .addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
     //httpSecurity.cors();
   }
-  
-  
+
+
 }

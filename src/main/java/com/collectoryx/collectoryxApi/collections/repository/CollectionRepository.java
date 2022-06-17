@@ -11,5 +11,6 @@ public interface CollectionRepository extends JpaRepository<Collection, Long> {
   //@Query(value = "CREATE TABLE :tableName (id int)", nativeQuery = true)
   //String createTable(@Param("tableName") String tableLookUp);
 
-  List<Collection> findByCollection(Long collection_id);
+  List<Collection> findByCollection_Id(Long collection_id);
+
 }

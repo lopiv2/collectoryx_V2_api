@@ -10,12 +10,12 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class CollectionListResponse {
+public class CollectionSeriesListResponse {
 
   private Long id;
 
   private String name;
 
-  protected ImageResponse logo;
+  private ImageResponse logo;
 
 }

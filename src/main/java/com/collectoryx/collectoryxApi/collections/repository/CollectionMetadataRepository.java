@@ -8,6 +8,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface CollectionMetadataRepository extends JpaRepository<CollectionMetadata, Long> {
 
-  List<CollectionMetadata> findByCollection(Long collection_id);
+  List<CollectionMetadata> findByCollection_Id(Long collection_id);
 
 }

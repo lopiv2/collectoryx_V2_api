@@ -15,6 +15,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class CollectionItemsResponse {
 
+  protected Long id;
+
   protected String name;
 
   protected ImageResponse image;
