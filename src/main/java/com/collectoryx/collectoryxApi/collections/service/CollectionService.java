@@ -76,7 +76,7 @@ public class CollectionService {
         .orElseThrow(NotFoundException::new);
     collection.setOwn(!item.getOwn());
     this.collectionRepository.save(collection);
-    CollectionItemsResponse collectionItemsResponse=toCollectionItemResponse(collection);
+    CollectionItemsResponse collectionItemsResponse = toCollectionItemResponse(collection);
     return collectionItemsResponse;
   }
 
@@ -95,6 +95,12 @@ public class CollectionService {
         .name(request.getName())
         .logo(imageResponse).build();
     return collectionSeriesListResponse;
+  }
+
+  public boolean deleteCollection(Long id) throws NotFoundException {
+    Collection col = this.collectionRepository.findById(id).orElseThrow(NotFoundException::new);
+    this.collectionRepository.deleteById(col.getId());
+    return true;
   }
 
   public List<CollectionSeriesListResponse> listCollections() {
@@ -127,7 +133,7 @@ public class CollectionService {
   public List<CollectionItemsResponse> getMoneyFromAllItems() {
     final List<CollectionItemsResponse> collectionResponseList = new LinkedList<>();
     List<Collection> collections = this.collectionRepository
-        .findByCollection_Id(id);
+        .findAll();
     return StreamSupport.stream(collections.spliterator(), false)
         .map(this::toCollectionItemsResponse)
         .collect(Collectors.toList());

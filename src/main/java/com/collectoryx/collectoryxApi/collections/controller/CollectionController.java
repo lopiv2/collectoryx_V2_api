@@ -11,6 +11,7 @@ import com.collectoryx.collectoryxApi.image.service.ImageService;
 import java.util.List;
 import org.springframework.data.crossstore.ChangeSetPersister.NotFoundException;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -116,6 +117,12 @@ public class CollectionController {
     List<CollectionItemsResponse> collectionResponses = this.collectionService.getCollectionById(
         id);
     return Mono.just(collectionResponses);
+  }
+
+  @DeleteMapping(value = "/delete-collection/{id}")
+  public Mono<Boolean> deleteCollectionItem(@PathVariable("id") Long id) throws NotFoundException {
+    boolean isDeleted = this.collectionService.deleteCollection(id);
+    return Mono.just(isDeleted);
   }
 
 }
