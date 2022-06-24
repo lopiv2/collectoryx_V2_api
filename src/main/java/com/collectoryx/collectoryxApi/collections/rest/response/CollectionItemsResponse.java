@@ -1,6 +1,5 @@
 package com.collectoryx.collectoryxApi.collections.rest.response;
 
-import com.collectoryx.collectoryxApi.collections.model.CollectionSeriesList;
 import com.collectoryx.collectoryxApi.image.rest.response.ImageResponse;
 import java.util.Date;
 import java.util.List;
@@ -23,13 +22,15 @@ public class CollectionItemsResponse {
 
   protected String collection;
 
-  protected CollectionSeriesList serie;
+  protected CollectionSeriesListResponse serie;
 
   protected Integer year;
 
   protected Float price;
 
   protected boolean own;
+
+  protected boolean wanted;
 
   protected String notes;
 

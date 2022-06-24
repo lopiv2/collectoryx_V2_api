@@ -79,6 +79,20 @@ public class CollectionController {
     return Mono.just(collectionItemsResponse);
   }
 
+  @PostMapping(value = "/toggle-item-wish")
+  public Mono<CollectionItemsResponse> toggleItemWish(
+      @RequestBody CollectionItemRequest collectionItemRequest) {
+    CollectionItemsResponse collectionItemsResponse = null;
+    if (collectionItemRequest.getId() != null) {
+      try {
+        collectionItemsResponse = this.collectionService.toggleWish(collectionItemRequest);
+      } catch (NotFoundException e) {
+        e.printStackTrace();
+      }
+    }
+    return Mono.just(collectionItemsResponse);
+  }
+
 
   @GetMapping(value = "/count-collections")
   public Mono<Long> getCountCollections() {
@@ -119,8 +133,14 @@ public class CollectionController {
     return Mono.just(collectionResponses);
   }
 
-  @DeleteMapping(value = "/delete-collection/{id}")
+  @DeleteMapping(value = "/delete-collection-item/{id}")
   public Mono<Boolean> deleteCollectionItem(@PathVariable("id") Long id) throws NotFoundException {
+    boolean isDeleted = this.collectionService.deleteCollectionItem(id);
+    return Mono.just(isDeleted);
+  }
+
+  @DeleteMapping(value = "/delete-collection/{id}")
+  public Mono<Boolean> deleteCollection(@PathVariable("id") Long id) throws NotFoundException {
     boolean isDeleted = this.collectionService.deleteCollection(id);
     return Mono.just(isDeleted);
   }

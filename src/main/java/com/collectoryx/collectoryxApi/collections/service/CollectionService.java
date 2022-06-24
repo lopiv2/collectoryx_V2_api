@@ -80,6 +80,15 @@ public class CollectionService {
     return collectionItemsResponse;
   }
 
+  public CollectionItemsResponse toggleWish(CollectionItemRequest item) throws NotFoundException {
+    Collection collection = this.collectionRepository.findById(item.getId())
+        .orElseThrow(NotFoundException::new);
+    collection.setWanted(!item.getWanted());
+    this.collectionRepository.save(collection);
+    CollectionItemsResponse collectionItemsResponse = toCollectionItemResponse(collection);
+    return collectionItemsResponse;
+  }
+
   public CollectionSeriesListResponse createSerie(CollectionSerieListRequest request)
       throws NotFoundException {
     Image image = this.imagesRepository.findImageByPath(request.getFile()).orElseThrow(
@@ -97,9 +106,16 @@ public class CollectionService {
     return collectionSeriesListResponse;
   }
 
-  public boolean deleteCollection(Long id) throws NotFoundException {
+  public boolean deleteCollectionItem(Long id) throws NotFoundException {
     Collection col = this.collectionRepository.findById(id).orElseThrow(NotFoundException::new);
     this.collectionRepository.deleteById(col.getId());
+    return true;
+  }
+
+  public boolean deleteCollection(Long id) throws NotFoundException {
+    CollectionList col = this.collectionListRepository.findById(id)
+        .orElseThrow(NotFoundException::new);
+    this.collectionListRepository.deleteById(col.getId());
     return true;
   }
 
@@ -148,6 +164,15 @@ public class CollectionService {
     } catch (NotFoundException e) {
       e.printStackTrace();
     }
+    CollectionSeriesListResponse collectionSeriesListResponse = null;
+    try {
+      collectionSeriesListResponse = toCollectionSerieListResponse(
+          this.collectionSeriesListRepository.findById(collection.getSerie().getId())
+              .orElseThrow(NotFoundException::new));
+    } catch (NotFoundException e) {
+      e.printStackTrace();
+    }
+
     List<CollectionMetadataResponse> collectionMetadata = null;
     collectionMetadata = StreamSupport.stream(this.collectionMetadataRepository.findByCollection_Id(
             collection.getId()).spliterator(), false).map(this::toCollectionMetadataResponse)
@@ -157,10 +182,11 @@ public class CollectionService {
         .name(collection.getName())
         .image(image)
         .collection(collection.getName())
-        .serie(collection.getSerie())
+        .serie(collectionSeriesListResponse)
         .year(collection.getYear())
         .price(collection.getPrice())
         .own(collection.isOwn())
+        .wanted(collection.isWanted())
         .notes(collection.getNotes())
         .adquiringDate(collection.getAdquiringDate())
         .metadata(collectionMetadata)
@@ -202,16 +228,34 @@ public class CollectionService {
   }
 
   private CollectionItemsResponse toCollectionItemResponse(Collection collection) {
+    ImageResponse image = null;
+    try {
+      image = toImageResponse(
+          this.imagesRepository.findById(collection.getImage().getId())
+              .orElseThrow(NotFoundException::new));
+    } catch (NotFoundException e) {
+      e.printStackTrace();
+    }
+    CollectionSeriesListResponse collectionSeriesListResponse = null;
+    try {
+      collectionSeriesListResponse = toCollectionSerieListResponse(
+          this.collectionSeriesListRepository.findById(collection.getSerie().getId())
+              .orElseThrow(NotFoundException::new));
+    } catch (NotFoundException e) {
+      e.printStackTrace();
+    }
     return CollectionItemsResponse.builder()
         .id(collection.getId())
         .name(collection.getName())
+        .image(image)
         .adquiringDate(collection.getAdquiringDate())
         .notes(collection.getNotes())
         .price(collection.getPrice())
         .year(collection.getYear())
         .collection(collection.getCollection().getName())
-        .serie(collection.getSerie())
+        .serie(collectionSeriesListResponse)
         .own(collection.isOwn())
+        .wanted(collection.isWanted())
         .build();
   }
 

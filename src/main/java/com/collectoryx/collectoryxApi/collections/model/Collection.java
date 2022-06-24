@@ -51,7 +51,10 @@ public class Collection {
   protected Float price;
 
   @Column
-  protected boolean own;
+  protected boolean own=false;
+
+  @Column
+  protected boolean wanted=false;
 
   @Column
   protected String notes;

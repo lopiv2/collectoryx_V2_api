@@ -18,4 +18,7 @@ public class CollectionItemRequest {
   @NotEmpty
   protected Boolean own;
 
+  @NotEmpty
+  protected Boolean wanted;
+
 }
