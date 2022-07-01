@@ -1,6 +1,8 @@
 package com.collectoryx.collectoryxApi.collections.rest.request;
 
+import com.collectoryx.collectoryxApi.collections.model.CollectionMetadata;
 import com.collectoryx.collectoryxApi.collections.model.CollectionTypes;
+import java.util.List;
 import javax.validation.constraints.NotEmpty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -21,6 +23,8 @@ public class CollectionRequest {
 
   @NotEmpty
   protected String file;
+
+  protected List<CollectionMetadata> metadata;
 
 
 }

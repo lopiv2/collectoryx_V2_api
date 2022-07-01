@@ -16,6 +16,8 @@ public class CollectionSeriesListResponse {
 
   private String name;
 
+  private CollectionResponse collection;
+
   private ImageResponse logo;
 
 }

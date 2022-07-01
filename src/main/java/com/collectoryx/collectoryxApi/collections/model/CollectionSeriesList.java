@@ -35,4 +35,8 @@ public class CollectionSeriesList {
   @JoinColumn(name = "images_id")
   protected Image logo;
 
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "collection")
+  private CollectionList collection;
+
 }

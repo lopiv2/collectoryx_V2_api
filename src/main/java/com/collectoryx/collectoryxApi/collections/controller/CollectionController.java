@@ -39,14 +39,20 @@ public class CollectionController {
       @RequestBody CollectionRequest collectionRequest) {
     CollectionResponse collectionResponse = null;
     switch (collectionRequest.getTemplate()) {
-      case Action_Figures:
-        if (collectionRequest.getFile() != null) {
-          try {
-            collectionResponse = this.collectionService.createCollection(collectionRequest);
-          } catch (NotFoundException e) {
-            e.printStackTrace();
-          }
+      case New:
+        try {
+          collectionResponse = this.collectionService.createCollectionNew(collectionRequest);
+        } catch (NotFoundException e) {
+          e.printStackTrace();
         }
+        break;
+      case Action_Figures:
+        try {
+          collectionResponse = this.collectionService.createCollection(collectionRequest);
+        } catch (NotFoundException e) {
+          e.printStackTrace();
+        }
+        break;
     }
     return Mono.just(collectionResponse);
   }
@@ -55,12 +61,10 @@ public class CollectionController {
   public Mono<CollectionSeriesListResponse> createSerie(
       @RequestBody CollectionSerieListRequest collectionSerieRequest) {
     CollectionSeriesListResponse collectionSerieListResponse = null;
-    if (collectionSerieRequest.getFile() != null) {
-      try {
-        collectionSerieListResponse = this.collectionService.createSerie(collectionSerieRequest);
-      } catch (NotFoundException e) {
-        e.printStackTrace();
-      }
+    try {
+      collectionSerieListResponse = this.collectionService.createSerie(collectionSerieRequest);
+    } catch (NotFoundException e) {
+      e.printStackTrace();
     }
     return Mono.just(collectionSerieListResponse);
   }
@@ -120,9 +124,17 @@ public class CollectionController {
   }
 
   @GetMapping(value = "/view-series")
-  public Mono<List<CollectionSeriesListResponse>> getCollectionsSeries() {
+  public Mono<List<CollectionSeriesListResponse>> getAllSeries() {
     List<CollectionSeriesListResponse> collectionSerieListResponses = this.collectionService
-        .listSeriesCollections();
+        .listAllSeriesCollections();
+    return Mono.just(collectionSerieListResponses);
+  }
+
+  @GetMapping(value = "/view-collection-series/{id}")
+  public Mono<List<CollectionSeriesListResponse>> getCollectionsSeries(
+      @PathVariable("id") Long id) {
+    List<CollectionSeriesListResponse> collectionSerieListResponses = this.collectionService
+        .listSeriesByCollection(id);
     return Mono.just(collectionSerieListResponses);
   }
 

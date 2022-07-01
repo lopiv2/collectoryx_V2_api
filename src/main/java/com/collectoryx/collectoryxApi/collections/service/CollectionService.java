@@ -18,6 +18,7 @@ import com.collectoryx.collectoryxApi.collections.rest.response.CollectionSeries
 import com.collectoryx.collectoryxApi.image.model.Image;
 import com.collectoryx.collectoryxApi.image.repository.ImageRepository;
 import com.collectoryx.collectoryxApi.image.rest.response.ImageResponse;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -58,16 +59,65 @@ public class CollectionService {
   }
 
   public CollectionResponse createCollection(CollectionRequest request) throws NotFoundException {
-    Image image = this.imagesRepository.findImageByPath(request.getFile()).orElseThrow(
-        NotFoundException::new);
-    CollectionList collectionList = CollectionList.builder()
-        .name(request.getName())
+    Image image = null;
+    CollectionList collectionList = null;
+    if (request.getFile() != null) {
+      image = this.imagesRepository.findImageByPath(request.getFile()).orElseThrow(
+          NotFoundException::new);
+      collectionList = CollectionList.builder()
+          .name(request.getName())
+          .logo(image)
+          .build();
+    } else {
+      collectionList = CollectionList.builder()
+          .name(request.getName())
+          .build();
+    }
+    this.collectionListRepository.save(collectionList);
+    CollectionResponse collectionResponse = CollectionResponse.builder()
+        .collection(request.getName())
+        .template(request.getTemplate())
         .logo(image)
         .build();
+    return collectionResponse;
+  }
+
+  public CollectionResponse createCollectionNew(CollectionRequest request)
+      throws NotFoundException {
+    Image image = null;
+    CollectionList collectionList = null;
+    if (request.getFile() != null) {
+      image = this.imagesRepository.findImageByPath(request.getFile()).orElseThrow(
+          NotFoundException::new);
+      collectionList = CollectionList.builder()
+          .name(request.getName())
+          .logo(image)
+          .build();
+    } else {
+      collectionList = CollectionList.builder()
+          .name(request.getName())
+          .build();
+    }
     this.collectionListRepository.save(collectionList);
-    CollectionResponse collectionResponse = CollectionResponse.builder().collection(
-            request.getName())
-        .template(request.getTemplate()).logo(image).build();
+    if (request.getMetadata().size() > 0) {
+      List<CollectionMetadata> collectionMetadataList = new ArrayList<>();
+      for (CollectionMetadata m : request.getMetadata()) {
+        CollectionMetadata collectionMetadata = CollectionMetadata.builder()
+            .id(m.getId())
+            .name(m.getName())
+            .type(m.getType())
+            .value("")
+            .collection(collectionList)
+            .build();
+        collectionMetadataList.add(collectionMetadata);
+      }
+      this.collectionMetadataRepository.saveAll(collectionMetadataList);
+    }
+    CollectionResponse collectionResponse = CollectionResponse.builder()
+        .collection(request.getName())
+        .template(request.getTemplate())
+        .logo(image)
+        .build();
     return collectionResponse;
   }
 
@@ -91,18 +141,39 @@ public class CollectionService {
 
   public CollectionSeriesListResponse createSerie(CollectionSerieListRequest request)
       throws NotFoundException {
-    Image image = this.imagesRepository.findImageByPath(request.getFile()).orElseThrow(
+    Image image = null;
+    ImageResponse imageResponse = null;
+    if (request.getFile() != null) {
+      image = this.imagesRepository.findImageByPath(request.getFile()).orElseThrow(
+          NotFoundException::new);
+      imageResponse = toImageResponse(image);
+    }
+    CollectionList collectionList = this.collectionListRepository.findById(
+        request.getCollection()).orElseThrow(
         NotFoundException::new);
-    ImageResponse imageResponse = toImageResponse(image);
+    CollectionResponse collectionResponse = toCollectionResponse(collectionList);
     CollectionSeriesList collectionSeriesList = CollectionSeriesList.builder()
         .name(request.getName())
         .logo(image)
+        .collection(collectionList)
         .build();
     this.collectionSeriesListRepository.save(collectionSeriesList);
-    CollectionSeriesListResponse collectionSeriesListResponse = CollectionSeriesListResponse
-        .builder()
-        .name(request.getName())
-        .logo(imageResponse).build();
+    CollectionSeriesListResponse collectionSeriesListResponse = null;
+    if (imageResponse != null) {
+      collectionSeriesListResponse = CollectionSeriesListResponse
+          .builder()
+          .name(request.getName())
+          .collection(collectionResponse)
+          .logo(imageResponse)
+          .build();
+    } else {
+      collectionSeriesListResponse = CollectionSeriesListResponse
+          .builder()
+          .name(request.getName())
+          .collection(collectionResponse)
+          .build();
+    }
+
     return collectionSeriesListResponse;
   }
 
@@ -128,10 +199,19 @@ public class CollectionService {
         .collect(Collectors.toList());
   }
 
-  public List<CollectionSeriesListResponse> listSeriesCollections() {
+  public List<CollectionSeriesListResponse> listAllSeriesCollections() {
     final List<CollectionSeriesListResponse> collectionSerieListResponseList = new LinkedList<>();
     List<CollectionSeriesList> collections = this.collectionSeriesListRepository
         .findAll();
+    return StreamSupport.stream(collections.spliterator(), false)
+        .map(this::toCollectionSerieListResponse)
+        .collect(Collectors.toList());
+  }
+
+  public List<CollectionSeriesListResponse> listSeriesByCollection(Long id) {
+    final List<CollectionSeriesListResponse> collectionSerieListResponseList = new LinkedList<>();
+    List<CollectionSeriesList> collections = this.collectionSeriesListRepository
+        .findAllByCollection_Id(id);
     return StreamSupport.stream(collections.spliterator(), false)
         .map(this::toCollectionSerieListResponse)
         .collect(Collectors.toList());
@@ -196,35 +276,51 @@ public class CollectionService {
   private CollectionSeriesListResponse toCollectionSerieListResponse(
       CollectionSeriesList collection) {
     ImageResponse image = null;
-    try {
-      image = toImageResponse(
-          this.imagesRepository.findById(collection.getLogo().getId())
-              .orElseThrow(NotFoundException::new));
-    } catch (NotFoundException e) {
-      e.printStackTrace();
+    if (collection.getLogo() != null) {
+      try {
+        image = toImageResponse(
+            this.imagesRepository.findById(collection.getLogo().getId())
+                .orElseThrow(NotFoundException::new));
+      } catch (NotFoundException e) {
+        e.printStackTrace();
+      }
     }
-    return CollectionSeriesListResponse.builder()
-        .id(collection.getId())
-        .name(collection.getName())
-        .logo(image)
-        .build();
+    if (image != null) {
+      return CollectionSeriesListResponse.builder()
+          .id(collection.getId())
+          .name(collection.getName())
+          .logo(image)
+          .build();
+    } else {
+      return CollectionSeriesListResponse.builder()
+          .id(collection.getId())
+          .name(collection.getName())
+          .build();
+    }
   }
 
   private CollectionSeriesListResponse toCollectionListResponse(
       CollectionList collection) {
     ImageResponse image = null;
-    try {
-      image = toImageResponse(
-          this.imagesRepository.findById(collection.getLogo().getId())
-              .orElseThrow(NotFoundException::new));
-    } catch (NotFoundException e) {
-      e.printStackTrace();
+    if (collection.getLogo() != null) {
+      try {
+        image = toImageResponse(
+            this.imagesRepository.findById(collection.getLogo().getId())
+                .orElseThrow(NotFoundException::new));
+      } catch (NotFoundException e) {
+        e.printStackTrace();
+      }
+      return CollectionSeriesListResponse.builder()
+          .id(collection.getId())
+          .name(collection.getName())
+          .logo(image)
+          .build();
+    } else {
+      return CollectionSeriesListResponse.builder()
+          .id(collection.getId())
+          .name(collection.getName())
+          .build();
     }
-    return CollectionSeriesListResponse.builder()
-        .id(collection.getId())
-        .name(collection.getName())
-        .logo(image)
-        .build();
   }
 
   private CollectionItemsResponse toCollectionItemResponse(Collection collection) {
@@ -265,6 +361,13 @@ public class CollectionService {
         .collection(request.getName())
         .logo(request.getLogo())
         .template((collectionRequest.getTemplate()))
+        .build();
+  }
+
+  private CollectionResponse toCollectionResponse(CollectionList request) {
+    return CollectionResponse.builder()
+        .collection(request.getName())
+        .logo(request.getLogo())
         .build();
   }
 

@@ -31,7 +31,8 @@ public class ImageController {
       @Parameter(description = "Content of the image",
           content = @Content(mediaType = MediaType.APPLICATION_OCTET_STREAM_VALUE))
       @RequestPart("image") MultipartFile image) {
-    ImageResponse imageResponse = this.imageService.createImage(name,image);
+    //ImageResponse imageResponse = this.imageService.createImage(name,image);
+    ImageResponse imageResponse=ImageResponse.builder().name("hola").build();
     return Mono.just(imageResponse);
 
   }

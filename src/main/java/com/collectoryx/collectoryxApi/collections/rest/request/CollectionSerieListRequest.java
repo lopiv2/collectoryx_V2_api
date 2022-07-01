@@ -16,6 +16,9 @@ public class CollectionSerieListRequest {
   protected String name;
 
   @NotEmpty
+  protected Long collection;
+
+  @NotEmpty
   protected String file;
 
 
