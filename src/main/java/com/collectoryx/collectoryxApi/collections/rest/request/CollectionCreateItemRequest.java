@@ -1,8 +1,9 @@
-package com.collectoryx.collectoryxApi.collections.rest.response;
+package com.collectoryx.collectoryxApi.collections.rest.request;
 
-import com.collectoryx.collectoryxApi.image.rest.response.ImageResponse;
+import com.collectoryx.collectoryxApi.collections.rest.response.CollectionMetadataResponse;
 import java.util.Date;
 import java.util.List;
+import javax.validation.constraints.NotEmpty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -12,27 +13,32 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class CollectionItemsResponse {
+public class CollectionCreateItemRequest {
 
   protected Long id;
 
+  @NotEmpty
   protected String name;
 
-  protected ImageResponse image;
+  protected String image;
 
-  protected CollectionListResponse collection;
+  protected Long collection;
 
-  protected CollectionSeriesListResponse serie;
+  protected Long serie;
 
+  @NotEmpty
   protected Integer year;
 
+  @NotEmpty
   protected Float price;
 
+  @NotEmpty
   protected boolean own;
 
   protected boolean wanted;
 
   protected String notes;
+
 
   private Date adquiringDate;
 

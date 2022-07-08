@@ -1,6 +1,7 @@
 package com.collectoryx.collectoryxApi.collections.model;
 
 import com.collectoryx.collectoryxApi.image.model.Image;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import java.util.Date;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -11,6 +12,8 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -20,9 +23,9 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Data
 @Entity
-@Table(name="collection")
+@Table(name = "collection")
 @NoArgsConstructor
-public class Collection {
+public class CollectionItem {
 
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
@@ -51,14 +54,16 @@ public class Collection {
   protected Float price;
 
   @Column
-  protected boolean own=false;
+  protected boolean own = false;
 
   @Column
-  protected boolean wanted=false;
+  protected boolean wanted = false;
 
   @Column
   protected String notes;
 
   @Column
+  @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
+  @Temporal(TemporalType.TIMESTAMP)
   private Date adquiringDate;
 }

@@ -1,6 +1,6 @@
 package com.collectoryx.collectoryxApi.collections.rest.response;
 
-import io.swagger.v3.oas.annotations.media.Schema;
+import com.collectoryx.collectoryxApi.image.rest.response.ImageResponse;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -10,14 +10,12 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class CollectionMetadataResponse {
+public class CollectionListResponse {
 
-  private String id;
+  private Long id;
 
-  @Schema(description = "Metadata name", example = "Tag")
   private String name;
 
-  @Schema(description = "Metadata value", example = "Foo")
-  private String value;
+  private ImageResponse logo;
 
 }

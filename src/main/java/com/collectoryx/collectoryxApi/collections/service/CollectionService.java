@@ -1,17 +1,19 @@
 package com.collectoryx.collectoryxApi.collections.service;
 
-import com.collectoryx.collectoryxApi.collections.model.Collection;
+import com.collectoryx.collectoryxApi.collections.model.CollectionItem;
 import com.collectoryx.collectoryxApi.collections.model.CollectionList;
 import com.collectoryx.collectoryxApi.collections.model.CollectionMetadata;
 import com.collectoryx.collectoryxApi.collections.model.CollectionSeriesList;
+import com.collectoryx.collectoryxApi.collections.repository.CollectionItemRepository;
 import com.collectoryx.collectoryxApi.collections.repository.CollectionListRepository;
 import com.collectoryx.collectoryxApi.collections.repository.CollectionMetadataRepository;
-import com.collectoryx.collectoryxApi.collections.repository.CollectionRepository;
 import com.collectoryx.collectoryxApi.collections.repository.CollectionSeriesListRepository;
+import com.collectoryx.collectoryxApi.collections.rest.request.CollectionCreateItemRequest;
 import com.collectoryx.collectoryxApi.collections.rest.request.CollectionItemRequest;
 import com.collectoryx.collectoryxApi.collections.rest.request.CollectionRequest;
 import com.collectoryx.collectoryxApi.collections.rest.request.CollectionSerieListRequest;
 import com.collectoryx.collectoryxApi.collections.rest.response.CollectionItemsResponse;
+import com.collectoryx.collectoryxApi.collections.rest.response.CollectionListResponse;
 import com.collectoryx.collectoryxApi.collections.rest.response.CollectionMetadataResponse;
 import com.collectoryx.collectoryxApi.collections.rest.response.CollectionResponse;
 import com.collectoryx.collectoryxApi.collections.rest.response.CollectionSeriesListResponse;
@@ -31,17 +33,17 @@ import org.springframework.stereotype.Service;
 @Transactional
 public class CollectionService {
 
-  private final CollectionRepository collectionRepository;
+  private final CollectionItemRepository collectionItemRepository;
   private final CollectionListRepository collectionListRepository;
   private final ImageRepository imagesRepository;
   private final CollectionMetadataRepository collectionMetadataRepository;
   private final CollectionSeriesListRepository collectionSeriesListRepository;
 
-  public CollectionService(CollectionRepository collectionRepository,
+  public CollectionService(CollectionItemRepository collectionItemRepository,
       CollectionListRepository collectionListRepository,
       ImageRepository imagesRepository, CollectionMetadataRepository collectionMetadataRepository,
       CollectionSeriesListRepository collectionSeriesListRepository) {
-    this.collectionRepository = collectionRepository;
+    this.collectionItemRepository = collectionItemRepository;
     this.collectionListRepository = collectionListRepository;
     this.imagesRepository = imagesRepository;
     this.collectionMetadataRepository = collectionMetadataRepository;
@@ -54,7 +56,7 @@ public class CollectionService {
   }
 
   public long getCountOfCollectionItems() {
-    long count = this.collectionRepository.count();
+    long count = this.collectionItemRepository.count();
     return count;
   }
 
@@ -122,20 +124,100 @@ public class CollectionService {
   }
 
   public CollectionItemsResponse toggleOwn(CollectionItemRequest item) throws NotFoundException {
-    Collection collection = this.collectionRepository.findById(item.getId())
+    CollectionItem collection = this.collectionItemRepository.findById(item.getId())
         .orElseThrow(NotFoundException::new);
     collection.setOwn(!item.getOwn());
-    this.collectionRepository.save(collection);
+    this.collectionItemRepository.save(collection);
     CollectionItemsResponse collectionItemsResponse = toCollectionItemResponse(collection);
     return collectionItemsResponse;
   }
 
   public CollectionItemsResponse toggleWish(CollectionItemRequest item) throws NotFoundException {
-    Collection collection = this.collectionRepository.findById(item.getId())
+    CollectionItem collection = this.collectionItemRepository.findById(item.getId())
         .orElseThrow(NotFoundException::new);
     collection.setWanted(!item.getWanted());
-    this.collectionRepository.save(collection);
+    this.collectionItemRepository.save(collection);
     CollectionItemsResponse collectionItemsResponse = toCollectionItemResponse(collection);
+    return collectionItemsResponse;
+  }
+
+  public CollectionItemsResponse getCollectionItem(Long id) throws NotFoundException {
+    CollectionItem col = this.collectionItemRepository.findById(id)
+        .orElseThrow(NotFoundException::new);
+    CollectionItemsResponse collectionItemsResponse = toCollectionItemResponse(col);
+    return collectionItemsResponse;
+  }
+
+  public CollectionItemsResponse createItem(CollectionCreateItemRequest request)
+      throws NotFoundException {
+    Image image = null;
+    ImageResponse imageResponse = null;
+    if (request.getImage() != null) {
+      image = this.imagesRepository.findImageByPath(request.getImage()).orElseThrow(
+          NotFoundException::new);
+      imageResponse = toImageResponse(image);
+    }
+    CollectionList collectionList = null;
+    CollectionListResponse collectionListResponse = null;
+    collectionList = this.collectionListRepository.findById(request.getCollection())
+        .orElseThrow(NotFoundException::new);
+    collectionListResponse = toCollectionListResponse(collectionList);
+
+    CollectionSeriesList collectionSeriesList = null;
+    CollectionSeriesListResponse collectionSeriesListResponse = null;
+    collectionSeriesList = this.collectionSeriesListRepository.findById(request.getSerie())
+        .orElseThrow(NotFoundException::new);
+    collectionSeriesListResponse = toCollectionSerieListResponse(collectionSeriesList);
+    CollectionItem collectionItem = null;
+    CollectionItemsResponse collectionItemsResponse = null;
+    if (imageResponse != null) {
+      collectionItem = CollectionItem.builder()
+          .name(request.getName())
+          .serie(collectionSeriesList)
+          .price(request.getPrice())
+          .year(request.getYear())
+          .adquiringDate(request.getAdquiringDate())
+          .own(request.isOwn())
+          .notes(request.getNotes())
+          .image(image)
+          .collection(collectionList)
+          .build();
+      collectionItemsResponse = CollectionItemsResponse.builder()
+          .name(request.getName())
+          .serie(collectionSeriesListResponse)
+          .price(request.getPrice())
+          .year(request.getYear())
+          .adquiringDate(request.getAdquiringDate())
+          .own(request.isOwn())
+          .notes(request.getNotes())
+          .image(imageResponse)
+          .collection(collectionListResponse)
+          .build();
+
+    } else {
+      collectionItem = CollectionItem.builder()
+          .name(request.getName())
+          .serie(collectionSeriesList)
+          .price(request.getPrice())
+          .year(request.getYear())
+          .adquiringDate(request.getAdquiringDate())
+          .own(request.isOwn())
+          .notes(request.getNotes())
+          .collection(collectionList)
+          .build();
+      collectionItemsResponse = CollectionItemsResponse.builder()
+          .name(request.getName())
+          .serie(collectionSeriesListResponse)
+          .price(request.getPrice())
+          .year(request.getYear())
+          .adquiringDate(request.getAdquiringDate())
+          .own(request.isOwn())
+          .notes(request.getNotes())
+          .collection(collectionListResponse)
+          .build();
+    }
+    this.collectionItemRepository.save(collectionItem);
+
     return collectionItemsResponse;
   }
 
@@ -177,9 +259,106 @@ public class CollectionService {
     return collectionSeriesListResponse;
   }
 
+  public CollectionItemsResponse updateItem(CollectionCreateItemRequest request)
+      throws NotFoundException {
+    Image image = null;
+    ImageResponse imageResponse = null;
+    if (request.getImage() != null) {
+      image = this.imagesRepository.findImageByPath(request.getImage()).orElseThrow(
+          NotFoundException::new);
+      imageResponse = toImageResponse(image);
+    }
+    final Image imageRight = image;
+    CollectionList collectionList = null;
+    CollectionListResponse collectionListResponse = null;
+    collectionList = this.collectionListRepository.findById(request.getCollection())
+        .orElseThrow(NotFoundException::new);
+    collectionListResponse = toCollectionListResponse(collectionList);
+
+    CollectionSeriesListResponse collectionSeriesListResponse = null;
+    final CollectionSeriesList collectionSeriesList = this.collectionSeriesListRepository.findById(
+            request.getSerie())
+        .orElseThrow(NotFoundException::new);
+    collectionSeriesListResponse = toCollectionSerieListResponse(collectionSeriesList);
+    CollectionItem collectionItem = this.collectionItemRepository.findById(request.getId())
+        .map(item -> {
+          item.setName(request.getName());
+          item.setSerie(collectionSeriesList);
+          item.setPrice(request.getPrice());
+          item.setYear(request.getYear());
+          item.setAdquiringDate(request.getAdquiringDate());
+          item.setOwn(request.isOwn());
+          item.setNotes(request.getNotes());
+          item.setImage(imageRight);
+          return this.collectionItemRepository.save(item);
+        }).orElseThrow(NotFoundException::new);
+    CollectionItemsResponse collectionItemsResponse = null;
+    collectionItemsResponse = CollectionItemsResponse.builder()
+        .name(request.getName())
+        .serie(collectionSeriesListResponse)
+        .price(request.getPrice())
+        .year(request.getYear())
+        .adquiringDate(request.getAdquiringDate())
+        .own(request.isOwn())
+        .notes(request.getNotes())
+        .image(imageResponse)
+        .collection(collectionListResponse)
+        .build();
+    /*if (imageResponse != null) {
+      collectionItem = CollectionItem.builder()
+          .name(request.getName())
+          .serie(collectionSeriesList)
+          .price(request.getPrice())
+          .year(request.getYear())
+          .adquiringDate(request.getAdquiringDate())
+          .own(request.isOwn())
+          .notes(request.getNotes())
+          .image(image)
+          .collection(collectionList)
+          .build();
+      collectionItemsResponse = CollectionItemsResponse.builder()
+          .name(request.getName())
+          .serie(collectionSeriesListResponse)
+          .price(request.getPrice())
+          .year(request.getYear())
+          .adquiringDate(request.getAdquiringDate())
+          .own(request.isOwn())
+          .notes(request.getNotes())
+          .image(imageResponse)
+          .collection(collectionListResponse)
+          .build();
+
+    } else {
+      collectionItem = CollectionItem.builder()
+          .name(request.getName())
+          .serie(collectionSeriesList)
+          .price(request.getPrice())
+          .year(request.getYear())
+          .adquiringDate(request.getAdquiringDate())
+          .own(request.isOwn())
+          .notes(request.getNotes())
+          .collection(collectionList)
+          .build();
+      collectionItemsResponse = CollectionItemsResponse.builder()
+          .name(request.getName())
+          .serie(collectionSeriesListResponse)
+          .price(request.getPrice())
+          .year(request.getYear())
+          .adquiringDate(request.getAdquiringDate())
+          .own(request.isOwn())
+          .notes(request.getNotes())
+          .collection(collectionListResponse)
+          .build();
+    }
+    this.collectionItemRepository.save(collectionItem);*/
+
+    return collectionItemsResponse;
+  }
+
   public boolean deleteCollectionItem(Long id) throws NotFoundException {
-    Collection col = this.collectionRepository.findById(id).orElseThrow(NotFoundException::new);
-    this.collectionRepository.deleteById(col.getId());
+    CollectionItem col = this.collectionItemRepository.findById(id)
+        .orElseThrow(NotFoundException::new);
+    this.collectionItemRepository.deleteById(col.getId());
     return true;
   }
 
@@ -195,7 +374,7 @@ public class CollectionService {
     List<CollectionList> collections = this.collectionListRepository
         .findAll();
     return StreamSupport.stream(collections.spliterator(), false)
-        .map(this::toCollectionListResponse)
+        .map(this::toCollectionSerieListResponse)
         .collect(Collectors.toList());
   }
 
@@ -219,7 +398,7 @@ public class CollectionService {
 
   public List<CollectionItemsResponse> getCollectionById(Long id) {
     final List<CollectionItemsResponse> collectionResponseList = new LinkedList<>();
-    List<Collection> collections = this.collectionRepository
+    List<CollectionItem> collections = this.collectionItemRepository
         .findByCollection_Id(id);
     return StreamSupport.stream(collections.spliterator(), false)
         .map(this::toCollectionItemsResponse)
@@ -228,26 +407,38 @@ public class CollectionService {
 
   public List<CollectionItemsResponse> getMoneyFromAllItems() {
     final List<CollectionItemsResponse> collectionResponseList = new LinkedList<>();
-    List<Collection> collections = this.collectionRepository
+    List<CollectionItem> collections = this.collectionItemRepository
         .findAll();
     return StreamSupport.stream(collections.spliterator(), false)
         .map(this::toCollectionItemsResponse)
         .collect(Collectors.toList());
   }
 
-  private CollectionItemsResponse toCollectionItemsResponse(Collection collection) {
+  private CollectionItemsResponse toCollectionItemsResponse(CollectionItem collection) {
     ImageResponse image = null;
-    try {
-      image = toImageResponse(
-          this.imagesRepository.findById(collection.getImage().getId())
-              .orElseThrow(NotFoundException::new));
-    } catch (NotFoundException e) {
-      e.printStackTrace();
+    if (collection.getImage() != null) {
+      try {
+        image = toImageResponse(
+            this.imagesRepository.findById(collection.getImage().getId())
+                .orElseThrow(NotFoundException::new));
+      } catch (NotFoundException e) {
+        e.printStackTrace();
+      }
     }
+
     CollectionSeriesListResponse collectionSeriesListResponse = null;
     try {
       collectionSeriesListResponse = toCollectionSerieListResponse(
           this.collectionSeriesListRepository.findById(collection.getSerie().getId())
+              .orElseThrow(NotFoundException::new));
+    } catch (NotFoundException e) {
+      e.printStackTrace();
+    }
+
+    CollectionListResponse collectionListResponse = null;
+    try {
+      collectionListResponse = toCollectionListResponse(
+          this.collectionListRepository.findById(collection.getCollection().getId())
               .orElseThrow(NotFoundException::new));
     } catch (NotFoundException e) {
       e.printStackTrace();
@@ -261,8 +452,8 @@ public class CollectionService {
         .id(collection.getId())
         .name(collection.getName())
         .image(image)
-        .collection(collection.getName())
         .serie(collectionSeriesListResponse)
+        .collection(collectionListResponse)
         .year(collection.getYear())
         .price(collection.getPrice())
         .own(collection.isOwn())
@@ -299,7 +490,78 @@ public class CollectionService {
     }
   }
 
-  private CollectionSeriesListResponse toCollectionListResponse(
+  private CollectionItemsResponse toCollectionItemResponse(CollectionItem collection) {
+    ImageResponse image = null;
+    if (collection.getImage() != null) {
+      try {
+        image = toImageResponse(
+            this.imagesRepository.findById(collection.getImage().getId())
+                .orElseThrow(NotFoundException::new));
+      } catch (NotFoundException e) {
+        e.printStackTrace();
+      }
+    }
+    CollectionSeriesListResponse collectionSeriesListResponse = null;
+    try {
+      collectionSeriesListResponse = toCollectionSerieListResponse(
+          this.collectionSeriesListRepository.findById(collection.getSerie().getId())
+              .orElseThrow(NotFoundException::new));
+    } catch (NotFoundException e) {
+      e.printStackTrace();
+    }
+    if (image != null) {
+      return CollectionItemsResponse.builder()
+          .id(collection.getId())
+          .name(collection.getName())
+          .image(image)
+          .adquiringDate(collection.getAdquiringDate())
+          .notes(collection.getNotes())
+          .price(collection.getPrice())
+          .year(collection.getYear())
+          .serie(collectionSeriesListResponse)
+          .own(collection.isOwn())
+          .wanted(collection.isWanted())
+          .build();
+    } else {
+      return CollectionItemsResponse.builder()
+          .id(collection.getId())
+          .name(collection.getName())
+          .adquiringDate(collection.getAdquiringDate())
+          .notes(collection.getNotes())
+          .price(collection.getPrice())
+          .year(collection.getYear())
+          .serie(collectionSeriesListResponse)
+          .own(collection.isOwn())
+          .wanted(collection.isWanted())
+          .build();
+    }
+
+  }
+
+  private CollectionListResponse toCollectionListResponse(CollectionList request) {
+    ImageResponse image = null;
+    if (request.getLogo() != null) {
+      try {
+        image = toImageResponse(
+            this.imagesRepository.findById(request.getLogo().getId())
+                .orElseThrow(NotFoundException::new));
+      } catch (NotFoundException e) {
+        e.printStackTrace();
+      }
+      return CollectionListResponse.builder()
+          .id(request.getId())
+          .name(request.getName())
+          .logo(image)
+          .build();
+    } else {
+      return CollectionListResponse.builder()
+          .id(request.getId())
+          .name(request.getName())
+          .build();
+    }
+  }
+
+  private CollectionSeriesListResponse toCollectionSerieListResponse(
       CollectionList collection) {
     ImageResponse image = null;
     if (collection.getLogo() != null) {
@@ -323,41 +585,10 @@ public class CollectionService {
     }
   }
 
-  private CollectionItemsResponse toCollectionItemResponse(Collection collection) {
-    ImageResponse image = null;
-    try {
-      image = toImageResponse(
-          this.imagesRepository.findById(collection.getImage().getId())
-              .orElseThrow(NotFoundException::new));
-    } catch (NotFoundException e) {
-      e.printStackTrace();
-    }
-    CollectionSeriesListResponse collectionSeriesListResponse = null;
-    try {
-      collectionSeriesListResponse = toCollectionSerieListResponse(
-          this.collectionSeriesListRepository.findById(collection.getSerie().getId())
-              .orElseThrow(NotFoundException::new));
-    } catch (NotFoundException e) {
-      e.printStackTrace();
-    }
-    return CollectionItemsResponse.builder()
-        .id(collection.getId())
-        .name(collection.getName())
-        .image(image)
-        .adquiringDate(collection.getAdquiringDate())
-        .notes(collection.getNotes())
-        .price(collection.getPrice())
-        .year(collection.getYear())
-        .collection(collection.getCollection().getName())
-        .serie(collectionSeriesListResponse)
-        .own(collection.isOwn())
-        .wanted(collection.isWanted())
-        .build();
-  }
-
   private CollectionResponse toCollectionResponse(CollectionList request,
       CollectionRequest collectionRequest) {
     return CollectionResponse.builder()
+        .id(request.getId())
         .collection(request.getName())
         .logo(request.getLogo())
         .template((collectionRequest.getTemplate()))
@@ -373,6 +604,7 @@ public class CollectionService {
 
   private CollectionMetadataResponse toCollectionMetadataResponse(CollectionMetadata request) {
     return CollectionMetadataResponse.builder()
+        .id(request.getId())
         .value(request.getValue())
         .name(request.getName())
         .build();
@@ -380,6 +612,7 @@ public class CollectionService {
 
   private ImageResponse toImageResponse(Image request) {
     return ImageResponse.builder()
+        .id(request.getId())
         .name(request.getName())
         .path(request.getPath())
         .created(request.getCreated())

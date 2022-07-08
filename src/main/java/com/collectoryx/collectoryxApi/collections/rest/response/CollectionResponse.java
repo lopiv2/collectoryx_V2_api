@@ -13,6 +13,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class CollectionResponse {
 
+  private Long id;
+
   private String collection;
 
   private Enum<CollectionTypes> template;
