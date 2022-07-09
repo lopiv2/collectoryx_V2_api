@@ -1,18 +1,18 @@
 package com.collectoryx.collectoryxApi.image.service;
 
-import com.collectoryx.collectoryxApi.image.rest.response.ImageResponse;
 import com.collectoryx.collectoryxApi.image.model.Image;
 import com.collectoryx.collectoryxApi.image.repository.ImageRepository;
+import com.collectoryx.collectoryxApi.image.rest.response.ImageResponse;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Date;
-import java.util.UUID;
 import javax.persistence.EntityNotFoundException;
 import javax.transaction.Transactional;
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -40,8 +40,8 @@ public class ImageService {
   }
 
   public ImageResponse createImage(String name, MultipartFile fileName) {
-    String path = FilenameUtils.getBaseName(fileName.getName())
-        + "-" + UUID.randomUUID()
+    String path = name
+        + "-" + RandomStringUtils.randomAlphanumeric(8)
         + "." + FilenameUtils.getExtension(fileName.getOriginalFilename());
     Image image = Image.builder()
         .name(name)
