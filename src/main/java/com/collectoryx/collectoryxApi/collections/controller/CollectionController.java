@@ -119,13 +119,15 @@ public class CollectionController {
   }
 
   @DeleteMapping(value = "/delete-collection-item/{id}")
-  public Mono<Boolean> deleteCollectionItem(@PathVariable("id") Long id) throws NotFoundException {
+  public Mono<Boolean> deleteCollectionItem(@PathVariable("id") Long id,
+      @RequestHeader(value = "Authorization") String token) throws NotFoundException {
     boolean isDeleted = this.collectionService.deleteCollectionItem(id);
     return Mono.just(isDeleted);
   }
 
   @DeleteMapping(value = "/delete-collection/{id}")
-  public Mono<Boolean> deleteCollection(@PathVariable("id") Long id) throws NotFoundException {
+  public Mono<Boolean> deleteCollection(@PathVariable("id") Long id,
+      @RequestHeader(value = "Authorization") String token) throws NotFoundException {
     boolean isDeleted = this.collectionService.deleteCollection(id);
     return Mono.just(isDeleted);
   }
