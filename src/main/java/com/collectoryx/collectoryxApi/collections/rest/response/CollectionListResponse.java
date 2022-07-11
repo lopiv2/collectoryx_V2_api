@@ -1,6 +1,7 @@
 package com.collectoryx.collectoryxApi.collections.rest.response;
 
 import com.collectoryx.collectoryxApi.image.rest.response.ImageResponse;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -17,5 +18,7 @@ public class CollectionListResponse {
   private String name;
 
   private ImageResponse logo;
+
+  private List<CollectionMetadataResponse> metadata;
 
 }

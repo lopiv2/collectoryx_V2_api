@@ -370,7 +370,6 @@ public class CollectionService {
   }
 
   public List<CollectionSeriesListResponse> listCollections() {
-    final List<CollectionSeriesListResponse> collectionListResponseList = new LinkedList<>();
     List<CollectionList> collections = this.collectionListRepository
         .findAll();
     return StreamSupport.stream(collections.spliterator(), false)
@@ -378,8 +377,15 @@ public class CollectionService {
         .collect(Collectors.toList());
   }
 
+  public List<CollectionMetadataResponse> listMetadataByCollection(Long id) {
+    List<CollectionMetadata> collections = this.collectionMetadataRepository
+        .findByCollection_Id(id);
+    return StreamSupport.stream(collections.spliterator(), false)
+        .map(this::toCollectionMetadataResponse)
+        .collect(Collectors.toList());
+  }
+
   public List<CollectionSeriesListResponse> listAllSeriesCollections() {
-    final List<CollectionSeriesListResponse> collectionSerieListResponseList = new LinkedList<>();
     List<CollectionSeriesList> collections = this.collectionSeriesListRepository
         .findAll();
     return StreamSupport.stream(collections.spliterator(), false)
@@ -396,13 +402,25 @@ public class CollectionService {
         .collect(Collectors.toList());
   }
 
-  public List<CollectionItemsResponse> getCollectionById(Long id) {
+  public List<CollectionItemsResponse> getCollectionItemsById(Long id) {
     final List<CollectionItemsResponse> collectionResponseList = new LinkedList<>();
     List<CollectionItem> collections = this.collectionItemRepository
         .findByCollection_Id(id);
     return StreamSupport.stream(collections.spliterator(), false)
         .map(this::toCollectionItemsResponse)
         .collect(Collectors.toList());
+  }
+
+  public CollectionListResponse getCollectionById(Long id) {
+    CollectionList collection = null;
+    try {
+      collection = this.collectionListRepository
+          .findById(id).orElseThrow(NotFoundException::new);
+    } catch (NotFoundException e) {
+      e.printStackTrace();
+    }
+
+    return toCollectionListResponse(collection);
   }
 
   public List<CollectionItemsResponse> getMoneyFromAllItems() {
@@ -540,6 +558,10 @@ public class CollectionService {
 
   private CollectionListResponse toCollectionListResponse(CollectionList request) {
     ImageResponse image = null;
+    List<CollectionMetadataResponse> collectionMetadata = null;
+    collectionMetadata = StreamSupport.stream(this.collectionMetadataRepository.findByCollection_Id(
+            request.getId()).spliterator(), false).map(this::toCollectionMetadataResponse)
+        .collect(Collectors.toList());
     if (request.getLogo() != null) {
       try {
         image = toImageResponse(
@@ -552,11 +574,13 @@ public class CollectionService {
           .id(request.getId())
           .name(request.getName())
           .logo(image)
+          .metadata(collectionMetadata)
           .build();
     } else {
       return CollectionListResponse.builder()
           .id(request.getId())
           .name(request.getName())
+          .metadata(collectionMetadata)
           .build();
     }
   }
@@ -585,16 +609,6 @@ public class CollectionService {
     }
   }
 
-  private CollectionResponse toCollectionResponse(CollectionList request,
-      CollectionRequest collectionRequest) {
-    return CollectionResponse.builder()
-        .id(request.getId())
-        .collection(request.getName())
-        .logo(request.getLogo())
-        .template((collectionRequest.getTemplate()))
-        .build();
-  }
-
   private CollectionResponse toCollectionResponse(CollectionList request) {
     return CollectionResponse.builder()
         .collection(request.getName())
@@ -607,6 +621,7 @@ public class CollectionService {
         .id(request.getId())
         .value(request.getValue())
         .name(request.getName())
+        .type(request.getType())
         .build();
   }
 

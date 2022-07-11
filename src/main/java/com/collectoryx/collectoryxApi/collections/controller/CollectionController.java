@@ -5,6 +5,7 @@ import com.collectoryx.collectoryxApi.collections.rest.request.CollectionItemReq
 import com.collectoryx.collectoryxApi.collections.rest.request.CollectionRequest;
 import com.collectoryx.collectoryxApi.collections.rest.request.CollectionSerieListRequest;
 import com.collectoryx.collectoryxApi.collections.rest.response.CollectionItemsResponse;
+import com.collectoryx.collectoryxApi.collections.rest.response.CollectionListResponse;
 import com.collectoryx.collectoryxApi.collections.rest.response.CollectionResponse;
 import com.collectoryx.collectoryxApi.collections.rest.response.CollectionSeriesListResponse;
 import com.collectoryx.collectoryxApi.collections.service.CollectionService;
@@ -37,9 +38,9 @@ public class CollectionController {
   }
 
   @GetMapping(value = "/collections/{id}")
-  public Mono<List<CollectionItemsResponse>> getCollectionById(@PathVariable("id") Long id,
+  public Mono<List<CollectionItemsResponse>> getCollectionItemsById(@PathVariable("id") Long id,
       @RequestHeader(value = "Authorization") String token) {
-    List<CollectionItemsResponse> collectionResponses = this.collectionService.getCollectionById(
+    List<CollectionItemsResponse> collectionResponses = this.collectionService.getCollectionItemsById(
         id);
     return Mono.just(collectionResponses);
   }
@@ -127,6 +128,14 @@ public class CollectionController {
   public Mono<Boolean> deleteCollection(@PathVariable("id") Long id) throws NotFoundException {
     boolean isDeleted = this.collectionService.deleteCollection(id);
     return Mono.just(isDeleted);
+  }
+
+  @GetMapping(value = "/get-collection/{id}")
+  public Mono<CollectionListResponse> getCollectionById(@PathVariable("id") Long id,
+      @RequestHeader(value = "Authorization") String token) {
+    CollectionListResponse collectionListResponse =
+        this.collectionService.getCollectionById(id);
+    return Mono.just(collectionListResponse);
   }
 
   @GetMapping(value = "/get-item/{id}")
