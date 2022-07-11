@@ -1,5 +1,6 @@
 package com.collectoryx.collectoryxApi.collections.rest.response;
 
+import com.collectoryx.collectoryxApi.collections.model.CollectionTemplateType;
 import com.collectoryx.collectoryxApi.image.rest.response.ImageResponse;
 import java.util.List;
 import lombok.AllArgsConstructor;
@@ -20,5 +21,7 @@ public class CollectionListResponse {
   private ImageResponse logo;
 
   private List<CollectionMetadataResponse> metadata;
+
+  private CollectionTemplateType template;
 
 }

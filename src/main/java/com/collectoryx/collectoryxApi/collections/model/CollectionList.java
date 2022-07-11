@@ -3,6 +3,8 @@ package com.collectoryx.collectoryxApi.collections.model;
 import com.collectoryx.collectoryxApi.image.model.Image;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -20,7 +22,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @Entity
-@Table(name="collection_list")
+@Table(name = "collection_list")
 public class CollectionList {
 
   @Id
@@ -34,5 +36,8 @@ public class CollectionList {
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "images_id")
   protected Image logo;
+
+  @Enumerated(EnumType.STRING)
+  protected CollectionTemplateType template;
 
 }

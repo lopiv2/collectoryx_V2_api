@@ -1,6 +1,6 @@
 package com.collectoryx.collectoryxApi.collections.rest.response;
 
-import com.collectoryx.collectoryxApi.collections.model.CollectionTypes;
+import com.collectoryx.collectoryxApi.collections.model.CollectionTemplateType;
 import com.collectoryx.collectoryxApi.image.model.Image;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -17,7 +17,7 @@ public class CollectionResponse {
 
   private String collection;
 
-  private Enum<CollectionTypes> template;
+  private CollectionTemplateType template;
 
   private Image logo;
 

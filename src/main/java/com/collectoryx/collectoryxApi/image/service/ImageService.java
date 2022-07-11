@@ -29,8 +29,6 @@ public class ImageService {
   public void saveImage(MultipartFile file, String path) throws IOException {
     File files = new File(System.getProperty("user.dir")).getCanonicalFile();
     path=files.getParent() + "\\images\\"+path;
-    //System.out.println(path);
-    //System.out.println("Parent directory : " + files.getParent() + "\\images");
     Path pathFinal = Paths.get(path);
     try {
       Files.copy(file.getInputStream(), pathFinal);
@@ -43,6 +41,7 @@ public class ImageService {
     String path = name
         + "-" + RandomStringUtils.randomAlphanumeric(8)
         + "." + FilenameUtils.getExtension(fileName.getOriginalFilename());
+    path=path.replaceAll(" ","_");
     Image image = Image.builder()
         .name(name)
         .path(path)

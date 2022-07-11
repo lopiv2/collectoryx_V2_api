@@ -1,5 +1,6 @@
 package com.collectoryx.collectoryxApi.collections.controller;
 
+import com.collectoryx.collectoryxApi.collections.model.CollectionTemplateType;
 import com.collectoryx.collectoryxApi.collections.rest.request.CollectionCreateItemRequest;
 import com.collectoryx.collectoryxApi.collections.rest.request.CollectionItemRequest;
 import com.collectoryx.collectoryxApi.collections.rest.request.CollectionRequest;
@@ -71,7 +72,8 @@ public class CollectionController {
       @RequestBody CollectionRequest collectionRequest,
       @RequestHeader(value = "Authorization") String token) {
     CollectionResponse collectionResponse = null;
-    switch (collectionRequest.getTemplate()) {
+    CollectionTemplateType template = (CollectionTemplateType) collectionRequest.getTemplate();
+    switch (template) {
       case New:
         try {
           collectionResponse = this.collectionService.createCollectionNew(collectionRequest);

@@ -4,6 +4,7 @@ import com.collectoryx.collectoryxApi.collections.model.CollectionItem;
 import com.collectoryx.collectoryxApi.collections.model.CollectionList;
 import com.collectoryx.collectoryxApi.collections.model.CollectionMetadata;
 import com.collectoryx.collectoryxApi.collections.model.CollectionSeriesList;
+import com.collectoryx.collectoryxApi.collections.model.CollectionTemplateType;
 import com.collectoryx.collectoryxApi.collections.repository.CollectionItemRepository;
 import com.collectoryx.collectoryxApi.collections.repository.CollectionListRepository;
 import com.collectoryx.collectoryxApi.collections.repository.CollectionMetadataRepository;
@@ -69,10 +70,12 @@ public class CollectionService {
       collectionList = CollectionList.builder()
           .name(request.getName())
           .logo(image)
+          .template(request.getTemplate())
           .build();
     } else {
       collectionList = CollectionList.builder()
           .name(request.getName())
+          .template(request.getTemplate())
           .build();
     }
     this.collectionListRepository.save(collectionList);
@@ -93,11 +96,13 @@ public class CollectionService {
           NotFoundException::new);
       collectionList = CollectionList.builder()
           .name(request.getName())
+          .template(request.getTemplate())
           .logo(image)
           .build();
     } else {
       collectionList = CollectionList.builder()
           .name(request.getName())
+          .template(request.getTemplate())
           .build();
     }
     this.collectionListRepository.save(collectionList);
@@ -574,12 +579,14 @@ public class CollectionService {
           .id(request.getId())
           .name(request.getName())
           .logo(image)
+          .template((CollectionTemplateType) request.getTemplate())
           .metadata(collectionMetadata)
           .build();
     } else {
       return CollectionListResponse.builder()
           .id(request.getId())
           .name(request.getName())
+          .template((CollectionTemplateType) request.getTemplate())
           .metadata(collectionMetadata)
           .build();
     }
