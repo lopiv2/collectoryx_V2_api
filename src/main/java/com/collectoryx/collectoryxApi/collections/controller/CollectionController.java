@@ -11,6 +11,7 @@ import com.collectoryx.collectoryxApi.collections.rest.response.CollectionRespon
 import com.collectoryx.collectoryxApi.collections.rest.response.CollectionSeriesListResponse;
 import com.collectoryx.collectoryxApi.collections.service.CollectionService;
 import com.collectoryx.collectoryxApi.image.service.ImageService;
+import com.collectoryx.collectoryxApi.util.service.FandomApiService;
 import java.util.List;
 import org.springframework.data.crossstore.ChangeSetPersister.NotFoundException;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -33,9 +34,13 @@ public class CollectionController {
   private final CollectionService collectionService;
   private final ImageService imageService;
 
-  public CollectionController(CollectionService collectionService, ImageService imageService) {
+  private final FandomApiService fandomApiService;
+
+
+  public CollectionController(CollectionService collectionService, ImageService imageService, FandomApiService fandomApiService) {
     this.collectionService = collectionService;
     this.imageService = imageService;
+    this.fandomApiService = fandomApiService;
   }
 
   @GetMapping(value = "/collections/{id}")
@@ -134,12 +139,27 @@ public class CollectionController {
     return Mono.just(isDeleted);
   }
 
+  @DeleteMapping(value = "/delete-collection-cascade/{id}")
+  public Mono<Boolean> deleteCollectionCascade(@PathVariable("id") Long id,
+      @RequestHeader(value = "Authorization") String token) throws NotFoundException {
+    boolean isDeleted = this.collectionService.deleteCollectionCascade(id);
+    return Mono.just(isDeleted);
+  }
+
   @GetMapping(value = "/get-collection/{id}")
   public Mono<CollectionListResponse> getCollectionById(@PathVariable("id") Long id,
       @RequestHeader(value = "Authorization") String token) {
     CollectionListResponse collectionListResponse =
         this.collectionService.getCollectionById(id);
     return Mono.just(collectionListResponse);
+  }
+
+  @GetMapping(value = "/get-images/{query}")
+  public Mono<String> getImagesByStringDDG(@PathVariable("query") String query,
+      @RequestHeader(value = "Authorization") String token) {
+    //List<String> response = this.collectionService.getImagesFromDDG(query);
+    String response="";
+    return Mono.just(response);
   }
 
   @GetMapping(value = "/get-item/{id}")
@@ -199,9 +219,9 @@ public class CollectionController {
   }
 
   @GetMapping(value = "/view-collections")
-  public Mono<List<CollectionSeriesListResponse>> getCollections(
+  public Mono<List<CollectionListResponse>> getCollections(
       @RequestHeader(value = "Authorization") String token) {
-    List<CollectionSeriesListResponse> collectionListResponses =
+    List<CollectionListResponse> collectionListResponses =
         this.collectionService.listCollections();
     return Mono.just(collectionListResponses);
   }
