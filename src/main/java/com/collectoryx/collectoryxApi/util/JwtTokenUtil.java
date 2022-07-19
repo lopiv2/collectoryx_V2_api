@@ -10,15 +10,15 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 @Component
 public class JwtTokenUtil implements Serializable {
 
-  public static final long JWT_TOKEN_VALIDITY = 5 * 60 * 60;
-
   Key key = Keys.secretKeyFor(SignatureAlgorithm.HS512);
+  private int jwtExpirationInMs;
 
   public String getUsernameFromToken(String token) {
     return getClaimFromToken(token, Claims::getSubject);
@@ -42,11 +42,16 @@ public class JwtTokenUtil implements Serializable {
     return expiration.before(new Date());
   }
 
+  @Value("${jwt.expirationDateInMs}")
+  public void setJwtExpirationInMs(int jwtExpirationInMs) {
+    this.jwtExpirationInMs = jwtExpirationInMs;
+  }
+
   public String generateToken(UserDetails userDetails) {
     Map<String, Object> claims = new HashMap<>();
     return Jwts.builder().setClaims(claims).setSubject(userDetails.getUsername())
         .setIssuedAt(new Date(System.currentTimeMillis()))
-        .setExpiration(new Date(System.currentTimeMillis() + JWT_TOKEN_VALIDITY * 1000))
+        .setExpiration(new Date(System.currentTimeMillis() + jwtExpirationInMs * 1000))
         .signWith(key).compact();
   }
 
