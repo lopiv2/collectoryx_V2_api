@@ -20,11 +20,24 @@ public class JwtUserDetailsService implements UserDetailsService {
     this.userRepository = userRepository;
   }
 
+  public String getRole(String userName) {
+    User user = userRepository.findUserByUsername(userName);
+    if (user.getRole().contains("ADMIN")) {
+      return "ADMIN_ROLE";
+    } else {
+      return "USER_ROLE";
+    }
+  }
+
   @Override
   public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
     User user = userRepository.findUserByUsername(username);
     List<GrantedAuthority> authorityList = new ArrayList<>();
-    authorityList.add(new SimpleGrantedAuthority("USER_ROLE"));
+    if (user.getRole().contains("ADMIN")) {
+      authorityList.add(new SimpleGrantedAuthority("ADMIN_ROLE"));
+    } else {
+      authorityList.add(new SimpleGrantedAuthority("USER_ROLE"));
+    }
     return new org.springframework.security.core.userdetails.User(user.getUserName(),
         user.getPassword(), authorityList);
   }

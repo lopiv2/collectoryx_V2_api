@@ -28,7 +28,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/")
-@CrossOrigin(origins = "*",allowedHeaders = "*", maxAge = 3600)
+@CrossOrigin(origins = "*", allowedHeaders = "*", maxAge = 3600)
 public class AuthenticationController {
 
   protected final Log logger = LogFactory.getLog(getClass());
@@ -57,10 +57,13 @@ public class AuthenticationController {
       if (auth.isAuthenticated()) {
         logger.info("Logged In");
         UserDetails userDetails = userDetailsService.loadUserByUsername(request.getUser_name());
+        System.out.println(userDetails);
         String token = jwtTokenUtil.generateToken(userDetails);
+        String role = userDetailsService.getRole(request.getUser_name());
         responseMap.put("error", false);
         responseMap.put("message", "Logged In");
         responseMap.put("token", token);
+        responseMap.put("role", role);
         return ResponseEntity.ok(responseMap);
       } else {
         responseMap.put("error", true);
@@ -94,7 +97,8 @@ public class AuthenticationController {
     user.setPassword(new BCryptPasswordEncoder().encode(request.getPassword()));
     user.setRole("USER");
     user.setUserName(request.getUserName());
-    UserDetails userDetails = userDetailsService.createUserDetails(request.getUserName(), user.getPassword());
+    UserDetails userDetails = userDetailsService.createUserDetails(request.getUserName(),
+        user.getPassword());
     String token = jwtTokenUtil.generateToken(userDetails);
     userRepository.save(user);
     responseMap.put("error", false);
