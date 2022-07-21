@@ -22,10 +22,10 @@ public class AdminController {
   }
 
   @GetMapping(value = "/keygen/{email}")
-  @PreAuthorize("hasRole('ADMIN_ROLE')")
+  @PreAuthorize("hasAuthority('ADMIN_ROLE')")
   public Mono<String> getKey(@PathVariable("email") String email,
       @RequestHeader(value = "Authorization") String token) {
-    String prueba="";
+    String prueba="hola";
     return Mono.just(prueba);
   }
 

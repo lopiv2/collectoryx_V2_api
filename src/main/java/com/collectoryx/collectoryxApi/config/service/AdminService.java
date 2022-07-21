@@ -7,6 +7,12 @@ import org.springframework.stereotype.Service;
 @Transactional
 public class AdminService {
 
+  public AdminService() {
 
+  }
+
+  public void CheckClientMachineData(){
+
+  }
 
 }
