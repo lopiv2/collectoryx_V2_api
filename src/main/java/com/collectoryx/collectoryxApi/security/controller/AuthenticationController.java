@@ -60,10 +60,12 @@ public class AuthenticationController {
         System.out.println(userDetails);
         String token = jwtTokenUtil.generateToken(userDetails);
         String role = userDetailsService.getRole(request.getUser_name());
+        String email=userDetailsService.getEmail(request.getUser_name());
         responseMap.put("error", false);
         responseMap.put("message", "Logged In");
         responseMap.put("token", token);
         responseMap.put("role", role);
+        responseMap.put("email", email);
         return ResponseEntity.ok(responseMap);
       } else {
         responseMap.put("error", true);
