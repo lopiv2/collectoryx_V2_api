@@ -1,6 +1,8 @@
 package com.collectoryx.collectoryxApi.config.controller;
 
 import com.collectoryx.collectoryxApi.config.service.AdminService;
+import com.collectoryx.collectoryxApi.shop.rest.response.UserLicenseResponse;
+import java.util.List;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -27,6 +29,14 @@ public class AdminController {
       @RequestHeader(value = "Authorization") String token) {
     String prueba="hola";
     return Mono.just(prueba);
+  }
+
+  @GetMapping(value = "/get-pending-licenses")
+  public Mono<List<UserLicenseResponse>> getPendingLicenses(
+      @RequestHeader(value = "Authorization") String token) {
+    List<UserLicenseResponse> userLicenseResponses =
+        this.adminService.listPendingLicenses();
+    return Mono.just(userLicenseResponses);
   }
 
 }

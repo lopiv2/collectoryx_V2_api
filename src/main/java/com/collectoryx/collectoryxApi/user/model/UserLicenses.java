@@ -37,11 +37,14 @@ public class UserLicenses {
   private String license;
 
   @Column
-  protected boolean activated=false;
+  protected boolean paid=false;
+
+  @Enumerated(EnumType.STRING)
+  protected LicenseStateTypes state=LicenseStateTypes.Pending;
 
   @Enumerated(EnumType.STRING)
   @Default
-  private LicenseTypes type = LicenseTypes.Trial;
+  private LicenseTypes type = LicenseTypes.Free;
 
   /**
    * Certificate effective time
@@ -64,7 +67,7 @@ public class UserLicenses {
   private String consumerType = "user";
 
   @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "user_id")
-  protected User user;
+  @JoinColumn(name = "licenseCheckMachine")
+  protected UserMachines licenseCheckMachine;
 
 }

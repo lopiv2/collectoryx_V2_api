@@ -1,5 +1,5 @@
 package com.collectoryx.collectoryxApi.user.model;
 
 public enum LicenseTypes {
-  Trial, Monthly, Lifetime
+  Trial, Free, Monthly, Yearly, Lifetime
 }
