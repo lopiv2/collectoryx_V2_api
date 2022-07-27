@@ -2,7 +2,7 @@ package com.collectoryx.collectoryxApi.security.controller;
 
 import com.collectoryx.collectoryxApi.security.rest.request.LoginRequest;
 import com.collectoryx.collectoryxApi.security.rest.request.RegisterRequest;
-import com.collectoryx.collectoryxApi.user.model.User;
+import com.collectoryx.collectoryxApi.security.service.AuthService;
 import com.collectoryx.collectoryxApi.user.repository.UserRepository;
 import com.collectoryx.collectoryxApi.user.service.JwtUserDetailsService;
 import com.collectoryx.collectoryxApi.util.JwtTokenUtil;
@@ -18,7 +18,6 @@ import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -37,14 +36,17 @@ public class AuthenticationController {
   final AuthenticationManager authenticationManager;
   final JwtUserDetailsService userDetailsService;
   final JwtTokenUtil jwtTokenUtil;
+  private final AuthService authService;
 
   public AuthenticationController(UserRepository userRepository,
       AuthenticationManager authenticationManager,
-      JwtUserDetailsService userDetailsService, JwtTokenUtil jwtTokenUtil) {
+      JwtUserDetailsService userDetailsService, JwtTokenUtil jwtTokenUtil,
+      AuthService authService) {
     this.userRepository = userRepository;
     this.authenticationManager = authenticationManager;
     this.userDetailsService = userDetailsService;
     this.jwtTokenUtil = jwtTokenUtil;
+    this.authService=authService;
   }
 
   @PostMapping("/login")
@@ -60,7 +62,7 @@ public class AuthenticationController {
         System.out.println(userDetails);
         String token = jwtTokenUtil.generateToken(userDetails);
         String role = userDetailsService.getRole(request.getUser_name());
-        String email=userDetailsService.getEmail(request.getUser_name());
+        String email = userDetailsService.getEmail(request.getUser_name());
         responseMap.put("error", false);
         responseMap.put("message", "Logged In");
         responseMap.put("token", token);
@@ -89,7 +91,7 @@ public class AuthenticationController {
     }
   }
 
-  @PostMapping("/register")
+  /*@PostMapping("/register")
   public ResponseEntity<?> saveUser(@RequestBody @Valid RegisterRequest request) {
     Map<String, Object> responseMap = new HashMap<>();
     User user = new User();
@@ -103,10 +105,21 @@ public class AuthenticationController {
         user.getPassword());
     String token = jwtTokenUtil.generateToken(userDetails);
     userRepository.save(user);
+    this.authService.replicateUserRecordAdminServer(request);
     responseMap.put("error", false);
     responseMap.put("username", request.getUserName());
     responseMap.put("message", "Account created successfully");
     responseMap.put("token", token);
+    return ResponseEntity.ok(responseMap);
+  }*/
+
+  @PostMapping("/register")
+  public ResponseEntity<?> saveUser(@RequestBody @Valid RegisterRequest request) {
+    Map<String, Object> responseMap = new HashMap<>();
+    this.authService.replicateUserRecordAdminServer(request);
+    responseMap.put("error", false);
+    responseMap.put("username", request.getUserName());
+    responseMap.put("message", "Account created successfully");
     return ResponseEntity.ok(responseMap);
   }
 
