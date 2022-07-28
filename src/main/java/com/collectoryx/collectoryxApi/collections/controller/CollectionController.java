@@ -37,7 +37,8 @@ public class CollectionController {
   private final FandomApiService fandomApiService;
 
 
-  public CollectionController(CollectionService collectionService, ImageService imageService, FandomApiService fandomApiService) {
+  public CollectionController(CollectionService collectionService, ImageService imageService,
+      FandomApiService fandomApiService) {
     this.collectionService = collectionService;
     this.imageService = imageService;
     this.fandomApiService = fandomApiService;
@@ -158,7 +159,7 @@ public class CollectionController {
   public Mono<String> getImagesByStringDDG(@PathVariable("query") String query,
       @RequestHeader(value = "Authorization") String token) {
     //List<String> response = this.collectionService.getImagesFromDDG(query);
-    String response="";
+    String response = "";
     return Mono.just(response);
   }
 
@@ -218,11 +219,11 @@ public class CollectionController {
     return Mono.just(collectionItemsResponse);
   }
 
-  @GetMapping(value = "/view-collections")
-  public Mono<List<CollectionListResponse>> getCollections(
+  @GetMapping(value = "/view-collections/{id}")
+  public Mono<List<CollectionListResponse>> getCollections(@PathVariable("id") Long id,
       @RequestHeader(value = "Authorization") String token) {
     List<CollectionListResponse> collectionListResponses =
-        this.collectionService.listCollections();
+        this.collectionService.listCollections(id);
     return Mono.just(collectionListResponses);
   }
 

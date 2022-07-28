@@ -1,16 +1,12 @@
 package com.collectoryx.collectoryxApi.security.service;
 
-import com.collectoryx.collectoryxApi.security.rest.request.RegisterRequest;
 import com.collectoryx.collectoryxApi.shop.rest.response.UserLicenseResponse;
-import com.collectoryx.collectoryxApi.user.model.User;
 import com.collectoryx.collectoryxApi.user.model.UserLicenses;
 import com.collectoryx.collectoryxApi.user.repository.UserLicensesRepository;
 import java.time.Duration;
 import javax.transaction.Transactional;
-import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
-import reactor.core.publisher.Mono;
 
 @Service
 @Transactional
@@ -26,15 +22,14 @@ public class AuthService {
     this.userLicensesRepository = userLicensesRepository;
   }
 
-  public void replicateUserRecordAdminServer(RegisterRequest user) {
+  /*public String replicateUserRecordAdminServer(RegisterRequest user) {
 
-    webClient.post()
-        .uri("/clone-user")
-        .body(Mono.just(user), User.class)
-        .accept(MediaType.APPLICATION_JSON)
+    return webClient.get()
+        .uri("/admin/keygen")
         .retrieve()
-        .bodyToMono(User.class);
-  }
+        .bodyToMono(String.class)
+        .block();
+  }*/
 
   private UserLicenseResponse toUserLicenseResponse(UserLicenses request) {
     return UserLicenseResponse.builder()

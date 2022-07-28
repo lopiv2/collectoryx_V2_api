@@ -11,6 +11,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class UserResponse {
 
+  private Long id;
+
   private String email;
 
 }

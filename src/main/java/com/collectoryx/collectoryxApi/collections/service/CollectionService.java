@@ -28,6 +28,7 @@ import java.util.stream.StreamSupport;
 import javax.transaction.Transactional;
 import org.springframework.data.crossstore.ChangeSetPersister.NotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.web.reactive.function.client.WebClient;
 
 @Service
 @Transactional
@@ -38,6 +39,9 @@ public class CollectionService {
   private final ImageRepository imagesRepository;
   private final CollectionMetadataRepository collectionMetadataRepository;
   private final CollectionSeriesListRepository collectionSeriesListRepository;
+  public WebClient webClient = WebClient.builder()
+      .baseUrl("http://localhost:8083")
+      .build();
 
   public CollectionService(CollectionItemRepository collectionItemRepository,
       CollectionListRepository collectionListRepository,
@@ -414,13 +418,21 @@ public class CollectionService {
         .collect(Collectors.toList());
   }
 
-  public List<CollectionListResponse> listCollections() {
+  public List<CollectionListResponse> listCollections(Long id) {
     List<CollectionList> collections = this.collectionListRepository
-        .findAll();
+        .findAllByUser_Id(id);
     return StreamSupport.stream(collections.spliterator(), false)
         .map(this::toCollectionListResponse)
         .collect(Collectors.toList());
   }
+
+  /*public UserResponse getAdminServerUserById(Long id) {
+    return webClient.get()
+        .uri("/admin/get-user/{id}")
+        .retrieve()
+        .bodyToMono(UserResponse.class)
+        .block();
+  }*/
 
   public List<CollectionMetadataResponse> listMetadataByCollection(Long id) {
     List<CollectionMetadata> collections = this.collectionMetadataRepository

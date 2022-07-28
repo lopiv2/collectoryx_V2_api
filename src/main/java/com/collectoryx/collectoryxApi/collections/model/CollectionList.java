@@ -1,6 +1,7 @@
 package com.collectoryx.collectoryxApi.collections.model;
 
 import com.collectoryx.collectoryxApi.image.model.Image;
+import com.collectoryx.collectoryxApi.user.model.User;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -39,5 +40,9 @@ public class CollectionList {
 
   @Enumerated(EnumType.STRING)
   protected CollectionTemplateType template;
+
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "user_id")
+  protected User user;
 
 }
