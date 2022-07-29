@@ -10,6 +10,6 @@ import org.springframework.stereotype.Repository;
 public interface UserLicensesRepository extends JpaRepository<UserLicenses, Long> {
 
 
-  List<UserLicenses> findByStateContaining(LicenseStateTypes pending);
+  List<UserLicenses> findByState(LicenseStateTypes pending);
 
 }

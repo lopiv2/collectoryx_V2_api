@@ -23,11 +23,11 @@ public class AdminController {
     this.adminService = adminService;
   }
 
-  @GetMapping(value = "/keygen/{email}")
+  @GetMapping(value = "/keygen/{id}")
   @PreAuthorize("hasAuthority('ADMIN_ROLE')")
-  public Mono<String> generateClientKey(@PathVariable("email") String email,
-      @RequestHeader(value = "Authorization") String token) {
-    String prueba="hola";
+  public Mono<String> generateClientKey(@PathVariable("id") Long userId,
+      @RequestHeader(value = "Authorization") String token) throws Exception {
+    String prueba = this.adminService.getMachineCode(this.adminService.getMachineByUserId(userId));
     return Mono.just(prueba);
   }
 
