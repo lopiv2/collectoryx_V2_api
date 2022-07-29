@@ -44,7 +44,7 @@ public class UserLicenses {
 
   @Enumerated(EnumType.STRING)
   @Default
-  private LicenseTypes type = LicenseTypes.Free;
+  private LicenseTypes type = LicenseTypes.Trial;
 
   /**
    * Certificate effective time

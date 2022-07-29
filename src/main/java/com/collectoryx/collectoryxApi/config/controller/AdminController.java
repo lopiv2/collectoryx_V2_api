@@ -2,6 +2,7 @@ package com.collectoryx.collectoryxApi.config.controller;
 
 import com.collectoryx.collectoryxApi.config.service.AdminService;
 import com.collectoryx.collectoryxApi.shop.rest.response.UserLicenseResponse;
+import com.collectoryx.collectoryxApi.user.rest.response.UserMachinesResponse;
 import java.util.List;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -27,7 +28,8 @@ public class AdminController {
   @PreAuthorize("hasAuthority('ADMIN_ROLE')")
   public Mono<String> generateClientKey(@PathVariable("id") Long userId,
       @RequestHeader(value = "Authorization") String token) throws Exception {
-    String prueba = this.adminService.getMachineCode(this.adminService.getMachineByUserId(userId));
+    UserMachinesResponse userMachinesResponse = this.adminService.getMachineByUserId(userId);
+    String prueba = this.adminService.getMachineCode(userMachinesResponse);
     return Mono.just(prueba);
   }
 

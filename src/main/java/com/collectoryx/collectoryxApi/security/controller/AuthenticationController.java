@@ -3,6 +3,8 @@ package com.collectoryx.collectoryxApi.security.controller;
 import com.collectoryx.collectoryxApi.security.rest.request.LoginRequest;
 import com.collectoryx.collectoryxApi.security.rest.request.RegisterRequest;
 import com.collectoryx.collectoryxApi.security.service.AuthService;
+import com.collectoryx.collectoryxApi.shop.rest.response.UserLicenseResponse;
+import com.collectoryx.collectoryxApi.shop.service.ShopService;
 import com.collectoryx.collectoryxApi.user.model.User;
 import com.collectoryx.collectoryxApi.user.repository.UserRepository;
 import com.collectoryx.collectoryxApi.user.service.JwtUserDetailsService;
@@ -39,16 +41,18 @@ public class AuthenticationController {
   final JwtUserDetailsService userDetailsService;
   final JwtTokenUtil jwtTokenUtil;
   private final AuthService authService;
+  private final ShopService shopService;
 
   public AuthenticationController(UserRepository userRepository,
       AuthenticationManager authenticationManager,
       JwtUserDetailsService userDetailsService, JwtTokenUtil jwtTokenUtil,
-      AuthService authService) {
+      AuthService authService, ShopService shopService) {
     this.userRepository = userRepository;
     this.authenticationManager = authenticationManager;
     this.userDetailsService = userDetailsService;
     this.jwtTokenUtil = jwtTokenUtil;
     this.authService = authService;
+    this.shopService = shopService;
   }
 
   @PostMapping("/login")
@@ -66,9 +70,11 @@ public class AuthenticationController {
         String role = userDetailsService.getRole(request.getUser_name());
         String email = userDetailsService.getEmail(request.getUser_name());
         Long id = userDetailsService.getId(request.getUser_name());
-        responseMap.put("id",id);
+        String licenseType = userDetailsService.getLicenseType(email);
+        responseMap.put("id", id);
         responseMap.put("error", false);
         responseMap.put("message", "Logged In");
+        responseMap.put("license", licenseType);
         responseMap.put("token", token);
         responseMap.put("role", role);
         responseMap.put("email", email);
@@ -108,6 +114,10 @@ public class AuthenticationController {
     UserDetails userDetails = userDetailsService.createUserDetails(request.getUserName(),
         user.getPassword());
     String token = jwtTokenUtil.generateToken(userDetails);
+    //Se genera una licencia trial por defecto al crear un usuario nuevo
+    UserLicenseResponse userLicenseResponse = this.shopService.SetClientLicensePetition(
+        request.getEmail(),
+        "Trial");
     //userRepository.save(user);
     responseMap.put("error", false);
     responseMap.put("username", request.getUserName());

@@ -30,28 +30,45 @@ public class ShopService {
     this.userRepository = userRepository;
     this.userLicensesRepository = userLicensesRepository;
     this.userMachinesRepository = userMachinesRepository;
-    this.hardwareInfo=hardwareInfo;
+    this.hardwareInfo = hardwareInfo;
   }
 
   public UserLicenseResponse SetClientLicensePetition(String email, String licenseSelected) {
     User user = this.userRepository.findByEmail(email);
+    UserMachines userMachines = null;
     List<String> Macs = new ArrayList<>();
     Macs.add(HardwareInfo.getMacs());
-    UserMachines userMachines = UserMachines.builder()
-        .macAddress(Macs)
-        .mainBoardSerial(HardwareInfo.getMoBoId())
-        .cpuSerial(HardwareInfo.getCPUId())
-        //.ipAddress()
-        .user(user)
-        .build();
-    this.userMachinesRepository.save((userMachines));
-    UserLicenses userLicenses = UserLicenses.builder()
-        .consumerType("user")
-        .paid(true)
-        .state(LicenseStateTypes.Pending)
-        .type(LicenseTypes.valueOf(licenseSelected))
-        .licenseCheckMachine(userMachines)
-        .build();
+    //Buscamos si existe la licencia en la BBDD primero y sino generamos la peticion
+    UserLicenses userLicenses = this.userLicensesRepository
+        .findByLicenseCheckMachine_User_Email(email);
+    //Si no existe la peticion de licencia, la creamos
+    if (userLicenses == null) {
+      //Generamos datos de la maquina
+      userMachines = UserMachines.builder()
+          .macAddress(Macs)
+          .mainBoardSerial(HardwareInfo.getMoBoId())
+          .cpuSerial(HardwareInfo.getCPUId())
+          //.ipAddress()
+          .user(user)
+          .build();
+      this.userMachinesRepository.save((userMachines));
+      //Generamos los datos de la peticion de licencia
+      userLicenses = UserLicenses.builder()
+          .consumerType("user")
+          .paid(true)
+          .state(LicenseStateTypes.Pending)
+          .type(LicenseTypes.valueOf(licenseSelected))
+          .licenseCheckMachine(userMachines)
+          .build();
+      this.userLicensesRepository.save(userLicenses);
+    } else {
+      if (!licenseSelected.contains(userLicenses.getType().toString())) {
+        //Solo actualizamos el tipo de licencia solicitado cuando cambia el tipo de licencia
+        //sino cambia, no se actualiza
+        userLicenses.setType(LicenseTypes.valueOf(licenseSelected));
+        this.userLicensesRepository.save(userLicenses);
+      }
+    }
     UserLicenseResponse userLicenseResponse = UserLicenseResponse.builder()
         .paid(true)
         .state(LicenseStateTypes.Pending)
@@ -59,7 +76,7 @@ public class ShopService {
         .email(email)
         .machine(userMachines)
         .build();
-    this.userLicensesRepository.save(userLicenses);
+
     return userLicenseResponse;
   }
 }

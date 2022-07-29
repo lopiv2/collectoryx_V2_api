@@ -12,4 +12,5 @@ public interface UserLicensesRepository extends JpaRepository<UserLicenses, Long
 
   List<UserLicenses> findByState(LicenseStateTypes pending);
 
+  UserLicenses findByLicenseCheckMachine_User_Email(String email);
 }

@@ -52,24 +52,26 @@ public class CollectionController {
     return Mono.just(collectionResponses);
   }
 
-  @GetMapping(value = "/count-collections")
-  public Mono<Long> getCountCollections(@RequestHeader(value = "Authorization") String token) {
-    Long count = this.collectionService.getCountOfCollections();
-    return Mono.just(count);
-  }
-
-  @GetMapping(value = "/count-collections-items")
-  public Mono<Long> getCountCollectionsItems(
+  @GetMapping(value = "/count-collections/{id}")
+  public Mono<Long> getCountCollectionsById(@PathVariable("id") Long id,
       @RequestHeader(value = "Authorization") String token) {
-    Long count = this.collectionService.getCountOfCollectionItems();
+    Long count = this.collectionService.getCountOfCollections(id);
     return Mono.just(count);
   }
 
-  @GetMapping(value = "/count-collections-money")
-  public Mono<List<CollectionItemsResponse>> getCollectionsTotalMoney(
+  @GetMapping(value = "/count-collections-items/{id}")
+  public Mono<Long> getCountCollectionsItemsById(@PathVariable("id") Long id,
+      @RequestHeader(value = "Authorization") String token) {
+    Long count = this.collectionService.getCountOfCollectionItems(id);
+    return Mono.just(count);
+  }
+
+  @GetMapping(value = "/count-collections-money/{id}")
+  public Mono<List<CollectionItemsResponse>> getCollectionsTotalMoneyById(
+      @PathVariable("id") Long id,
       @RequestHeader(value = "Authorization") String token) {
     List<CollectionItemsResponse> collectionResponses = this.collectionService
-        .getMoneyFromAllItems();
+        .getMoneyFromAllItems(id);
     return Mono.just(collectionResponses);
   }
 

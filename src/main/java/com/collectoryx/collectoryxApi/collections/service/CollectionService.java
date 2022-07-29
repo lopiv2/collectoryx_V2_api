@@ -54,13 +54,13 @@ public class CollectionService {
     this.collectionSeriesListRepository = collectionSeriesListRepository;
   }
 
-  public long getCountOfCollections() {
-    long count = this.collectionListRepository.count();
+  public long getCountOfCollections(Long id) {
+    long count = this.collectionListRepository.countByUserId_Id(id);
     return count;
   }
 
-  public long getCountOfCollectionItems() {
-    long count = this.collectionItemRepository.count();
+  public long getCountOfCollectionItems(Long id) {
+    long count = this.collectionItemRepository.countByCollection_UserId_Id(id);
     return count;
   }
 
@@ -401,7 +401,7 @@ public class CollectionService {
   }
 
   public List<CollectionItemsResponse> getCollectionItemsById(Long id) {
-    final List<CollectionItemsResponse> collectionResponseList = new LinkedList<>();
+    //final List<CollectionItemsResponse> collectionResponseList = new LinkedList<>();
     List<CollectionItem> collections = this.collectionItemRepository
         .findByCollection_Id(id);
     return StreamSupport.stream(collections.spliterator(), false)
@@ -409,10 +409,10 @@ public class CollectionService {
         .collect(Collectors.toList());
   }
 
-  public List<CollectionItemsResponse> getMoneyFromAllItems() {
-    final List<CollectionItemsResponse> collectionResponseList = new LinkedList<>();
+  public List<CollectionItemsResponse> getMoneyFromAllItems(Long id) {
+    //final List<CollectionItemsResponse> collectionResponseList = new LinkedList<>();
     List<CollectionItem> collections = this.collectionItemRepository
-        .findAll();
+        .findByCollection_UserId_Id(id);
     return StreamSupport.stream(collections.spliterator(), false)
         .map(this::toCollectionItemsResponse)
         .collect(Collectors.toList());

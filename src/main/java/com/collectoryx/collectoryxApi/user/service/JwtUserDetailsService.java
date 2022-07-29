@@ -1,6 +1,8 @@
 package com.collectoryx.collectoryxApi.user.service;
 
 import com.collectoryx.collectoryxApi.user.model.User;
+import com.collectoryx.collectoryxApi.user.model.UserLicenses;
+import com.collectoryx.collectoryxApi.user.repository.UserLicensesRepository;
 import com.collectoryx.collectoryxApi.user.repository.UserRepository;
 import java.util.ArrayList;
 import java.util.List;
@@ -15,9 +17,12 @@ import org.springframework.stereotype.Service;
 public class JwtUserDetailsService implements UserDetailsService {
 
   final UserRepository userRepository;
+  final UserLicensesRepository userLicensesRepository;
 
-  public JwtUserDetailsService(UserRepository userRepository) {
+  public JwtUserDetailsService(UserRepository userRepository,
+      UserLicensesRepository userLicensesRepository) {
     this.userRepository = userRepository;
+    this.userLicensesRepository = userLicensesRepository;
   }
 
   public String getRole(String userName) {
@@ -37,6 +42,12 @@ public class JwtUserDetailsService implements UserDetailsService {
   public Long getId(String userName) {
     User user = userRepository.findUserByUsername(userName);
     return user.getId();
+  }
+
+  public String getLicenseType(String email) {
+    UserLicenses userLicenses = this.userLicensesRepository
+        .findByLicenseCheckMachine_User_Email(email);
+    return userLicenses.getType().toString();
   }
 
   @Override

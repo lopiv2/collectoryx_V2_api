@@ -13,4 +13,7 @@ public interface CollectionItemRepository extends JpaRepository<CollectionItem, 
 
   List<CollectionItem> findByCollection_Id(Long collection_id);
 
+  long countByCollection_UserId_Id(Long id);
+
+  List<CollectionItem> findByCollection_UserId_Id(Long id);
 }

@@ -7,4 +7,5 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface UserMachinesRepository extends JpaRepository<UserMachines, Long> {
 
+  UserMachines findByUserId_Email(String email);
 }
