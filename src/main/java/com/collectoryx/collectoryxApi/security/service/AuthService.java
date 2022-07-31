@@ -1,7 +1,5 @@
 package com.collectoryx.collectoryxApi.security.service;
 
-import com.collectoryx.collectoryxApi.shop.rest.response.UserLicenseResponse;
-import com.collectoryx.collectoryxApi.user.model.UserLicenses;
 import com.collectoryx.collectoryxApi.user.repository.UserLicensesRepository;
 import java.time.Duration;
 import javax.transaction.Transactional;
@@ -31,7 +29,7 @@ public class AuthService {
         .block();
   }*/
 
-  private UserLicenseResponse toUserLicenseResponse(UserLicenses request) {
+  /*private UserLicenseResponse toUserLicenseResponse(UserLicenses request) {
     return UserLicenseResponse.builder()
         .email(request.getLicenseCheckMachine().getUser().getEmail())
         .machine(request.getLicenseCheckMachine())
@@ -39,6 +37,6 @@ public class AuthService {
         .type(request.getType())
         .paid(request.isPaid())
         .build();
-  }
+  }*/
 
 }

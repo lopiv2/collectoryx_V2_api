@@ -1,15 +1,16 @@
 package com.collectoryx.collectoryxApi.shop.controller;
 
 import com.collectoryx.collectoryxApi.config.service.AdminService;
+import com.collectoryx.collectoryxApi.shop.rest.request.UserKeyRequest;
 import com.collectoryx.collectoryxApi.shop.rest.response.UserLicenseResponse;
 import com.collectoryx.collectoryxApi.shop.service.ShopService;
+import javax.validation.Valid;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
 
@@ -27,13 +28,13 @@ public class ShopController {
 
   }
 
-  @GetMapping(value = "/key-request/{email}")
+  @PostMapping(value = "/key-request")
   @PreAuthorize("hasAuthority('USER_ROLE')")
-  public Mono<UserLicenseResponse> getUserKeyLicense(@PathVariable("email") String email,
-      @RequestParam("license") String licenseSelected,
+  public Mono<UserLicenseResponse> getUserKeyLicense(@RequestBody @Valid UserKeyRequest request,
       @RequestHeader(value = "Authorization") String token) {
-    UserLicenseResponse userLicenseResponse = this.shopService.SetClientLicensePetition(email,
-        licenseSelected);
+    UserLicenseResponse userLicenseResponse = this.shopService.SetClientLicensePetition(
+        request.getEmail(),
+        request.getLicenseSelected());
     return Mono.just(userLicenseResponse);
   }
 

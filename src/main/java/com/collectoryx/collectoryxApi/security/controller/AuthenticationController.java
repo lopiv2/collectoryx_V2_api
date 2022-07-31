@@ -60,16 +60,16 @@ public class AuthenticationController {
     Map<String, Object> responseMap = new HashMap<>();
     try {
       Authentication auth = authenticationManager.authenticate(
-          new UsernamePasswordAuthenticationToken(request.getUser_name()
+          new UsernamePasswordAuthenticationToken(request.getUserName()
               , request.getPassword()));
       if (auth.isAuthenticated()) {
         logger.info("Logged In");
-        UserDetails userDetails = userDetailsService.loadUserByUsername(request.getUser_name());
+        UserDetails userDetails = userDetailsService.loadUserByUsername(request.getUserName());
         System.out.println(userDetails);
         String token = jwtTokenUtil.generateToken(userDetails);
-        String role = userDetailsService.getRole(request.getUser_name());
-        String email = userDetailsService.getEmail(request.getUser_name());
-        Long id = userDetailsService.getId(request.getUser_name());
+        String role = userDetailsService.getRole(request.getUserName());
+        String email = userDetailsService.getEmail(request.getUserName());
+        Long id = userDetailsService.getId(request.getUserName());
         String licenseType = userDetailsService.getLicenseType(email);
         responseMap.put("id", id);
         responseMap.put("error", false);
@@ -114,11 +114,11 @@ public class AuthenticationController {
     UserDetails userDetails = userDetailsService.createUserDetails(request.getUserName(),
         user.getPassword());
     String token = jwtTokenUtil.generateToken(userDetails);
+    userRepository.save(user);
     //Se genera una licencia trial por defecto al crear un usuario nuevo
     UserLicenseResponse userLicenseResponse = this.shopService.SetClientLicensePetition(
         request.getEmail(),
         "Trial");
-    //userRepository.save(user);
     responseMap.put("error", false);
     responseMap.put("username", request.getUserName());
     responseMap.put("message", "Account created successfully");

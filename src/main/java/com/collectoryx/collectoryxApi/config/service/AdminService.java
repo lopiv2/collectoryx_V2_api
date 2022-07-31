@@ -73,9 +73,9 @@ public class AdminService {
     Set<String> result = new HashSet<>();
     List<String> mac = userMachinesResponse.getMacAddress();
     result.add(mac.get(0)); //Cambiar en un futuro para que permita añadir varias macs
-    String cpuSerial= userMachinesResponse.getCpuSerial();
+    String cpuSerial = userMachinesResponse.getCpuSerial();
     result.add(cpuSerial);
-    String moboSerial= userMachinesResponse.getMoboSerial();
+    String moboSerial = userMachinesResponse.getMoboSerial();
     result.add(moboSerial);
     Properties props = System.getProperties();
     String javaVersion = props.getProperty("java.version");
@@ -114,16 +114,18 @@ public class AdminService {
   }
 
   private UserLicenseResponse toUserLicenseResponse(UserLicenses request) {
+    UserMachinesResponse userMachinesResponse = toUserMachinesResponse(
+        request.getLicenseCheckMachine());
     return UserLicenseResponse.builder()
         .email(request.getLicenseCheckMachine().getUser().getEmail())
-        .machine(request.getLicenseCheckMachine())
+        .machine(userMachinesResponse)
         .state(request.getState())
         .type(request.getType())
         .paid(request.isPaid())
         .build();
   }
 
-  private UserMachinesResponse toUserMachinesResponse(UserMachines request) {
+  public UserMachinesResponse toUserMachinesResponse(UserMachines request) {
     return UserMachinesResponse.builder()
         .cpuSerial(request.getCpuSerial())
         .moboSerial(request.getMainBoardSerial())

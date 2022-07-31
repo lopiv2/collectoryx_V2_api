@@ -2,10 +2,9 @@ package com.collectoryx.collectoryxApi.util;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
 import java.io.Serializable;
-import java.security.Key;
+import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -17,7 +16,9 @@ import org.springframework.stereotype.Component;
 @Component
 public class JwtTokenUtil implements Serializable {
 
-  Key key = Keys.secretKeyFor(SignatureAlgorithm.HS512);
+  @Value("${jwt.secret}")
+  private String secret;
+
   private int jwtExpirationInMs;
 
   public String getUsernameFromToken(String token) {
@@ -34,7 +35,9 @@ public class JwtTokenUtil implements Serializable {
   }
 
   private Claims getAllClaimsFromToken(String token) {
-    return Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token).getBody();
+    return Jwts.parserBuilder().setSigningKey(
+            Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8)))
+        .build().parseClaimsJws(token).getBody();
   }
 
   private Boolean isTokenExpired(String token) {
@@ -52,7 +55,7 @@ public class JwtTokenUtil implements Serializable {
     return Jwts.builder().setClaims(claims).setSubject(userDetails.getUsername())
         .setIssuedAt(new Date(System.currentTimeMillis()))
         .setExpiration(new Date(System.currentTimeMillis() + jwtExpirationInMs * 1000))
-        .signWith(key).compact();
+        .signWith(Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8))).compact();
   }
 
   public Boolean validateToken(String token, UserDetails userDetails) {

@@ -1,7 +1,6 @@
-package com.collectoryx.collectoryxApi.security.rest.request;
+package com.collectoryx.collectoryxApi.shop.rest.request;
 
 import javax.validation.constraints.Email;
-import javax.validation.constraints.NotEmpty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -11,12 +10,11 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class LoginRequest {
+public class UserKeyRequest {
 
   @Email
-  private String userName;
+  private String email;
 
-  @NotEmpty
-  private String password;
+  private String licenseSelected;
 
 }

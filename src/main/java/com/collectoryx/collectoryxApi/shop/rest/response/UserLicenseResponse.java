@@ -2,7 +2,7 @@ package com.collectoryx.collectoryxApi.shop.rest.response;
 
 import com.collectoryx.collectoryxApi.user.model.LicenseStateTypes;
 import com.collectoryx.collectoryxApi.user.model.LicenseTypes;
-import com.collectoryx.collectoryxApi.user.model.UserMachines;
+import com.collectoryx.collectoryxApi.user.rest.response.UserMachinesResponse;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -14,7 +14,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class UserLicenseResponse {
 
-  private UserMachines machine;
+  private UserMachinesResponse machine;
 
   private String email;
 

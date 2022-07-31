@@ -26,7 +26,7 @@ public class JwtUserDetailsService implements UserDetailsService {
   }
 
   public String getRole(String userName) {
-    User user = userRepository.findUserByUsername(userName);
+    User user = userRepository.findByUserName(userName);
     if (user.getRole().contains("ADMIN")) {
       return "ADMIN_ROLE";
     } else {
@@ -35,12 +35,12 @@ public class JwtUserDetailsService implements UserDetailsService {
   }
 
   public String getEmail(String userName) {
-    User user = userRepository.findUserByUsername(userName);
+    User user = userRepository.findByUserName(userName);
     return user.getEmail();
   }
 
   public Long getId(String userName) {
-    User user = userRepository.findUserByUsername(userName);
+    User user = userRepository.findByUserName(userName);
     return user.getId();
   }
 

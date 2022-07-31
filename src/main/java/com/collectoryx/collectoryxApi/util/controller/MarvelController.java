@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import reactor.core.publisher.Mono;
 
 @RestController
 @RequestMapping("/marvel")
@@ -20,10 +21,9 @@ public class MarvelController {
   }
 
   @GetMapping(value = "/item-images/{query}")
-  public String getCollectionItemsById(@PathVariable("query") String query,
+  public Mono<String> getCollectionItemsById(@PathVariable("query") String query,
       @RequestHeader(value = "Authorization") String token) {
-    this.fandomApiService.Prueba();
-    return null;
+    return this.fandomApiService.Prueba();
     /*List<CollectionItemsResponse> collectionResponses = this.collectionService.getCollectionItemsById(
         id);*/
     //return Mono.just(collectionResponses);
