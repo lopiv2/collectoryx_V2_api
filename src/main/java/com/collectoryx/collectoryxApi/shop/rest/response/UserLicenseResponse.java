@@ -24,4 +24,6 @@ public class UserLicenseResponse {
 
   private LicenseTypes type;
 
+  private String licenseCode;
+
 }

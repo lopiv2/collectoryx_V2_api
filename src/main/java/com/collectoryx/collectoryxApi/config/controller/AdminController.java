@@ -41,4 +41,12 @@ public class AdminController {
     return Mono.just(userLicenseResponses);
   }
 
+  @GetMapping(value = "/get-all-licenses")
+  public Mono<List<UserLicenseResponse>> getAllLicenses(
+      @RequestHeader(value = "Authorization") String token) {
+    List<UserLicenseResponse> userLicenseResponses =
+        this.adminService.listAllLicenses();
+    return Mono.just(userLicenseResponses);
+  }
+
 }

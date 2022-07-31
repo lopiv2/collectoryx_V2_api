@@ -20,6 +20,8 @@ import com.collectoryx.collectoryxApi.collections.rest.response.CollectionSeries
 import com.collectoryx.collectoryxApi.image.model.Image;
 import com.collectoryx.collectoryxApi.image.repository.ImageRepository;
 import com.collectoryx.collectoryxApi.image.rest.response.ImageResponse;
+import com.collectoryx.collectoryxApi.user.model.User;
+import com.collectoryx.collectoryxApi.user.repository.UserRepository;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -39,6 +41,7 @@ public class CollectionService {
   private final ImageRepository imagesRepository;
   private final CollectionMetadataRepository collectionMetadataRepository;
   private final CollectionSeriesListRepository collectionSeriesListRepository;
+  private final UserRepository userRepository;
   public WebClient webClient = WebClient.builder()
       .baseUrl("http://localhost:8083")
       .build();
@@ -46,12 +49,14 @@ public class CollectionService {
   public CollectionService(CollectionItemRepository collectionItemRepository,
       CollectionListRepository collectionListRepository,
       ImageRepository imagesRepository, CollectionMetadataRepository collectionMetadataRepository,
-      CollectionSeriesListRepository collectionSeriesListRepository) {
+      CollectionSeriesListRepository collectionSeriesListRepository,
+      UserRepository userRepository) {
     this.collectionItemRepository = collectionItemRepository;
     this.collectionListRepository = collectionListRepository;
     this.imagesRepository = imagesRepository;
     this.collectionMetadataRepository = collectionMetadataRepository;
     this.collectionSeriesListRepository = collectionSeriesListRepository;
+    this.userRepository = userRepository;
   }
 
   public long getCountOfCollections(Long id) {
@@ -67,6 +72,8 @@ public class CollectionService {
   public CollectionResponse createCollection(CollectionRequest request) throws NotFoundException {
     Image image = null;
     CollectionList collectionList = null;
+    User user = this.userRepository.findById(request.getUserId())
+        .orElseThrow(NotFoundException::new);
     if (request.getFile() != null) {
       image = this.imagesRepository.findImageByPath(request.getFile()).orElseThrow(
           NotFoundException::new);
@@ -74,11 +81,13 @@ public class CollectionService {
           .name(request.getName())
           .logo(image)
           .template(request.getTemplate())
+          .user(user)
           .build();
     } else {
       collectionList = CollectionList.builder()
           .name(request.getName())
           .template(request.getTemplate())
+          .user(user)
           .build();
     }
     this.collectionListRepository.save(collectionList);

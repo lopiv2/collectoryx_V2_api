@@ -25,5 +25,7 @@ public class CollectionRequest {
 
   protected CollectionTemplateType template;
 
+  protected Long userId;
+
 
 }

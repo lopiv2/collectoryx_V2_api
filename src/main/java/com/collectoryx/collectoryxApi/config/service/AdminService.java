@@ -2,12 +2,14 @@ package com.collectoryx.collectoryxApi.config.service;
 
 import com.collectoryx.collectoryxApi.shop.rest.response.UserLicenseResponse;
 import com.collectoryx.collectoryxApi.user.model.LicenseStateTypes;
+import com.collectoryx.collectoryxApi.user.model.User;
 import com.collectoryx.collectoryxApi.user.model.UserLicenses;
 import com.collectoryx.collectoryxApi.user.model.UserMachines;
 import com.collectoryx.collectoryxApi.user.repository.UserLicensesRepository;
 import com.collectoryx.collectoryxApi.user.repository.UserMachinesRepository;
 import com.collectoryx.collectoryxApi.user.repository.UserRepository;
 import com.collectoryx.collectoryxApi.user.rest.response.UserMachinesResponse;
+import com.collectoryx.collectoryxApi.user.rest.response.UserResponse;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.HashSet;
@@ -113,6 +115,14 @@ public class AdminService {
         .collect(Collectors.toList());
   }
 
+  public List<UserLicenseResponse> listAllLicenses() {
+    List<UserLicenses> collections = this.userLicensesRepository
+        .findAll();
+    return StreamSupport.stream(collections.spliterator(), false)
+        .map(this::toUserLicenseResponse)
+        .collect(Collectors.toList());
+  }
+
   private UserLicenseResponse toUserLicenseResponse(UserLicenses request) {
     UserMachinesResponse userMachinesResponse = toUserMachinesResponse(
         request.getLicenseCheckMachine());
@@ -122,14 +132,23 @@ public class AdminService {
         .state(request.getState())
         .type(request.getType())
         .paid(request.isPaid())
+        .licenseCode(request.getLicense())
+        .build();
+  }
+
+  private UserResponse toUserResponse(User user) {
+    return UserResponse.builder()
+        .id(user.getId())
+        .email(user.getEmail())
         .build();
   }
 
   public UserMachinesResponse toUserMachinesResponse(UserMachines request) {
+    UserResponse userResponse =toUserResponse(request.getUser());
     return UserMachinesResponse.builder()
         .cpuSerial(request.getCpuSerial())
         .moboSerial(request.getMainBoardSerial())
-        .user_id(request.getUser())
+        .user_id(userResponse)
         .macAddress(request.getMacAddress())
         .build();
   }

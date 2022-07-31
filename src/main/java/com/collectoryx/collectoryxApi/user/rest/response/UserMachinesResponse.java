@@ -1,6 +1,5 @@
 package com.collectoryx.collectoryxApi.user.rest.response;
 
-import com.collectoryx.collectoryxApi.user.model.User;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -17,7 +16,7 @@ public class UserMachinesResponse {
 
   private String moboSerial;
 
-  private User user_id;
+  private UserResponse user_id;
 
   private List<String> macAddress;
 
