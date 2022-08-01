@@ -70,11 +70,13 @@ public class AuthenticationController {
         String role = userDetailsService.getRole(request.getUserName());
         String email = userDetailsService.getEmail(request.getUserName());
         Long id = userDetailsService.getId(request.getUserName());
-        String licenseType = userDetailsService.getLicenseType(email);
+        String licenseType = userDetailsService.getLicenseType(email).getType().toString();
+        String licenseState = userDetailsService.getLicenseType(email).getState().toString();
         responseMap.put("id", id);
         responseMap.put("error", false);
         responseMap.put("message", "Logged In");
         responseMap.put("license", licenseType);
+        responseMap.put("licenseState", licenseState);
         responseMap.put("token", token);
         responseMap.put("role", role);
         responseMap.put("email", email);

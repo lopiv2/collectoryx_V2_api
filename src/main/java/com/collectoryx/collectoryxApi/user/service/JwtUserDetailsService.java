@@ -44,10 +44,10 @@ public class JwtUserDetailsService implements UserDetailsService {
     return user.getId();
   }
 
-  public String getLicenseType(String email) {
+  public UserLicenses getLicenseType(String email) {
     UserLicenses userLicenses = this.userLicensesRepository
         .findByLicenseCheckMachine_User_Email(email);
-    return userLicenses.getType().toString();
+    return userLicenses;
   }
 
   @Override
