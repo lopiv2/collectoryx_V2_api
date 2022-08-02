@@ -1,13 +1,16 @@
 package com.collectoryx.collectoryxApi.config.controller;
 
 import com.collectoryx.collectoryxApi.config.service.AdminService;
+import com.collectoryx.collectoryxApi.shop.rest.request.UserKeyRequest;
 import com.collectoryx.collectoryxApi.shop.rest.response.UserLicenseResponse;
 import com.collectoryx.collectoryxApi.user.rest.response.UserMachinesResponse;
+import com.collectoryx.collectoryxApi.user.rest.response.UserResponse;
 import java.util.List;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -24,13 +27,15 @@ public class AdminController {
     this.adminService = adminService;
   }
 
-  @GetMapping(value = "/keygen/{id}")
+  @PostMapping(value = "/keygen")
   @PreAuthorize("hasAuthority('ADMIN_ROLE')")
-  public Mono<String> generateClientKey(@PathVariable("id") Long userId,
+  public Mono<UserLicenseResponse> generateClientKey(@RequestBody UserKeyRequest keyRequest,
       @RequestHeader(value = "Authorization") String token) throws Exception {
-    UserMachinesResponse userMachinesResponse = this.adminService.getMachineByUserId(userId);
-    String prueba = this.adminService.getMachineCode(userMachinesResponse);
-    return Mono.just(prueba);
+    UserResponse user = this.adminService.getUserIdByEmail(keyRequest.getEmail());
+    UserMachinesResponse userMachinesResponse = this.adminService.getMachineByUserId(user.getId());
+    UserLicenseResponse userLicenseResponse = this.adminService.setUserLicenseCode(
+        userMachinesResponse);
+    return Mono.just(userLicenseResponse);
   }
 
   @GetMapping(value = "/get-pending-licenses")

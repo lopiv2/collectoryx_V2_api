@@ -3,6 +3,7 @@ package com.collectoryx.collectoryxApi.shop.rest.response;
 import com.collectoryx.collectoryxApi.user.model.LicenseStateTypes;
 import com.collectoryx.collectoryxApi.user.model.LicenseTypes;
 import com.collectoryx.collectoryxApi.user.rest.response.UserMachinesResponse;
+import java.util.Date;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -19,6 +20,10 @@ public class UserLicenseResponse {
   private String email;
 
   private boolean paid;
+
+  private Date grantedDate;
+
+  private Date expiringDate;
 
   protected LicenseStateTypes state;
 

@@ -2,6 +2,9 @@ package com.collectoryx.collectoryxApi.security.service;
 
 import com.collectoryx.collectoryxApi.user.repository.UserLicensesRepository;
 import java.time.Duration;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.Date;
 import javax.transaction.Transactional;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -18,6 +21,12 @@ public class AuthService {
 
   public AuthService(UserLicensesRepository userLicensesRepository) {
     this.userLicensesRepository = userLicensesRepository;
+  }
+
+  public LocalDateTime convertToLocalDateTimeViaInstant(Date dateToConvert) {
+    return dateToConvert.toInstant()
+        .atZone(ZoneId.systemDefault())
+        .toLocalDateTime();
   }
 
   /*public String replicateUserRecordAdminServer(RegisterRequest user) {
