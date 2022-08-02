@@ -126,6 +126,8 @@ public class AdminService {
     result.add(javaVMVersion);
     String osVersion = props.getProperty("os.version");
     result.add(osVersion);
+    Date grantDate = DateUtil.now();
+    result.add(grantDate.toString());
 
     byte[] msg = result.toString().getBytes();
 

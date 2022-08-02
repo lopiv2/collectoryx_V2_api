@@ -24,9 +24,12 @@ public class AuthService {
   }
 
   public LocalDateTime convertToLocalDateTimeViaInstant(Date dateToConvert) {
-    return dateToConvert.toInstant()
-        .atZone(ZoneId.systemDefault())
-        .toLocalDateTime();
+    if (dateToConvert != null) {
+      return dateToConvert.toInstant()
+          .atZone(ZoneId.systemDefault())
+          .toLocalDateTime();
+    }
+    return null;
   }
 
   /*public String replicateUserRecordAdminServer(RegisterRequest user) {

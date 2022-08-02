@@ -5,6 +5,7 @@ import com.collectoryx.collectoryxApi.security.rest.request.RegisterRequest;
 import com.collectoryx.collectoryxApi.security.service.AuthService;
 import com.collectoryx.collectoryxApi.shop.rest.response.UserLicenseResponse;
 import com.collectoryx.collectoryxApi.shop.service.ShopService;
+import com.collectoryx.collectoryxApi.user.model.LicenseStateTypes;
 import com.collectoryx.collectoryxApi.user.model.User;
 import com.collectoryx.collectoryxApi.user.repository.UserRepository;
 import com.collectoryx.collectoryxApi.user.service.JwtUserDetailsService;
@@ -62,6 +63,7 @@ public class AuthenticationController {
   @PostMapping("/login")
   public ResponseEntity<?> loginUser(@RequestBody @Valid LoginRequest request) {
     Map<String, Object> responseMap = new HashMap<>();
+    long daysBetween = 0;
     try {
       Authentication auth = authenticationManager.authenticate(
           new UsernamePasswordAuthenticationToken(request.getUserName()
@@ -77,10 +79,12 @@ public class AuthenticationController {
         String licenseType = userDetailsService.getLicenseType(email).getType().toString();
         String licenseState = userDetailsService.getLicenseType(email).getState().toString();
         Date expiringDate = userDetailsService.getLicenseType(email).getExpiryTime();
-        LocalDateTime date1 = authService.convertToLocalDateTimeViaInstant(DateUtil.now());
-        LocalDateTime date2 = authService.convertToLocalDateTimeViaInstant(expiringDate);
-        long daysBetween = Duration.between(date1, date2).toDays();
-        System.out.println ("Days: " + daysBetween);
+        if (licenseState.equals(LicenseStateTypes.Activated.toString())) {
+          LocalDateTime date1 = authService.convertToLocalDateTimeViaInstant(DateUtil.now());
+          LocalDateTime date2 = authService.convertToLocalDateTimeViaInstant(expiringDate);
+          daysBetween = Duration.between(date1, date2).toDays();
+        }
+        System.out.println("Days: " + daysBetween);
         responseMap.put("id", id);
         responseMap.put("error", false);
         responseMap.put("message", "Logged In");
@@ -137,17 +141,4 @@ public class AuthenticationController {
     responseMap.put("token", token);
     return ResponseEntity.ok(responseMap);
   }
-
-  /*@PostMapping("/register")
-  public ResponseEntity<?> saveUser(@RequestBody @Valid RegisterRequest request) {
-    Map<String, Object> responseMap = new HashMap<>();
-    String hola = this.authService.replicateUserRecordAdminServer(request);
-    //System.out.println(hola);
-    responseMap.put("hola", hola);
-    responseMap.put("error", false);
-    responseMap.put("username", request.getUserName());
-    responseMap.put("message", "Account created successfully");
-    return ResponseEntity.ok(responseMap);
-  }*/
-
 }
