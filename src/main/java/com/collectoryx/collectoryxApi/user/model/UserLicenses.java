@@ -29,45 +29,39 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class UserLicenses {
 
+  @Column
+  protected boolean paid = false;
+  @Column
+  protected boolean trialActivated = false;
+  @Enumerated(EnumType.STRING)
+  protected LicenseStateTypes state = LicenseStateTypes.Pending;
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "licenseCheckMachine")
+  protected UserMachines licenseCheckMachine;
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
-
   @Column
   private String license;
-
-  @Column
-  protected boolean paid=false;
-
-  @Enumerated(EnumType.STRING)
-  protected LicenseStateTypes state=LicenseStateTypes.Pending;
-
   @Enumerated(EnumType.STRING)
   @Default
   private LicenseTypes type = LicenseTypes.Trial;
-
   /**
    * Certificate effective time
    */
   @Column
   @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
   @Temporal(TemporalType.TIMESTAMP)
-  private Date issuedTime=new Date();
-
+  private Date issuedTime = new Date();
   /**
    * Certificate expiration time
    */
   @Column
   @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
   private Date expiryTime;
-
   /**
    * customer type
    */
   private String consumerType = "user";
-
-  @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "licenseCheckMachine")
-  protected UserMachines licenseCheckMachine;
 
 }

@@ -31,4 +31,6 @@ public class UserLicenseResponse {
 
   private String licenseCode;
 
+  private Boolean trialActivated;
+
 }

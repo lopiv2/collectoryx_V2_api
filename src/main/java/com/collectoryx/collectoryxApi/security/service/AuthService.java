@@ -32,15 +32,6 @@ public class AuthService {
     return null;
   }
 
-  /*public String replicateUserRecordAdminServer(RegisterRequest user) {
-
-    return webClient.get()
-        .uri("/admin/keygen")
-        .retrieve()
-        .bodyToMono(String.class)
-        .block();
-  }*/
-
   /*private UserLicenseResponse toUserLicenseResponse(UserLicenses request) {
     return UserLicenseResponse.builder()
         .email(request.getLicenseCheckMachine().getUser().getEmail())

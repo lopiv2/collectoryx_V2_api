@@ -78,19 +78,21 @@ public class AuthenticationController {
         Long id = userDetailsService.getId(request.getUserName());
         String licenseType = userDetailsService.getLicenseType(email).getType().toString();
         String licenseState = userDetailsService.getLicenseType(email).getState().toString();
+        Boolean trialActivated = userDetailsService.getLicenseType(email).isTrialActivated();
         Date expiringDate = userDetailsService.getLicenseType(email).getExpiryTime();
         if (licenseState.equals(LicenseStateTypes.Activated.toString())) {
           LocalDateTime date1 = authService.convertToLocalDateTimeViaInstant(DateUtil.now());
           LocalDateTime date2 = authService.convertToLocalDateTimeViaInstant(expiringDate);
           daysBetween = Duration.between(date1, date2).toDays();
         }
-        System.out.println("Days: " + daysBetween);
+        //System.out.println("Days: " + daysBetween);
         responseMap.put("id", id);
         responseMap.put("error", false);
         responseMap.put("message", "Logged In");
         responseMap.put("license", licenseType);
         responseMap.put("licenseState", licenseState);
         responseMap.put("licenseDuration", daysBetween);
+        responseMap.put("trialActivated", trialActivated);
         responseMap.put("token", token);
         responseMap.put("role", role);
         responseMap.put("email", email);
@@ -130,11 +132,17 @@ public class AuthenticationController {
     UserDetails userDetails = userDetailsService.createUserDetails(request.getUserName(),
         user.getPassword());
     String token = jwtTokenUtil.generateToken(userDetails);
+    Boolean checkUser = this.userDetailsService.checkUserEmailExists(request.getEmail());
+    if (checkUser) {
+      responseMap.put("error", true);
+      responseMap.put("message", "Email already exists");
+      return ResponseEntity.badRequest().body(responseMap);
+    }
     userRepository.save(user);
-    //Se genera una licencia trial por defecto al crear un usuario nuevo
+    //Se genera una licencia free por defecto al crear un usuario nuevo
     UserLicenseResponse userLicenseResponse = this.shopService.SetClientLicensePetition(
         request.getEmail(),
-        "Trial");
+        "Free");
     responseMap.put("error", false);
     responseMap.put("username", request.getUserName());
     responseMap.put("message", "Account created successfully");

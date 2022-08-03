@@ -50,6 +50,16 @@ public class JwtUserDetailsService implements UserDetailsService {
     return userLicenses;
   }
 
+  public Boolean checkUserEmailExists(String email){
+    User user=this.userRepository.findByEmail(email);
+    if(user==null){
+      return false;
+    }
+    else{
+      return true;
+    }
+  }
+
   @Override
   public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
     User user = userRepository.findUserByUsername(username);

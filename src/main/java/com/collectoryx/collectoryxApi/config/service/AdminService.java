@@ -100,6 +100,7 @@ public class AdminService {
       cal.add(Calendar.DAY_OF_MONTH, 15);
       Date modifiedDate = cal.getTime();
       userLicenses.setExpiryTime(modifiedDate);
+      userLicenses.setTrialActivated(true);
     }
     if (userLicenses.getType() == LicenseTypes.Lifetime) {
       cal.add(Calendar.YEAR, 7000);
@@ -171,6 +172,7 @@ public class AdminService {
         .state(request.getState())
         .type(request.getType())
         .paid(request.isPaid())
+        .trialActivated(request.isTrialActivated())
         .grantedDate(request.getIssuedTime())
         .expiringDate(request.getExpiryTime())
         .licenseCode(request.getLicense())

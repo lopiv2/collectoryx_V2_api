@@ -78,14 +78,16 @@ public class ShopService {
         this.userLicensesRepository.save(userLicenses);
       }
     }
-
-    UserLicenseResponse userLicenseResponse = UserLicenseResponse.builder()
-        .paid(true)
-        .state(LicenseStateTypes.Pending)
-        .type(LicenseTypes.valueOf(licenseSelected))
-        .email(email)
-        .machine(userMachinesResponse)
-        .build();
+    UserLicenseResponse userLicenseResponse = new UserLicenseResponse();
+    userLicenseResponse.setPaid(true);
+    userLicenseResponse.setState(LicenseStateTypes.Pending);
+    userLicenseResponse.setType(LicenseTypes.valueOf(licenseSelected));
+    userLicenseResponse.setEmail(email);
+    userLicenseResponse.setMachine(userMachinesResponse);
+    //Si se activa la licencia trial, se hace solo una vez
+    if (licenseSelected.equals(LicenseTypes.Trial.toString())) {
+      userLicenseResponse.setTrialActivated(true);
+    }
 
     return userLicenseResponse;
   }
