@@ -12,4 +12,6 @@ public interface CollectionSeriesListRepository extends JpaRepository<Collection
 
   //@Query(value = "SELECT * FROM :tableName (id int)", nativeQuery = true)
   List<CollectionSeriesList> findAllByCollection_Id(Long id);
+
+  List<CollectionSeriesList> findAllByCollection_UserId(Long id);
 }

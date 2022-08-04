@@ -229,11 +229,11 @@ public class CollectionController {
     return Mono.just(collectionListResponses);
   }
 
-  @GetMapping(value = "/view-series")
-  public Mono<List<CollectionSeriesListResponse>> getAllSeries(
+  @GetMapping(value = "/view-series/{id}")
+  public Mono<List<CollectionSeriesListResponse>> getAllSeries(@PathVariable("id") Long id,
       @RequestHeader(value = "Authorization") String token) {
     List<CollectionSeriesListResponse> collectionSerieListResponses = this.collectionService
-        .listAllSeriesCollections();
+        .listAllSeriesCollections(id);
     return Mono.just(collectionSerieListResponses);
   }
 

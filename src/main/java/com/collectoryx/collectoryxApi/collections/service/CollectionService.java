@@ -451,9 +451,9 @@ public class CollectionService {
         .collect(Collectors.toList());
   }
 
-  public List<CollectionSeriesListResponse> listAllSeriesCollections() {
+  public List<CollectionSeriesListResponse> listAllSeriesCollections(Long id) {
     List<CollectionSeriesList> collections = this.collectionSeriesListRepository
-        .findAll();
+        .findAllByCollection_UserId(id);
     return StreamSupport.stream(collections.spliterator(), false)
         .map(this::toCollectionSerieListResponse)
         .collect(Collectors.toList());

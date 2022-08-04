@@ -18,7 +18,6 @@ import java.util.Map;
 import javax.validation.Valid;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.assertj.core.util.DateUtil;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -80,12 +79,12 @@ public class AuthenticationController {
         String licenseState = userDetailsService.getLicenseType(email).getState().toString();
         Boolean trialActivated = userDetailsService.getLicenseType(email).isTrialActivated();
         Date expiringDate = userDetailsService.getLicenseType(email).getExpiryTime();
+        Date issuedDate = userDetailsService.getLicenseType(email).getIssuedTime();
         if (licenseState.equals(LicenseStateTypes.Activated.toString())) {
-          LocalDateTime date1 = authService.convertToLocalDateTimeViaInstant(DateUtil.now());
+          LocalDateTime date1 = authService.convertToLocalDateTimeViaInstant(issuedDate);
           LocalDateTime date2 = authService.convertToLocalDateTimeViaInstant(expiringDate);
           daysBetween = Duration.between(date1, date2).toDays();
         }
-        //System.out.println("Days: " + daysBetween);
         responseMap.put("id", id);
         responseMap.put("error", false);
         responseMap.put("message", "Logged In");
