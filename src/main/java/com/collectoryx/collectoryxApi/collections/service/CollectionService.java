@@ -321,54 +321,6 @@ public class CollectionService {
         .image(imageResponse)
         .collection(collectionListResponse)
         .build();
-    /*if (imageResponse != null) {
-      collectionItem = CollectionItem.builder()
-          .name(request.getName())
-          .serie(collectionSeriesList)
-          .price(request.getPrice())
-          .year(request.getYear())
-          .adquiringDate(request.getAdquiringDate())
-          .own(request.isOwn())
-          .notes(request.getNotes())
-          .image(image)
-          .collection(collectionList)
-          .build();
-      collectionItemsResponse = CollectionItemsResponse.builder()
-          .name(request.getName())
-          .serie(collectionSeriesListResponse)
-          .price(request.getPrice())
-          .year(request.getYear())
-          .adquiringDate(request.getAdquiringDate())
-          .own(request.isOwn())
-          .notes(request.getNotes())
-          .image(imageResponse)
-          .collection(collectionListResponse)
-          .build();
-
-    } else {
-      collectionItem = CollectionItem.builder()
-          .name(request.getName())
-          .serie(collectionSeriesList)
-          .price(request.getPrice())
-          .year(request.getYear())
-          .adquiringDate(request.getAdquiringDate())
-          .own(request.isOwn())
-          .notes(request.getNotes())
-          .collection(collectionList)
-          .build();
-      collectionItemsResponse = CollectionItemsResponse.builder()
-          .name(request.getName())
-          .serie(collectionSeriesListResponse)
-          .price(request.getPrice())
-          .year(request.getYear())
-          .adquiringDate(request.getAdquiringDate())
-          .own(request.isOwn())
-          .notes(request.getNotes())
-          .collection(collectionListResponse)
-          .build();
-    }
-    this.collectionItemRepository.save(collectionItem);*/
-
     return collectionItemsResponse;
   }
 
