@@ -9,4 +9,8 @@ import org.springframework.stereotype.Repository;
 public interface UserFeedsRepository extends JpaRepository<UserFeeds, Long> {
 
   List<UserFeeds> findAllByUserId(Long id);
+
+  UserFeeds findByUserId(Long id);
+
+  UserFeeds findByUserIdAndName(Long id, String title);
 }

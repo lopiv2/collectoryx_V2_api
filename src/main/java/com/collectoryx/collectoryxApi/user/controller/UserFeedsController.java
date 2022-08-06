@@ -1,11 +1,11 @@
 package com.collectoryx.collectoryxApi.user.controller;
 
-import com.collectoryx.collectoryxApi.collections.rest.response.CollectionItemsResponse;
 import com.collectoryx.collectoryxApi.user.rest.request.UserFeedsRequest;
 import com.collectoryx.collectoryxApi.user.rest.response.UserFeedsResponse;
 import com.collectoryx.collectoryxApi.user.service.UserFeedsService;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 import org.springframework.data.crossstore.ChangeSetPersister.NotFoundException;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -29,14 +29,29 @@ public class UserFeedsController {
   }
 
   @GetMapping(value = "/get-all/{id}")
-  public Mono<List<CollectionItemsResponse>> readUserFeeds(
+  public Mono<List<String>> readUserFeeds(
       @PathVariable("id") Long id,
       @RequestHeader(value = "Authorization") String token) {
-    List<CollectionItemsResponse> collectionResponses = null;
+    List<UserFeedsResponse> userFeedsResponseList = this.userFeedsService.listAllUserFeeds(id);
+    List<String> feeds = userFeedsResponseList.stream().map(x -> x.getRssUrl())
+        .collect(Collectors.toList());
+    List<String> userFeedReaderResponse = new ArrayList<>();
+    userFeedReaderResponse.add(this.userFeedsService.feedReader(feeds).toString());
+    return Mono.just(userFeedReaderResponse);
+  }
+
+  @GetMapping(value = "/get-feeds/{id}/{title}")
+  public Mono<List<String>> readUserFeedsById(
+      @PathVariable("id") Long id,
+      @PathVariable("title") String title,
+      @RequestHeader(value = "Authorization") String token) {
+    UserFeedsResponse userFeedsResponseList = this.userFeedsService.getUserFeedsById(id, title);
+    List<String> userFeedReaderResponse = new ArrayList<>();
     List<String> feeds = new ArrayList<>();
-    feeds.add("http://thefwoosh.com/feed/");
-    this.userFeedsService.feedReader(feeds);
-    return Mono.just(collectionResponses);
+    feeds.add(userFeedsResponseList.getRssUrl());
+    userFeedReaderResponse.add(
+        this.userFeedsService.feedReader(feeds).toString());
+    return Mono.just(userFeedReaderResponse);
   }
 
   @GetMapping(value = "/view/{id}")
