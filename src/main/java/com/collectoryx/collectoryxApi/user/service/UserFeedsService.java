@@ -47,7 +47,7 @@ public class UserFeedsService {
 
         SyndFeedInput input = new SyndFeedInput();
         SyndFeed feed = input.build(new XmlReader(feedUrl));
-
+        System.out.println(feed);
         ok = true;
         final SyndFeedOutput output = new SyndFeedOutput();
         final Writer writer = new StringWriter();
@@ -77,7 +77,6 @@ public class UserFeedsService {
 
         SyndFeedInput input = new SyndFeedInput();
         SyndFeed feed = input.build(new XmlReader(feedUrl));
-
         List<SyndEntry> items = feed.getEntries();
         UserFeedsData userFeedsData = null;
         if (feed.getImage() != null) {
