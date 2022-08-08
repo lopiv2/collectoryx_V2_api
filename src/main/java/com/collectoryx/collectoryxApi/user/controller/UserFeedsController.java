@@ -1,6 +1,7 @@
 package com.collectoryx.collectoryxApi.user.controller;
 
 import com.collectoryx.collectoryxApi.user.rest.request.UserFeedsRequest;
+import com.collectoryx.collectoryxApi.user.rest.response.UserFeedsContentResponse;
 import com.collectoryx.collectoryxApi.user.rest.response.UserFeedsResponse;
 import com.collectoryx.collectoryxApi.user.service.UserFeedsService;
 import java.util.ArrayList;
@@ -41,16 +42,15 @@ public class UserFeedsController {
   }
 
   @GetMapping(value = "/get-feeds/{id}/{title}")
-  public Mono<List<String>> readUserFeedsById(
+  public Mono<List<UserFeedsContentResponse>> readUserFeedsById(
       @PathVariable("id") Long id,
       @PathVariable("title") String title,
       @RequestHeader(value = "Authorization") String token) {
     UserFeedsResponse userFeedsResponseList = this.userFeedsService.getUserFeedsById(id, title);
-    List<String> userFeedReaderResponse = new ArrayList<>();
+    List<UserFeedsContentResponse> userFeedReaderResponse = new ArrayList<>();
     List<String> feeds = new ArrayList<>();
     feeds.add(userFeedsResponseList.getRssUrl());
-    userFeedReaderResponse.add(
-        this.userFeedsService.feedReader(feeds).toString());
+    userFeedReaderResponse = this.userFeedsService.feedReader(feeds);
     return Mono.just(userFeedReaderResponse);
   }
 

@@ -33,4 +33,7 @@ public class UserFeeds {
   @Column(name = "rssUrl", nullable = false, unique = true)
   private String rssUrl;
 
+  @Column(name = "logo")
+  private String logo;
+
 }
