@@ -79,11 +79,10 @@ public class AuthenticationController {
         String licenseState = userDetailsService.getLicenseType(email).getState().toString();
         Boolean trialActivated = userDetailsService.getLicenseType(email).isTrialActivated();
         Date expiringDate = userDetailsService.getLicenseType(email).getExpiryTime();
-        Date issuedDate = userDetailsService.getLicenseType(email).getIssuedTime();
         if (licenseState.equals(LicenseStateTypes.Activated.toString())) {
-          LocalDateTime date1 = authService.convertToLocalDateTimeViaInstant(issuedDate);
+          LocalDateTime today = LocalDateTime.now();
           LocalDateTime date2 = authService.convertToLocalDateTimeViaInstant(expiringDate);
-          daysBetween = Duration.between(date1, date2).toDays();
+          daysBetween = Duration.between(today, date2).toDays();
         }
         responseMap.put("id", id);
         responseMap.put("error", false);

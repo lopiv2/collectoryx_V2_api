@@ -25,13 +25,17 @@ import java.util.stream.StreamSupport;
 import javax.transaction.Transactional;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+import org.json.JSONObject;
 import org.jsoup.Jsoup;
 import org.springframework.data.crossstore.ChangeSetPersister.NotFoundException;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
+import org.springframework.web.reactive.function.client.WebClient;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import reactor.core.publisher.Mono;
 
 @Service
 @Transactional
@@ -48,16 +52,29 @@ public class UserFeedsService {
     this.adminService = adminService;
   }
 
+  public UserFeedsResponse createFeed(UserFeedsRequest request)
+      throws NotFoundException {
+    User user = this.userRepository.findById(request.getUserId())
+        .orElseThrow(NotFoundException::new);
+    String getLogo = getLogoFromUrlFeed(request.getCleanUrl()).block();
+    JSONObject jsonObject = new JSONObject(getLogo);
+    UserFeeds userFeeds = UserFeeds.builder()
+        .user(user)
+        .name(request.getName())
+        .rssUrl(request.getUrl())
+        .logo(jsonObject.getJSONArray("icons").getJSONObject(0).getString("src"))
+        .build();
+    this.userFeedsRepository.save(userFeeds);
+    UserFeedsResponse userFeedsResponse = toUserFeedsResponse(userFeeds);
+    return userFeedsResponse;
+  }
+
   public List<UserFeedsContentResponse> feedReader(List<String> args) {
     List<UserFeedsContentResponse> userFeedsContentResponseList = new ArrayList<>();
     boolean ok = false;
     if (args.size() == 1) {
       try {
         URL feedUrl = new URL(args.get(0));
-
-        //SyndFeedInput input = new SyndFeedInput();
-        //SyndFeed feed = input.build(new XmlReader(feedUrl));
-
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         DocumentBuilder builder = factory.newDocumentBuilder();
         Document doc = builder.parse(feedUrl.toString());
@@ -135,20 +152,9 @@ public class UserFeedsService {
         SyndFeed feed = input.build(new XmlReader(feedUrl));
         List<SyndEntry> items = feed.getEntries();
         UserFeedsData userFeedsData = null;
-        if (feed.getImage() != null) {
-          //System.out.println(feed.getImage());
-          //System.out.println(items.size());
-          return userFeedsData.builder()
-              .imageLink(feed.getImage().getUrl())
-              .articles(items.size())
-              .build();
-        } else {
-          //System.out.println(items.size());
-          return userFeedsData.builder()
-              .imageLink(null)
-              .articles(items.size())
-              .build();
-        }
+        return userFeedsData.builder()
+            .articles(items.size())
+            .build();
 
         //return items.size();
       } catch (Exception ex) {
@@ -172,6 +178,18 @@ public class UserFeedsService {
     return toUserFeedsResponse(userFeed);
   }
 
+  public Mono<String> getLogoFromUrlFeed(String url) {
+    WebClient client = WebClient.create("https://favicongrabber.com/api/grab/" + url);
+    //WebClient client = WebClient.create("https://dc.fandom.com/api.php");
+    return client
+        .get()
+        .uri("?action=imageserving&wisId=90286")
+        .accept(MediaType.APPLICATION_JSON)
+        .retrieve()
+        .bodyToMono(String.class);
+    //.publish(s -> Mono.just(s.toString()));
+  }
+
   public List<UserFeedsResponse> listAllUserFeeds(Long id) {
     List<UserFeeds> userFeeds = this.userFeedsRepository
         .findAllByUserId(id);
@@ -185,6 +203,7 @@ public class UserFeedsService {
     feeds.add(request.getRssUrl());
     return UserFeedsResponse.builder()
         .feedData(feedParserEntries(feeds))
+        .logo(request.getLogo())
         .name(request.getName())
         .rssUrl(request.getRssUrl())
         .build();
@@ -194,23 +213,7 @@ public class UserFeedsService {
     return UserFeedsResponse.builder()
         .name(request.getName())
         .rssUrl(request.getRssUrl())
+        .logo(request.getLogo())
         .build();
   }
-
-  public UserFeedsResponse createFeed(UserFeedsRequest request)
-      throws NotFoundException {
-    User user = this.userRepository.findById(request.getUserId())
-        .orElseThrow(NotFoundException::new);
-    UserFeedsResponse userFeedsResponse = null;
-    UserFeeds userFeeds = UserFeeds.builder()
-        .user(user)
-        .name(request.getName())
-        .rssUrl(request.getUrl())
-        .build();
-    this.userFeedsRepository.save(userFeeds);
-    userFeedsResponse = toUserFeedsResponse(userFeeds);
-    return userFeedsResponse;
-  }
-
-
 }

@@ -16,6 +16,8 @@ public class UserFeedsResponse {
 
   private String rssUrl;
 
+  private String logo;
+
   //Datos del feed
   private UserFeedsData feedData;
 

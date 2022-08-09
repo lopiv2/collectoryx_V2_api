@@ -9,15 +9,15 @@ import reactor.core.publisher.Mono;
 public class FandomApiService {
 
   public Mono<String> Prueba() {
-    //WebClient client = WebClient.create("https://marveltoys.fandom.com/api.php");
-    WebClient client = WebClient.create("https://dc.fandom.com/api.php");
+    WebClient client = WebClient.create("https://favicongrabber.com/api/grab/thefwoosh.com");
+    //WebClient client = WebClient.create("https://dc.fandom.com/api.php");
     return client
         .get()
         .uri("?action=imageserving&wisId=90286")
         .accept(MediaType.APPLICATION_JSON)
         .retrieve()
-        .bodyToMono(String.class)
-        .publish(s -> Mono.just("hola"));
+        .bodyToMono(String.class);
+        //.publish(s -> Mono.just("hola"));
   }
 
 }

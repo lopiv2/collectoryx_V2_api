@@ -14,6 +14,4 @@ public class UserFeedsData {
   //Numero de articulos del feed
   private Integer articles;
 
-  private String imageLink;
-
 }

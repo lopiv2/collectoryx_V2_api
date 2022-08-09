@@ -22,4 +22,7 @@ public class UserFeedsRequest {
   @NotEmpty
   protected String url;
 
+  @NotEmpty
+  protected String cleanUrl;
+
 }
