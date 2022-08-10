@@ -12,6 +12,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class UserFeedsResponse {
 
+  private Long id;
+
   private String name;
 
   private String rssUrl;

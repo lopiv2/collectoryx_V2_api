@@ -328,7 +328,6 @@ public class CollectionService {
     CollectionItem col = this.collectionItemRepository.findById(id)
         .orElseThrow(NotFoundException::new);
     this.collectionItemRepository.deleteById(col.getId());
-
     return true;
   }
 

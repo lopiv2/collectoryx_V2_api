@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import org.springframework.data.crossstore.ChangeSetPersister.NotFoundException;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -27,6 +28,13 @@ public class UserFeedsController {
 
   public UserFeedsController(UserFeedsService userFeedsService) {
     this.userFeedsService = userFeedsService;
+  }
+
+  @DeleteMapping(value = "/delete-feed/{id}")
+  public Mono<Boolean> deleteFeed(@PathVariable("id") Long id,
+      @RequestHeader(value = "Authorization") String token) throws NotFoundException {
+    boolean isDeleted = this.userFeedsService.deleteFeed(id);
+    return Mono.just(isDeleted);
   }
 
   @GetMapping(value = "/get-all/{id}")

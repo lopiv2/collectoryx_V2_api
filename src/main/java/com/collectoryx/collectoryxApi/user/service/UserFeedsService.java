@@ -28,6 +28,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import org.json.JSONObject;
 import org.jsoup.Jsoup;
 import org.springframework.data.crossstore.ChangeSetPersister.NotFoundException;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -57,6 +58,7 @@ public class UserFeedsService {
     User user = this.userRepository.findById(request.getUserId())
         .orElseThrow(NotFoundException::new);
     String getLogo = getLogoFromUrlFeed(request.getCleanUrl()).block();
+    //System.out.println(getLogo);
     JSONObject jsonObject = new JSONObject(getLogo);
     UserFeeds userFeeds = UserFeeds.builder()
         .user(user)
@@ -67,6 +69,13 @@ public class UserFeedsService {
     this.userFeedsRepository.save(userFeeds);
     UserFeedsResponse userFeedsResponse = toUserFeedsResponse(userFeeds);
     return userFeedsResponse;
+  }
+
+  public boolean deleteFeed(Long id) throws NotFoundException {
+    UserFeeds col = this.userFeedsRepository.findById(id)
+        .orElseThrow(NotFoundException::new);
+    this.userFeedsRepository.deleteById(col.getId());
+    return true;
   }
 
   public List<UserFeedsContentResponse> feedReader(List<String> args) {
@@ -186,6 +195,9 @@ public class UserFeedsService {
         .uri("?action=imageserving&wisId=90286")
         .accept(MediaType.APPLICATION_JSON)
         .retrieve()
+        .onStatus(HttpStatus::is5xxServerError, response -> {
+          return Mono.error(new Exception("Api error"));
+        })
         .bodyToMono(String.class);
     //.publish(s -> Mono.just(s.toString()));
   }
@@ -202,6 +214,7 @@ public class UserFeedsService {
     List<String> feeds = new ArrayList<>();
     feeds.add(request.getRssUrl());
     return UserFeedsResponse.builder()
+        .id(request.getId())
         .feedData(feedParserEntries(feeds))
         .logo(request.getLogo())
         .name(request.getName())
