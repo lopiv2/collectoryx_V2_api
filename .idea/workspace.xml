@@ -6,14 +6,16 @@
   <component name="ChangeListManager">
     <list default="true" id="e7725e87-06c9-4363-a7e7-9ec3adee6157" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/collectoryx/collectoryxApi/collections/controller/CollectionController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/collectoryx/collectoryxApi/collections/controller/CollectionController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/collectoryx/collectoryxApi/collections/model/CollectionList.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/collectoryx/collectoryxApi/collections/model/CollectionList.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/collectoryx/collectoryxApi/collections/repository/CollectionItemRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/collectoryx/collectoryxApi/collections/repository/CollectionItemRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/collectoryx/collectoryxApi/collections/rest/response/CollectionListResponse.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/collectoryx/collectoryxApi/collections/rest/response/CollectionListResponse.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/collectoryx/collectoryxApi/collections/rest/response/CollectionResponse.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/collectoryx/collectoryxApi/collections/rest/response/CollectionResponse.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/collectoryx/collectoryxApi/collections/service/CollectionService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/collectoryx/collectoryxApi/collections/service/CollectionService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/collectoryx/collectoryxApi/user/controller/UserFeedsController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/collectoryx/collectoryxApi/user/controller/UserFeedsController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/collectoryx/collectoryxApi/user/rest/response/UserFeedsResponse.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/collectoryx/collectoryxApi/user/rest/response/UserFeedsResponse.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/collectoryx/collectoryxApi/user/service/UserFeedsService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/collectoryx/collectoryxApi/user/service/UserFeedsService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/collectoryx/collectoryxApi/user/controller/UserFeedsController.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/collectoryx/collectoryxApi/user/controller/UserFeedsController.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/collectoryx/collectoryxApi/user/rest/response/UserFeedsResponse$UserFeedsResponseBuilder.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/collectoryx/collectoryxApi/user/rest/response/UserFeedsResponse$UserFeedsResponseBuilder.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/collectoryx/collectoryxApi/user/rest/response/UserFeedsResponse.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/collectoryx/collectoryxApi/user/rest/response/UserFeedsResponse.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/collectoryx/collectoryxApi/user/service/UserFeedsService.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/collectoryx/collectoryxApi/user/service/UserFeedsService.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/collectoryx/collectoryxApi/collections/controller/CollectionController.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/collectoryx/collectoryxApi/collections/controller/CollectionController.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/collectoryx/collectoryxApi/collections/repository/CollectionItemRepository.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/collectoryx/collectoryxApi/collections/repository/CollectionItemRepository.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/collectoryx/collectoryxApi/collections/service/CollectionService.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/collectoryx/collectoryxApi/collections/service/CollectionService.class" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -255,15 +257,6 @@
     </ignored-roots>
   </component>
   <component name="XDebuggerManager">
-    <breakpoint-manager>
-      <breakpoints>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/main/java/com/collectoryx/collectoryxApi/collections/controller/CollectionController.java</url>
-          <line>164</line>
-          <option name="timeStamp" value="9" />
-        </line-breakpoint>
-      </breakpoints>
-    </breakpoint-manager>
     <watches-manager>
       <configuration name="Application">
         <watch expression="request" />

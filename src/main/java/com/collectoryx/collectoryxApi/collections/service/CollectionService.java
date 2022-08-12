@@ -22,6 +22,9 @@ import com.collectoryx.collectoryxApi.image.repository.ImageRepository;
 import com.collectoryx.collectoryxApi.image.rest.response.ImageResponse;
 import com.collectoryx.collectoryxApi.user.model.User;
 import com.collectoryx.collectoryxApi.user.repository.UserRepository;
+import java.time.LocalDate;
+import java.time.Year;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -91,10 +94,11 @@ public class CollectionService {
           .build();
     }
     this.collectionListRepository.save(collectionList);
+    ImageResponse imageResponse=toImageResponse(image);
     CollectionResponse collectionResponse = CollectionResponse.builder()
         .collection(request.getName())
         .template(request.getTemplate())
-        .logo(image)
+        .logo(imageResponse)
         .build();
     return collectionResponse;
   }
@@ -103,6 +107,8 @@ public class CollectionService {
       throws NotFoundException {
     Image image = null;
     CollectionList collectionList = null;
+    User user = this.userRepository.findById(request.getUserId())
+        .orElseThrow(NotFoundException::new);
     if (request.getFile() != null) {
       image = this.imagesRepository.findImageByPath(request.getFile()).orElseThrow(
           NotFoundException::new);
@@ -110,11 +116,13 @@ public class CollectionService {
           .name(request.getName())
           .template(request.getTemplate())
           .logo(image)
+          .user(user)
           .build();
     } else {
       collectionList = CollectionList.builder()
           .name(request.getName())
           .template(request.getTemplate())
+          .user(user)
           .build();
     }
     this.collectionListRepository.save(collectionList);
@@ -132,37 +140,13 @@ public class CollectionService {
       }
       this.collectionMetadataRepository.saveAll(collectionMetadataList);
     }
+    ImageResponse imageResponse=toImageResponse(image);
     CollectionResponse collectionResponse = CollectionResponse.builder()
         .collection(request.getName())
         .template(request.getTemplate())
-        .logo(image)
+        .logo(imageResponse)
         .build();
     return collectionResponse;
-  }
-
-  public CollectionItemsResponse toggleOwn(CollectionItemRequest item) throws NotFoundException {
-    CollectionItem collection = this.collectionItemRepository.findById(item.getId())
-        .orElseThrow(NotFoundException::new);
-    collection.setOwn(!item.getOwn());
-    this.collectionItemRepository.save(collection);
-    CollectionItemsResponse collectionItemsResponse = toCollectionItemResponse(collection);
-    return collectionItemsResponse;
-  }
-
-  public CollectionItemsResponse toggleWish(CollectionItemRequest item) throws NotFoundException {
-    CollectionItem collection = this.collectionItemRepository.findById(item.getId())
-        .orElseThrow(NotFoundException::new);
-    collection.setWanted(!item.getWanted());
-    this.collectionItemRepository.save(collection);
-    CollectionItemsResponse collectionItemsResponse = toCollectionItemResponse(collection);
-    return collectionItemsResponse;
-  }
-
-  public CollectionItemsResponse getCollectionItem(Long id) throws NotFoundException {
-    CollectionItem col = this.collectionItemRepository.findById(id)
-        .orElseThrow(NotFoundException::new);
-    CollectionItemsResponse collectionItemsResponse = toCollectionItemResponse(col);
-    return collectionItemsResponse;
   }
 
   public CollectionItemsResponse createItem(CollectionCreateItemRequest request)
@@ -276,6 +260,135 @@ public class CollectionService {
     return collectionSeriesListResponse;
   }
 
+  public boolean deleteCollectionItem(Long id) throws NotFoundException {
+    CollectionItem col = this.collectionItemRepository.findById(id)
+        .orElseThrow(NotFoundException::new);
+    this.collectionItemRepository.deleteById(col.getId());
+    return true;
+  }
+
+  public boolean deleteCollection(Long id) throws NotFoundException {
+    CollectionList col = this.collectionListRepository.findById(id)
+        .orElseThrow(NotFoundException::new);
+    this.collectionListRepository.deleteById(col.getId());
+    return true;
+  }
+
+  public boolean deleteCollectionCascade(Long id) throws NotFoundException {
+    List<CollectionMetadata> collectionMetadata = this.collectionMetadataRepository
+        .findByCollection_Id(id);
+    this.collectionMetadataRepository.deleteAll(collectionMetadata);
+    CollectionList col = this.collectionListRepository.findById(id)
+        .orElseThrow(NotFoundException::new);
+    this.collectionListRepository.deleteById(col.getId());
+    return true;
+  }
+
+  public boolean deleteSerie(Long id) throws NotFoundException {
+    CollectionSeriesList col = this.collectionSeriesListRepository.findById(id)
+        .orElseThrow(NotFoundException::new);
+    this.collectionSeriesListRepository.deleteById(col.getId());
+    return true;
+  }
+
+  public CollectionListResponse getCollectionById(Long id) {
+    CollectionList collection = null;
+    try {
+      collection = this.collectionListRepository
+          .findById(id).orElseThrow(NotFoundException::new);
+    } catch (NotFoundException e) {
+      e.printStackTrace();
+    }
+
+    return toCollectionListResponse(collection);
+  }
+
+  public CollectionItemsResponse getCollectionItem(Long id) throws NotFoundException {
+    CollectionItem col = this.collectionItemRepository.findById(id)
+        .orElseThrow(NotFoundException::new);
+    CollectionItemsResponse collectionItemsResponse = toCollectionItemResponse(col);
+    return collectionItemsResponse;
+  }
+
+  public List<CollectionItemsResponse> getCollectionItemsById(Long id) {
+    //final List<CollectionItemsResponse> collectionResponseList = new LinkedList<>();
+    List<CollectionItem> collections = this.collectionItemRepository
+        .findByCollection_Id(id);
+    return StreamSupport.stream(collections.spliterator(), false)
+        .map(this::toCollectionItemsResponse)
+        .collect(Collectors.toList());
+  }
+
+  public List<CollectionItemsResponse> getItemsYear(Long id) {
+    LocalDate firstDayOfThisYear = Year.now(ZoneId.systemDefault()).atDay(1);
+    LocalDate lastDayOfThisYear = Year.now(ZoneId.systemDefault()).atDay(365);
+    List<CollectionItem> collections = this.collectionItemRepository
+        .getItemsPerYear(id, firstDayOfThisYear, lastDayOfThisYear);
+    return StreamSupport.stream(collections.spliterator(), false)
+        .map(this::toCollectionItemResponse)
+        .collect(Collectors.toList());
+  }
+
+  public List<CollectionItemsResponse> getMoneyFromAllItems(Long id) {
+    //final List<CollectionItemsResponse> collectionResponseList = new LinkedList<>();
+    List<CollectionItem> collections = this.collectionItemRepository
+        .findByCollection_UserId_Id(id);
+    return StreamSupport.stream(collections.spliterator(), false)
+        .map(this::toCollectionItemsResponse)
+        .collect(Collectors.toList());
+  }
+
+  public List<CollectionSeriesListResponse> listAllSeriesCollections(Long id) {
+    List<CollectionSeriesList> collections = this.collectionSeriesListRepository
+        .findAllByCollection_UserId(id);
+    return StreamSupport.stream(collections.spliterator(), false)
+        .map(this::toCollectionSerieListResponse)
+        .collect(Collectors.toList());
+  }
+
+  public List<CollectionListResponse> listCollections(Long id) {
+    List<CollectionList> collections = this.collectionListRepository
+        .findAllByUser_Id(id);
+    return StreamSupport.stream(collections.spliterator(), false)
+        .map(this::toCollectionListResponse)
+        .collect(Collectors.toList());
+  }
+
+  public List<CollectionMetadataResponse> listMetadataByCollection(Long id) {
+    List<CollectionMetadata> collections = this.collectionMetadataRepository
+        .findByCollection_Id(id);
+    return StreamSupport.stream(collections.spliterator(), false)
+        .map(this::toCollectionMetadataResponse)
+        .collect(Collectors.toList());
+  }
+
+  public List<CollectionSeriesListResponse> listSeriesByCollection(Long id) {
+    final List<CollectionSeriesListResponse> collectionSerieListResponseList = new LinkedList<>();
+    List<CollectionSeriesList> collections = this.collectionSeriesListRepository
+        .findAllByCollection_Id(id);
+    return StreamSupport.stream(collections.spliterator(), false)
+        .map(this::toCollectionSerieListResponse)
+        .collect(Collectors.toList());
+  }
+
+  public CollectionItemsResponse toggleOwn(CollectionItemRequest item) throws NotFoundException {
+    CollectionItem collection = this.collectionItemRepository.findById(item.getId())
+        .orElseThrow(NotFoundException::new);
+    collection.setOwn(!item.getOwn());
+    this.collectionItemRepository.save(collection);
+    CollectionItemsResponse collectionItemsResponse = toCollectionItemResponse(collection);
+    return collectionItemsResponse;
+  }
+
+  public CollectionItemsResponse toggleWish(CollectionItemRequest item) throws NotFoundException {
+    CollectionItem collection = this.collectionItemRepository.findById(item.getId())
+        .orElseThrow(NotFoundException::new);
+    collection.setWanted(!item.getWanted());
+    this.collectionItemRepository.save(collection);
+    CollectionItemsResponse collectionItemsResponse = toCollectionItemResponse(collection);
+    return collectionItemsResponse;
+  }
+
   public CollectionItemsResponse updateItem(CollectionCreateItemRequest request)
       throws NotFoundException {
     Image image = null;
@@ -322,101 +435,6 @@ public class CollectionService {
         .collection(collectionListResponse)
         .build();
     return collectionItemsResponse;
-  }
-
-  public boolean deleteCollectionItem(Long id) throws NotFoundException {
-    CollectionItem col = this.collectionItemRepository.findById(id)
-        .orElseThrow(NotFoundException::new);
-    this.collectionItemRepository.deleteById(col.getId());
-    return true;
-  }
-
-  public boolean deleteCollection(Long id) throws NotFoundException {
-    CollectionList col = this.collectionListRepository.findById(id)
-        .orElseThrow(NotFoundException::new);
-    this.collectionListRepository.deleteById(col.getId());
-    return true;
-  }
-
-  public boolean deleteCollectionCascade(Long id) throws NotFoundException {
-    List<CollectionMetadata> collectionMetadata = this.collectionMetadataRepository
-        .findByCollection_Id(id);
-    this.collectionMetadataRepository.deleteAll(collectionMetadata);
-    CollectionList col = this.collectionListRepository.findById(id)
-        .orElseThrow(NotFoundException::new);
-    this.collectionListRepository.deleteById(col.getId());
-    return true;
-  }
-
-  public CollectionListResponse getCollectionById(Long id) {
-    CollectionList collection = null;
-    try {
-      collection = this.collectionListRepository
-          .findById(id).orElseThrow(NotFoundException::new);
-    } catch (NotFoundException e) {
-      e.printStackTrace();
-    }
-
-    return toCollectionListResponse(collection);
-  }
-
-  public List<CollectionItemsResponse> getCollectionItemsById(Long id) {
-    //final List<CollectionItemsResponse> collectionResponseList = new LinkedList<>();
-    List<CollectionItem> collections = this.collectionItemRepository
-        .findByCollection_Id(id);
-    return StreamSupport.stream(collections.spliterator(), false)
-        .map(this::toCollectionItemsResponse)
-        .collect(Collectors.toList());
-  }
-
-  public List<CollectionItemsResponse> getMoneyFromAllItems(Long id) {
-    //final List<CollectionItemsResponse> collectionResponseList = new LinkedList<>();
-    List<CollectionItem> collections = this.collectionItemRepository
-        .findByCollection_UserId_Id(id);
-    return StreamSupport.stream(collections.spliterator(), false)
-        .map(this::toCollectionItemsResponse)
-        .collect(Collectors.toList());
-  }
-
-  public List<CollectionListResponse> listCollections(Long id) {
-    List<CollectionList> collections = this.collectionListRepository
-        .findAllByUser_Id(id);
-    return StreamSupport.stream(collections.spliterator(), false)
-        .map(this::toCollectionListResponse)
-        .collect(Collectors.toList());
-  }
-
-  /*public UserResponse getAdminServerUserById(Long id) {
-    return webClient.get()
-        .uri("/admin/get-user/{id}")
-        .retrieve()
-        .bodyToMono(UserResponse.class)
-        .block();
-  }*/
-
-  public List<CollectionMetadataResponse> listMetadataByCollection(Long id) {
-    List<CollectionMetadata> collections = this.collectionMetadataRepository
-        .findByCollection_Id(id);
-    return StreamSupport.stream(collections.spliterator(), false)
-        .map(this::toCollectionMetadataResponse)
-        .collect(Collectors.toList());
-  }
-
-  public List<CollectionSeriesListResponse> listAllSeriesCollections(Long id) {
-    List<CollectionSeriesList> collections = this.collectionSeriesListRepository
-        .findAllByCollection_UserId(id);
-    return StreamSupport.stream(collections.spliterator(), false)
-        .map(this::toCollectionSerieListResponse)
-        .collect(Collectors.toList());
-  }
-
-  public List<CollectionSeriesListResponse> listSeriesByCollection(Long id) {
-    final List<CollectionSeriesListResponse> collectionSerieListResponseList = new LinkedList<>();
-    List<CollectionSeriesList> collections = this.collectionSeriesListRepository
-        .findAllByCollection_Id(id);
-    return StreamSupport.stream(collections.spliterator(), false)
-        .map(this::toCollectionSerieListResponse)
-        .collect(Collectors.toList());
   }
 
   private CollectionItemsResponse toCollectionItemsResponse(CollectionItem collection) {
@@ -481,16 +499,27 @@ public class CollectionService {
         e.printStackTrace();
       }
     }
+    CollectionList collectionList = null;
+    try {
+      collectionList = this.collectionListRepository.findById(
+          collection.getCollection().getId()).orElseThrow(
+          NotFoundException::new);
+    } catch (NotFoundException e) {
+      e.printStackTrace();
+    }
+    CollectionResponse collectionResponse = toCollectionResponse(collectionList);
     if (image != null) {
       return CollectionSeriesListResponse.builder()
           .id(collection.getId())
           .name(collection.getName())
+          .collection(collectionResponse)
           .logo(image)
           .build();
     } else {
       return CollectionSeriesListResponse.builder()
           .id(collection.getId())
           .name(collection.getName())
+          .collection(collectionResponse)
           .build();
     }
   }
@@ -514,12 +543,22 @@ public class CollectionService {
     } catch (NotFoundException e) {
       e.printStackTrace();
     }
+    CollectionListResponse collectionListResponse = null;
+    try {
+      collectionListResponse = toCollectionListResponse(
+          this.collectionListRepository.findById(collection.getCollection().getId())
+              .orElseThrow(NotFoundException::new));
+    } catch (NotFoundException e) {
+      e.printStackTrace();
+    }
+
     if (image != null) {
       return CollectionItemsResponse.builder()
           .id(collection.getId())
           .name(collection.getName())
           .image(image)
           .adquiringDate(collection.getAdquiringDate())
+          .collection(collectionListResponse)
           .notes(collection.getNotes())
           .price(collection.getPrice())
           .year(collection.getYear())
@@ -532,6 +571,7 @@ public class CollectionService {
           .id(collection.getId())
           .name(collection.getName())
           .adquiringDate(collection.getAdquiringDate())
+          .collection(collectionListResponse)
           .notes(collection.getNotes())
           .price(collection.getPrice())
           .year(collection.getYear())
@@ -560,6 +600,7 @@ public class CollectionService {
       return CollectionListResponse.builder()
           .id(request.getId())
           .name(request.getName())
+          .ambit(request.getAmbit())
           .logo(image)
           .template(request.getTemplate())
           .metadata(collectionMetadata)
@@ -568,6 +609,7 @@ public class CollectionService {
       return CollectionListResponse.builder()
           .id(request.getId())
           .name(request.getName())
+          .ambit(request.getAmbit())
           .template(request.getTemplate())
           .metadata(collectionMetadata)
           .build();
@@ -599,9 +641,11 @@ public class CollectionService {
   }
 
   private CollectionResponse toCollectionResponse(CollectionList request) {
+    ImageResponse imageResponse=toImageResponse(request.getLogo());
     return CollectionResponse.builder()
+        .id(request.getId())
         .collection(request.getName())
-        .logo(request.getLogo())
+        .logo(imageResponse)
         .build();
   }
 

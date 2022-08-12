@@ -1,8 +1,11 @@
 package com.collectoryx.collectoryxApi.collections.repository;
 
 import com.collectoryx.collectoryxApi.collections.model.CollectionItem;
+import java.time.LocalDate;
 import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 @Repository
@@ -16,4 +19,12 @@ public interface CollectionItemRepository extends JpaRepository<CollectionItem, 
   long countByCollection_UserId_Id(Long id);
 
   List<CollectionItem> findByCollection_UserId_Id(Long id);
+
+  @Query(value = "SELECT * FROM collection c "
+      + "JOIN collection_list l ON c.collection=l.id "
+      + "JOIN  users u ON l.user_id=u.id "
+      + "WHERE (c.adquiring_date BETWEEN :startDate AND :endDate) AND u.id=:userId",
+      nativeQuery = true)
+  List<CollectionItem> getItemsPerYear(@Param("userId") Long id, @Param("startDate") LocalDate start,
+      @Param("endDate") LocalDate end);
 }

@@ -18,6 +18,8 @@ public class CollectionListResponse {
 
   private String name;
 
+  private Boolean ambit;
+
   private ImageResponse logo;
 
   private List<CollectionMetadataResponse> metadata;

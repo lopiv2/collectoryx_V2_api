@@ -149,6 +149,13 @@ public class CollectionController {
     return Mono.just(isDeleted);
   }
 
+  @DeleteMapping(value = "/delete-serie/{id}")
+  public Mono<Boolean> deleteSerie(@PathVariable("id") Long id,
+      @RequestHeader(value = "Authorization") String token) throws NotFoundException {
+    boolean isDeleted = this.collectionService.deleteSerie(id);
+    return Mono.just(isDeleted);
+  }
+
   @GetMapping(value = "/get-collection/{id}")
   public Mono<CollectionListResponse> getCollectionById(@PathVariable("id") Long id,
       @RequestHeader(value = "Authorization") String token) {
@@ -174,6 +181,14 @@ public class CollectionController {
       collectionItemsResponse = this.collectionService.getCollectionItem(id);
     }
     return Mono.just(collectionItemsResponse);
+  }
+
+  @GetMapping(value = "/get-items-per-year/{id}")
+  public Mono<List<CollectionItemsResponse>> getItemsPerYear(@PathVariable("id") Long id,
+      @RequestHeader(value = "Authorization") String token) {
+    List<CollectionItemsResponse> collectionItemsResponses =
+        this.collectionService.getItemsYear(id);
+    return Mono.just(collectionItemsResponses);
   }
 
   @PostMapping(value = "/toggle-item-own")

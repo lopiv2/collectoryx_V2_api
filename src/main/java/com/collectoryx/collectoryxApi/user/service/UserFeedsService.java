@@ -105,10 +105,10 @@ public class UserFeedsService {
             DateFormat formatter = null;
             if (date.contains("GMT")) {
               formatter = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss z",
-                  Locale.ENGLISH);
+                  Locale.US);
             } else {
               formatter = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss Z",
-                  Locale.ENGLISH);
+                  Locale.US);
             }
             Date pubDate = formatter.parse(date);
             if (description.contains("img")) {

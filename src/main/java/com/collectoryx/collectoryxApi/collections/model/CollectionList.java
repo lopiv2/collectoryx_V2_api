@@ -38,6 +38,9 @@ public class CollectionList {
   @JoinColumn(name = "images_id")
   protected Image logo;
 
+  @Column(columnDefinition = "boolean default false")
+  protected Boolean ambit;
+
   @Enumerated(EnumType.STRING)
   protected CollectionTemplateType template;
 
