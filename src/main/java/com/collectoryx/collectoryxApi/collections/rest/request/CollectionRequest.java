@@ -16,10 +16,16 @@ import lombok.NoArgsConstructor;
 public class CollectionRequest {
 
   @NotEmpty
+  protected Long id;
+
+  @NotEmpty
   protected String name;
 
   @NotEmpty
   protected String file;
+
+  @NotEmpty
+  protected Boolean ambit;
 
   protected List<CollectionMetadata> metadata;
 

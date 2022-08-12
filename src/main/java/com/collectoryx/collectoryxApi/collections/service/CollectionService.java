@@ -23,6 +23,7 @@ import com.collectoryx.collectoryxApi.image.rest.response.ImageResponse;
 import com.collectoryx.collectoryxApi.user.model.User;
 import com.collectoryx.collectoryxApi.user.repository.UserRepository;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.Year;
 import java.time.ZoneId;
 import java.util.ArrayList;
@@ -94,7 +95,7 @@ public class CollectionService {
           .build();
     }
     this.collectionListRepository.save(collectionList);
-    ImageResponse imageResponse=toImageResponse(image);
+    ImageResponse imageResponse = toImageResponse(image);
     CollectionResponse collectionResponse = CollectionResponse.builder()
         .collection(request.getName())
         .template(request.getTemplate())
@@ -140,7 +141,7 @@ public class CollectionService {
       }
       this.collectionMetadataRepository.saveAll(collectionMetadataList);
     }
-    ImageResponse imageResponse=toImageResponse(image);
+    ImageResponse imageResponse = toImageResponse(image);
     CollectionResponse collectionResponse = CollectionResponse.builder()
         .collection(request.getName())
         .template(request.getTemplate())
@@ -371,10 +372,25 @@ public class CollectionService {
         .collect(Collectors.toList());
   }
 
+  public CollectionResponse toggleAmbit(CollectionRequest item) throws NotFoundException {
+    CollectionList collectionList = this.collectionListRepository.findById(item.getId())
+        .orElseThrow(NotFoundException::new);
+    collectionList.setAmbit(!item.getAmbit());
+    this.collectionListRepository.save(collectionList);
+    CollectionResponse collectionResponse = toCollectionResponse(collectionList);
+    return collectionResponse;
+  }
+
   public CollectionItemsResponse toggleOwn(CollectionItemRequest item) throws NotFoundException {
     CollectionItem collection = this.collectionItemRepository.findById(item.getId())
         .orElseThrow(NotFoundException::new);
     collection.setOwn(!item.getOwn());
+    LocalDateTime today = LocalDateTime.now();
+    if (item.getOwn()) {
+      collection.setAdquiringDate(null);
+    } else {
+      collection.setAdquiringDate(java.sql.Timestamp.valueOf(today));
+    }
     this.collectionItemRepository.save(collection);
     CollectionItemsResponse collectionItemsResponse = toCollectionItemResponse(collection);
     return collectionItemsResponse;
@@ -641,12 +657,28 @@ public class CollectionService {
   }
 
   private CollectionResponse toCollectionResponse(CollectionList request) {
-    ImageResponse imageResponse=toImageResponse(request.getLogo());
-    return CollectionResponse.builder()
-        .id(request.getId())
-        .collection(request.getName())
-        .logo(imageResponse)
-        .build();
+    ImageResponse image = null;
+    if (request.getLogo() != null) {
+      try {
+        image = toImageResponse(
+            this.imagesRepository.findById(request.getLogo().getId())
+                .orElseThrow(NotFoundException::new));
+      } catch (NotFoundException e) {
+        e.printStackTrace();
+      }
+      return CollectionResponse.builder()
+          .id(request.getId())
+          .collection(request.getName())
+          .ambit(request.getAmbit())
+          .logo(image)
+          .build();
+    } else {
+      return CollectionResponse.builder()
+          .id(request.getId())
+          .collection(request.getName())
+          .ambit(request.getAmbit())
+          .build();
+    }
   }
 
   private CollectionMetadataResponse toCollectionMetadataResponse(CollectionMetadata request) {

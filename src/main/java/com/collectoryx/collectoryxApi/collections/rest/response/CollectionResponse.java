@@ -17,6 +17,8 @@ public class CollectionResponse {
 
   private String collection;
 
+  protected Boolean ambit;
+
   private CollectionTemplateType template;
 
   private ImageResponse logo;

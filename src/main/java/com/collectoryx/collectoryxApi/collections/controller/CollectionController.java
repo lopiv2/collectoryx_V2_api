@@ -191,6 +191,21 @@ public class CollectionController {
     return Mono.just(collectionItemsResponses);
   }
 
+  @PostMapping(value = "/toggle-collection-ambit")
+  public Mono<CollectionResponse> toggleCollectionAmbit(
+      @RequestBody CollectionRequest collectionRequest,
+      @RequestHeader(value = "Authorization") String token) {
+    CollectionResponse collectionResponse = null;
+    if (collectionRequest.getId() != null) {
+      try {
+        collectionResponse = this.collectionService.toggleAmbit(collectionRequest);
+      } catch (NotFoundException e) {
+        e.printStackTrace();
+      }
+    }
+    return Mono.just(collectionResponse);
+  }
+
   @PostMapping(value = "/toggle-item-own")
   public Mono<CollectionItemsResponse> toggleItemOwn(
       @RequestBody CollectionItemRequest collectionItemRequest,
