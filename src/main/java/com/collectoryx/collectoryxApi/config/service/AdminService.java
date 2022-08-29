@@ -179,7 +179,7 @@ public class AdminService {
         .build();
   }
 
-  private UserResponse toUserResponse(User user) {
+  public UserResponse toUserResponse(User user) {
     return UserResponse.builder()
         .id(user.getId())
         .email(user.getEmail())

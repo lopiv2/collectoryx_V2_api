@@ -6,8 +6,10 @@ import com.collectoryx.collectoryxApi.security.service.AuthService;
 import com.collectoryx.collectoryxApi.shop.rest.response.UserLicenseResponse;
 import com.collectoryx.collectoryxApi.shop.service.ShopService;
 import com.collectoryx.collectoryxApi.user.model.LicenseStateTypes;
+import com.collectoryx.collectoryxApi.user.model.LicenseTypes;
 import com.collectoryx.collectoryxApi.user.model.User;
 import com.collectoryx.collectoryxApi.user.repository.UserRepository;
+import com.collectoryx.collectoryxApi.user.rest.response.ThemeResponse;
 import com.collectoryx.collectoryxApi.user.service.JwtUserDetailsService;
 import com.collectoryx.collectoryxApi.util.JwtTokenUtil;
 import java.time.Duration;
@@ -63,6 +65,7 @@ public class AuthenticationController {
   public ResponseEntity<?> loginUser(@RequestBody @Valid LoginRequest request) {
     Map<String, Object> responseMap = new HashMap<>();
     long daysBetween = 0;
+    Boolean trialActivated = false;
     try {
       Authentication auth = authenticationManager.authenticate(
           new UsernamePasswordAuthenticationToken(request.getUserName()
@@ -74,20 +77,35 @@ public class AuthenticationController {
         String token = jwtTokenUtil.generateToken(userDetails);
         String role = userDetailsService.getRole(request.getUserName());
         String email = userDetailsService.getEmail(request.getUserName());
+        ThemeResponse theme = userDetailsService.getTheme(request.getUserName());
         Long id = userDetailsService.getId(request.getUserName());
         String licenseType = userDetailsService.getLicenseType(email).getType().toString();
         String licenseState = userDetailsService.getLicenseType(email).getState().toString();
-        Boolean trialActivated = userDetailsService.getLicenseType(email).isTrialActivated();
         Date expiringDate = userDetailsService.getLicenseType(email).getExpiryTime();
-        if (licenseState.equals(LicenseStateTypes.Activated.toString())) {
+        if (licenseState.equals(LicenseStateTypes.Activated.toString()) && expiringDate != null) {
           LocalDateTime today = LocalDateTime.now();
           LocalDateTime date2 = authService.convertToLocalDateTimeViaInstant(expiringDate);
           daysBetween = Duration.between(today, date2).toDays();
         }
+        //Si la licencia ha caducado y es Trial, pasamos automaticamente a Gratuita y ponemos a
+        // trial utilizado
+        if (daysBetween <= 0 && licenseType.contains("Trial")) {
+          responseMap.put("license", LicenseTypes.Free);
+          userDetailsService.setTrialActivated(email);
+        } else {
+          //Si se ha caducado la licencia pero no es trial, pasamos a gratuita
+          if (daysBetween <= 0 && !licenseType.contains("Trial")) {
+            responseMap.put("license", LicenseTypes.Free);
+            userDetailsService.setFreeLicense(email);
+          } else {
+            responseMap.put("license", licenseType);
+          }
+        }
+        trialActivated = userDetailsService.getLicenseType(email).isTrialActivated();
         responseMap.put("id", id);
         responseMap.put("error", false);
         responseMap.put("message", "Logged In");
-        responseMap.put("license", licenseType);
+        responseMap.put("theme", theme);
         responseMap.put("licenseState", licenseState);
         responseMap.put("licenseDuration", daysBetween);
         responseMap.put("trialActivated", trialActivated);

@@ -25,6 +25,8 @@ public class UserLicenseResponse {
 
   private Date expiringDate;
 
+  private Long licenseDuration;
+
   protected LicenseStateTypes state;
 
   private LicenseTypes type;

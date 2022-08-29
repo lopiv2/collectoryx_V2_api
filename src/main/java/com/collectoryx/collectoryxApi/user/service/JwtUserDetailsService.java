@@ -1,9 +1,11 @@
 package com.collectoryx.collectoryxApi.user.service;
 
+import com.collectoryx.collectoryxApi.user.model.LicenseTypes;
 import com.collectoryx.collectoryxApi.user.model.User;
 import com.collectoryx.collectoryxApi.user.model.UserLicenses;
 import com.collectoryx.collectoryxApi.user.repository.UserLicensesRepository;
 import com.collectoryx.collectoryxApi.user.repository.UserRepository;
+import com.collectoryx.collectoryxApi.user.rest.response.ThemeResponse;
 import java.util.ArrayList;
 import java.util.List;
 import org.springframework.security.core.GrantedAuthority;
@@ -18,11 +20,13 @@ public class JwtUserDetailsService implements UserDetailsService {
 
   final UserRepository userRepository;
   final UserLicensesRepository userLicensesRepository;
+  final UserThemesService userThemesService;
 
   public JwtUserDetailsService(UserRepository userRepository,
-      UserLicensesRepository userLicensesRepository) {
+      UserLicensesRepository userLicensesRepository, UserThemesService userThemesService) {
     this.userRepository = userRepository;
     this.userLicensesRepository = userLicensesRepository;
+    this.userThemesService = userThemesService;
   }
 
   public String getRole(String userName) {
@@ -44,18 +48,37 @@ public class JwtUserDetailsService implements UserDetailsService {
     return user.getId();
   }
 
+  public ThemeResponse getTheme(String userName) {
+    User user = userRepository.findByUserName(userName);
+    return userThemesService.toThemesResponse(user.getTheme());
+  }
+
   public UserLicenses getLicenseType(String email) {
     UserLicenses userLicenses = this.userLicensesRepository
         .findByLicenseCheckMachine_User_Email(email);
     return userLicenses;
   }
 
-  public Boolean checkUserEmailExists(String email){
-    User user=this.userRepository.findByEmail(email);
-    if(user==null){
+  public void setTrialActivated(String email) {
+    UserLicenses userLicenses = this.userLicensesRepository
+        .findByLicenseCheckMachine_User_Email(email);
+    userLicenses.setType(LicenseTypes.Free);
+    userLicenses.setTrialActivated(true);
+    this.userLicensesRepository.save(userLicenses);
+  }
+
+  public void setFreeLicense(String email) {
+    UserLicenses userLicenses = this.userLicensesRepository
+        .findByLicenseCheckMachine_User_Email(email);
+    userLicenses.setType(LicenseTypes.Free);
+    this.userLicensesRepository.save(userLicenses);
+  }
+
+  public Boolean checkUserEmailExists(String email) {
+    User user = this.userRepository.findByEmail(email);
+    if (user == null) {
       return false;
-    }
-    else{
+    } else {
       return true;
     }
   }

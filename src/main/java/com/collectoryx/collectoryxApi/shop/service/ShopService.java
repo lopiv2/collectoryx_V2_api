@@ -1,6 +1,7 @@
 package com.collectoryx.collectoryxApi.shop.service;
 
 import com.collectoryx.collectoryxApi.config.service.AdminService;
+import com.collectoryx.collectoryxApi.security.service.AuthService;
 import com.collectoryx.collectoryxApi.shop.rest.response.UserLicenseResponse;
 import com.collectoryx.collectoryxApi.user.model.LicenseStateTypes;
 import com.collectoryx.collectoryxApi.user.model.LicenseTypes;
@@ -12,9 +13,13 @@ import com.collectoryx.collectoryxApi.user.repository.UserMachinesRepository;
 import com.collectoryx.collectoryxApi.user.repository.UserRepository;
 import com.collectoryx.collectoryxApi.user.rest.response.UserMachinesResponse;
 import com.collectoryx.collectoryxApi.util.HardwareInfo;
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import javax.transaction.Transactional;
+import org.apache.commons.lang3.time.DateUtils;
+import org.assertj.core.util.DateUtil;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -26,16 +31,18 @@ public class ShopService {
   private final UserMachinesRepository userMachinesRepository;
   private final HardwareInfo hardwareInfo;
   private final AdminService adminService;
+  private final AuthService authService;
 
 
   public ShopService(UserRepository userRepository, UserLicensesRepository userLicensesRepository,
       UserMachinesRepository userMachinesRepository, HardwareInfo hardwareInfo,
-      AdminService adminService) {
+      AdminService adminService, AuthService authService) {
     this.userRepository = userRepository;
     this.userLicensesRepository = userLicensesRepository;
     this.userMachinesRepository = userMachinesRepository;
     this.hardwareInfo = hardwareInfo;
     this.adminService = adminService;
+    this.authService = authService;
   }
 
   public UserLicenseResponse SetClientLicensePetition(String email, String licenseSelected) {
@@ -75,8 +82,22 @@ public class ShopService {
         //Solo actualizamos el tipo de licencia solicitado cuando cambia el tipo de licencia
         //sino cambia, no se actualiza
         userLicenses.setType(LicenseTypes.valueOf(licenseSelected));
+        userLicenses.setIssuedTime(DateUtil.now());
+        switch (userLicenses.getType()) {
+          case Monthly -> userLicenses.setExpiryTime(DateUtils.addDays(DateUtil.now(), 31));
+          case Yearly -> userLicenses.setExpiryTime(DateUtils.addDays(DateUtil.now(), 365));
+          case Trial -> userLicenses.setExpiryTime(DateUtils.addDays(DateUtil.now(), 15));
+          case Free, Lifetime -> userLicenses.setExpiryTime(null);
+        }
         this.userLicensesRepository.save(userLicenses);
       }
+    }
+    long daysBetween=0;
+    LocalDateTime today = LocalDateTime.now();
+    LocalDateTime date2 = authService.convertToLocalDateTimeViaInstant(
+        userLicenses.getExpiryTime());
+    if(userLicenses.getExpiryTime()!=null){
+      daysBetween = Duration.between(today, date2).toDays();
     }
     UserLicenseResponse userLicenseResponse = new UserLicenseResponse();
     userLicenseResponse.setPaid(true);
@@ -84,6 +105,7 @@ public class ShopService {
     userLicenseResponse.setType(LicenseTypes.valueOf(licenseSelected));
     userLicenseResponse.setEmail(email);
     userLicenseResponse.setMachine(userMachinesResponse);
+    userLicenseResponse.setLicenseDuration(daysBetween);
     //Si se activa la licencia trial, se hace solo una vez
     if (licenseSelected.equals(LicenseTypes.Trial.toString())) {
       userLicenseResponse.setTrialActivated(true);
