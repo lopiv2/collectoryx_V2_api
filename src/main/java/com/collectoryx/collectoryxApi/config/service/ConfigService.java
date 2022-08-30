@@ -51,7 +51,7 @@ public class ConfigService {
     } catch (NotFoundException e) {
       e.printStackTrace();
     }
-    return toConfigResponse(config, themes);
+    return toConfigResponse(config);
   }
 
   public ConfigResponse saveConfig(ConfigRequest item) throws NotFoundException {
@@ -92,6 +92,13 @@ public class ConfigService {
     return ConfigResponse.builder()
         .id(request.getId())
         .theme(toThemeResponse(theme))
+        .darkTheme(request.isDarkTheme())
+        .build();
+  }
+
+  private ConfigResponse toConfigResponse(Config request) {
+    return ConfigResponse.builder()
+        .id(request.getId())
         .darkTheme(request.isDarkTheme())
         .build();
   }

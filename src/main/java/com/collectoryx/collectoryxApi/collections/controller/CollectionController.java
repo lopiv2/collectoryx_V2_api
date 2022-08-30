@@ -10,15 +10,10 @@ import com.collectoryx.collectoryxApi.collections.rest.response.CollectionListRe
 import com.collectoryx.collectoryxApi.collections.rest.response.CollectionResponse;
 import com.collectoryx.collectoryxApi.collections.rest.response.CollectionSeriesListResponse;
 import com.collectoryx.collectoryxApi.collections.service.CollectionService;
-import com.collectoryx.collectoryxApi.image.rest.response.ImageResponse;
 import com.collectoryx.collectoryxApi.image.service.ImageService;
 import com.collectoryx.collectoryxApi.util.service.FandomApiService;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.media.Content;
 import java.util.List;
-import javax.validation.constraints.NotEmpty;
 import org.springframework.data.crossstore.ChangeSetPersister.NotFoundException;
-import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -28,9 +23,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.multipart.MultipartFile;
 import reactor.core.publisher.Mono;
 
 @RestController
@@ -198,7 +191,7 @@ public class CollectionController {
     return Mono.just(collectionItemsResponses);
   }
 
-  @PutMapping(value = "/put-file", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+  /*@PutMapping(value = "/put-file", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
   public Mono<CollectionResponse> putFile(
       @Parameter(description = "Name of the image") @RequestPart("name") @NotEmpty String name,
       @Parameter(description = "Content of the file",
@@ -207,8 +200,7 @@ public class CollectionController {
     CollectionResponse collectionResponse = this.collectionService.createImage(name, image);
     //ImageResponse imageResponse=ImageResponse.builder().name("hola").path("hola").build();
     return Mono.just(collectionResponse);
-
-  }
+  }*/
 
   @PostMapping(value = "/toggle-collection-ambit")
   public Mono<CollectionResponse> toggleCollectionAmbit(
