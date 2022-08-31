@@ -12,6 +12,7 @@ import com.collectoryx.collectoryxApi.collections.rest.request.CollectionCreateI
 import com.collectoryx.collectoryxApi.collections.rest.request.CollectionItemRequest;
 import com.collectoryx.collectoryxApi.collections.rest.request.CollectionRequest;
 import com.collectoryx.collectoryxApi.collections.rest.request.CollectionSerieListRequest;
+import com.collectoryx.collectoryxApi.collections.rest.response.CSVHeadersResponse;
 import com.collectoryx.collectoryxApi.collections.rest.response.CollectionItemsResponse;
 import com.collectoryx.collectoryxApi.collections.rest.response.CollectionListResponse;
 import com.collectoryx.collectoryxApi.collections.rest.response.CollectionMetadataResponse;
@@ -38,10 +39,12 @@ import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 import javax.transaction.Transactional;
 import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
 import org.apache.commons.io.FilenameUtils;
 import org.springframework.data.crossstore.ChangeSetPersister.NotFoundException;
@@ -431,8 +434,8 @@ public class CollectionService {
     return pathFinal.toString();
   }
 
-  public long parseCSV(MultipartFile fileName) {
-    long cont=0;
+  public List<CSVHeadersResponse> getCSVHeaders(MultipartFile fileName) {
+    long cont = 0;
     String path = fileName.getName()
         + "." + FilenameUtils.getExtension(fileName.getOriginalFilename());
     String finalFile = null;
@@ -454,7 +457,52 @@ public class CollectionService {
       e.printStackTrace();
     }
 
-    String[] HEADERS = {"Image", "Name", "Collection","Serie","Year","Price","Own","Notes"};
+    String[] HEADERS = {"Image", "Name", "Collection", "Serie", "Year", "Price", "Own", "Notes"};
+
+    Iterable<CSVRecord> records = null;
+    CSVParser csvParser = null;
+    List<Map<String, Integer>> list = new ArrayList<>();
+    List<String> result2 = new ArrayList<>();
+    List<CSVHeadersResponse> csvHeadersResponseList = new ArrayList<>();
+    try {
+      csvParser = new CSVParser(in, CSVFormat.DEFAULT.withHeader());
+      Map<String, Integer> header = csvParser.getHeaderMap();
+      list.add(header);
+      //list.forEach(System.out::println);
+      for (int x = 0; x < list.size(); x++) {
+        result2 = list.get(x).keySet().stream().collect(Collectors.toList());
+      }
+      for (int x = 0; x < result2.size(); x++) {
+        csvHeadersResponseList.add(CSVHeadersResponse.builder().name(result2.get(x)).build());
+      }
+      //System.out.println(result2);
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+    return StreamSupport.stream(csvHeadersResponseList.spliterator(), false)
+        .map(this::toCSVHeadersResponse)
+        .collect(Collectors.toList());
+  }
+
+  private CSVHeadersResponse toCSVHeadersResponse(CSVHeadersResponse request) {
+    return CSVHeadersResponse.builder()
+        .name(request.getName())
+        .build();
+  }
+
+  private void parseCSV(String[] HEADERS) {
+    File file = new File(finalFile);
+    try {
+      fileName.transferTo(file);
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+    Reader in = null;
+    try {
+      in = new FileReader(file);
+    } catch (FileNotFoundException e) {
+      e.printStackTrace();
+    }
 
     Iterable<CSVRecord> records = null;
     try {

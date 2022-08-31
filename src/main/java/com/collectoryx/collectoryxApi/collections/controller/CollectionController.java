@@ -5,6 +5,7 @@ import com.collectoryx.collectoryxApi.collections.rest.request.CollectionCreateI
 import com.collectoryx.collectoryxApi.collections.rest.request.CollectionItemRequest;
 import com.collectoryx.collectoryxApi.collections.rest.request.CollectionRequest;
 import com.collectoryx.collectoryxApi.collections.rest.request.CollectionSerieListRequest;
+import com.collectoryx.collectoryxApi.collections.rest.response.CSVHeadersResponse;
 import com.collectoryx.collectoryxApi.collections.rest.response.CollectionItemsResponse;
 import com.collectoryx.collectoryxApi.collections.rest.response.CollectionListResponse;
 import com.collectoryx.collectoryxApi.collections.rest.response.CollectionResponse;
@@ -197,14 +198,22 @@ public class CollectionController {
     return Mono.just(collectionItemsResponses);
   }
 
-  @PutMapping(value = "/parse-file", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
-  public Mono<Long> parseFile(
+  @PutMapping(value = "/import-file", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+  public Mono<List<CSVHeadersResponse>> importFile(
       @Parameter(description = "Name of the image") @RequestPart("name") @NotEmpty String name,
       @Parameter(description = "Content of the file",
           content = @Content(mediaType = MediaType.APPLICATION_OCTET_STREAM_VALUE))
       @RequestPart("file") MultipartFile file) {
-    Long records=this.collectionService.parseCSV(file);
+    List<CSVHeadersResponse> records = this.collectionService.getCSVHeaders(file);
     return Mono.just(records);
+  }
+
+  @PostMapping(value = "/parse-file")
+  public Mono<String> parseFile(
+      @RequestBody String fileJSON,
+      @RequestHeader(value = "Authorization") String token) {
+
+    return Mono.just(fileJSON);
   }
 
   @PostMapping(value = "/toggle-collection-ambit")
