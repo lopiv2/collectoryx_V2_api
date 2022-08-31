@@ -22,6 +22,15 @@ import com.collectoryx.collectoryxApi.image.repository.ImageRepository;
 import com.collectoryx.collectoryxApi.image.rest.response.ImageResponse;
 import com.collectoryx.collectoryxApi.user.model.User;
 import com.collectoryx.collectoryxApi.user.repository.UserRepository;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.Reader;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.Year;
@@ -32,8 +41,12 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 import javax.transaction.Transactional;
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVRecord;
+import org.apache.commons.io.FilenameUtils;
 import org.springframework.data.crossstore.ChangeSetPersister.NotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.reactive.function.client.WebClient;
 
 @Service
@@ -403,6 +416,62 @@ public class CollectionService {
     this.collectionItemRepository.save(collection);
     CollectionItemsResponse collectionItemsResponse = toCollectionItemResponse(collection);
     return collectionItemsResponse;
+  }
+
+  public String saveFile(MultipartFile file, String path) throws IOException {
+    File files = new File(System.getProperty("user.dir")).getCanonicalFile();
+    //path = files + "/src/main/resources/" + file;
+    Path pathFinal = Paths.get(files + "/src/main/resources/" + path);
+    try {
+      Files.copy(file.getInputStream(), pathFinal, StandardCopyOption.REPLACE_EXISTING);
+    } catch (Exception e) {
+      throw new RuntimeException("Could not store the file. Error: " + e.getMessage());
+    }
+
+    return pathFinal.toString();
+  }
+
+  public long parseCSV(MultipartFile fileName) {
+    long cont=0;
+    String path = fileName.getName()
+        + "." + FilenameUtils.getExtension(fileName.getOriginalFilename());
+    String finalFile = null;
+    try {
+      finalFile = saveFile(fileName, path);
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+    File file = new File(finalFile);
+    try {
+      fileName.transferTo(file);
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+    Reader in = null;
+    try {
+      in = new FileReader(file);
+    } catch (FileNotFoundException e) {
+      e.printStackTrace();
+    }
+
+    String[] HEADERS = {"Image", "Name", "Collection","Serie","Year","Price","Own","Notes"};
+
+    Iterable<CSVRecord> records = null;
+    try {
+      records = CSVFormat.DEFAULT
+          .withHeader(HEADERS)
+          .withFirstRecordAsHeader()
+          .parse(in);
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+    for (CSVRecord record : records) {
+      String author = record.get("Image");
+      String title = record.get("Name");
+      cont++;
+      System.out.println(title);
+    }
+    return cont;
   }
 
   public CollectionItemsResponse updateItem(CollectionCreateItemRequest request)
