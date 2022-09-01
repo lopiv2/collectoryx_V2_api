@@ -1,5 +1,7 @@
 package com.collectoryx.collectoryxApi.user.service;
 
+import com.collectoryx.collectoryxApi.config.model.Config;
+import com.collectoryx.collectoryxApi.config.repository.ConfigRepository;
 import com.collectoryx.collectoryxApi.user.model.LicenseTypes;
 import com.collectoryx.collectoryxApi.user.model.User;
 import com.collectoryx.collectoryxApi.user.model.UserLicenses;
@@ -21,11 +23,13 @@ public class JwtUserDetailsService implements UserDetailsService {
   final UserRepository userRepository;
   final UserLicensesRepository userLicensesRepository;
   final UserThemesService userThemesService;
+  final ConfigRepository configRepository;
 
   public JwtUserDetailsService(UserRepository userRepository,
-      UserLicensesRepository userLicensesRepository, UserThemesService userThemesService) {
+      UserLicensesRepository userLicensesRepository, ConfigRepository configRepository, UserThemesService userThemesService) {
     this.userRepository = userRepository;
     this.userLicensesRepository = userLicensesRepository;
+    this.configRepository=configRepository;
     this.userThemesService = userThemesService;
   }
 
@@ -49,8 +53,9 @@ public class JwtUserDetailsService implements UserDetailsService {
   }
 
   public ThemeResponse getTheme(String userName) {
-    User user = userRepository.findByUserName(userName);
-    return userThemesService.toThemesResponse(user.getTheme());
+    //User user = userRepository.findByUserName(userName);
+    Config config=configRepository.findByUser_UserName(userName);
+    return userThemesService.toThemesResponse(config.getTheme());
   }
 
   public UserLicenses getLicenseType(String email) {

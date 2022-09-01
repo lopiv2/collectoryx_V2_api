@@ -558,23 +558,40 @@ public class CollectionService {
         collectionList = checkCollection(jsonObj.getLong("collection"));
       }
     }
-    System.out.println(collectionList);
     //Leo registro a registro del documento csv
-    /*for (CSVRecord record : records) {
+    for (CSVRecord record : records) {
       collectionSeriesList = checkSerie(record.get(serie), collectionList);
+      float pric;
+      boolean ow = false;
+      int ye;
+      try {
+        pric = Float.valueOf(record.get(price));
+      } catch (NumberFormatException e) {
+        pric = 0;
+      }
+      try {
+        ye = Integer.valueOf(record.get(year));
+      } catch (NumberFormatException e) {
+        ye = 2022;
+      }
+      try {
+        ow = Boolean.parseBoolean(record.get(own));
+      } catch (IllegalArgumentException e) {
+        ow = false;
+      }
       CollectionItem collectionItem = CollectionItem.builder()
           .name(record.get(name))
-          .own(Boolean.parseBoolean(record.get(own)))
-          .price(Float.valueOf(record.get(price)))
+          .own(ow)
+          .price(pric)
           .notes(record.get(notes))
-          .year(Integer.valueOf(record.get(year)))
+          .year(ye)
           .wanted(false)
           .serie(collectionSeriesList)
           .collection(collectionList)
           .build();
       System.out.println(collectionItem);
       cont++;
-    }*/
+    }
     return cont;
   }
 
@@ -691,8 +708,9 @@ public class CollectionService {
     }
 
     List<CollectionMetadataResponse> collectionMetadata = null;
-    collectionMetadata = StreamSupport.stream(this.collectionMetadataRepository.findByCollection_Id(
-            collection.getId()).spliterator(), false).map(this::toCollectionMetadataResponse)
+    collectionMetadata = StreamSupport.stream(
+            this.collectionMetadataRepository.findByCollection_Id(
+                collection.getId()).spliterator(), false).map(this::toCollectionMetadataResponse)
         .collect(Collectors.toList());
     return CollectionItemsResponse.builder()
         .id(collection.getId())
@@ -809,8 +827,9 @@ public class CollectionService {
   private CollectionListResponse toCollectionListResponse(CollectionList request) {
     ImageResponse image = null;
     List<CollectionMetadataResponse> collectionMetadata = null;
-    collectionMetadata = StreamSupport.stream(this.collectionMetadataRepository.findByCollection_Id(
-            request.getId()).spliterator(), false).map(this::toCollectionMetadataResponse)
+    collectionMetadata = StreamSupport.stream(
+            this.collectionMetadataRepository.findByCollection_Id(
+                request.getId()).spliterator(), false).map(this::toCollectionMetadataResponse)
         .collect(Collectors.toList());
     if (request.getLogo() != null) {
       try {

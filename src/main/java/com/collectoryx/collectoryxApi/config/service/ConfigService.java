@@ -61,7 +61,7 @@ public class ConfigService {
       User user = this.userRepository.findById(item.getId()).orElseThrow(NotFoundException::new);
       Themes themes = this.userThemesRepository.findById(item.getTheme())
           .orElseThrow(NotFoundException::new);
-      user.setTheme(themes);
+      config.setTheme(themes);
       this.configRepository.save(config);
       this.userRepository.save(user);
       return toConfigResponse(config, themes);

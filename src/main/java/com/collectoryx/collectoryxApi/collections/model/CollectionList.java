@@ -44,7 +44,6 @@ public class CollectionList {
   @Enumerated(EnumType.STRING)
   protected CollectionTemplateType template;
 
-  //@ToString.Exclude
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "user_id")
   protected User user;

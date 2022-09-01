@@ -13,4 +13,6 @@ public interface ConfigRepository extends JpaRepository<Config, Long> {
   Iterable<Config> findAllByUser_Id(Long id);
 
   Config findByUser_Id(Long id);
+
+  Config findByUser_UserName(String userName);
 }
