@@ -209,11 +209,11 @@ public class CollectionController {
   }
 
   @PostMapping(value = "/parse-file")
-  public Mono<String> parseFile(
+  public Mono<Integer> parseFile(
       @RequestBody String fileJSON,
       @RequestHeader(value = "Authorization") String token) {
-
-    return Mono.just(fileJSON);
+    int cont = this.collectionService.parseCSV(fileJSON);
+    return Mono.just(cont);
   }
 
   @PostMapping(value = "/toggle-collection-ambit")

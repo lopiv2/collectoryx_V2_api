@@ -5,12 +5,13 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="e7725e87-06c9-4363-a7e7-9ec3adee6157" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/collectoryx/collectoryxApi/collections/rest/response/CSVHeadersResponse.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/collectoryx/collectoryxApi/collections/controller/CollectionController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/collectoryx/collectoryxApi/collections/controller/CollectionController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/collectoryx/collectoryxApi/collections/model/CollectionList.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/collectoryx/collectoryxApi/collections/model/CollectionList.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/collectoryx/collectoryxApi/collections/repository/CollectionSeriesListRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/collectoryx/collectoryxApi/collections/repository/CollectionSeriesListRepository.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/collectoryx/collectoryxApi/collections/service/CollectionService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/collectoryx/collectoryxApi/collections/service/CollectionService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/collectoryx/collectoryxApi/user/model/User.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/collectoryx/collectoryxApi/user/model/User.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/resources/file.csv" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/file.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/collectoryx/collectoryxApi/collections/controller/CollectionController$1.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/collectoryx/collectoryxApi/collections/controller/CollectionController$1.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/target/classes/com/collectoryx/collectoryxApi/collections/controller/CollectionController.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/collectoryx/collectoryxApi/collections/controller/CollectionController.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/target/classes/com/collectoryx/collectoryxApi/collections/service/CollectionService.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/collectoryx/collectoryxApi/collections/service/CollectionService.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/target/classes/file.csv" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/file.csv" afterDir="false" />
@@ -44,14 +45,14 @@
     </file-type-list>
   </component>
   <component name="HighlightingSettingsPerFile">
-    <setting file="file://$PROJECT_DIR$/src/main/java/com/collectoryx/collectoryxApi/shop/service/ShopService.java" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/src/main/java/com/collectoryx/collectoryxApi/config/controller/AdminController.java" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/src/main/java/com/collectoryx/collectoryxApi/config/service/AdminService.java" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/src/main/java/com/collectoryx/collectoryxApi/user/repository/UserLicensesRepository.java" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/src/main/java/com/collectoryx/collectoryxApi/collections/service/CollectionService.java" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/src/main/java/com/collectoryx/collectoryxApi/shop/rest/response/UserLicenseResponse.java" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/src/main/java/com/collectoryx/collectoryxApi/user/model/UserLicenses.java" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/src/main/java/com/collectoryx/collectoryxApi/user/model/LicenseStateTypes.java" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/src/main/java/com/collectoryx/collectoryxApi/shop/rest/response/UserLicenseResponse.java" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/src/main/java/com/collectoryx/collectoryxApi/shop/service/ShopService.java" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/src/main/java/com/collectoryx/collectoryxApi/user/repository/UserLicensesRepository.java" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/src/main/java/com/collectoryx/collectoryxApi/config/controller/AdminController.java" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/src/main/java/com/collectoryx/collectoryxApi/config/service/AdminService.java" root0="FORCE_HIGHLIGHTING" />
   </component>
   <component name="MarkdownSettingsMigration">
     <option name="stateVersion" value="1" />
@@ -103,7 +104,7 @@
       <option name="ALTERNATIVE_JRE_PATH" value="openjdk-18" />
       <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="true" />
       <option name="MAIN_CLASS_NAME" value="com.collectoryx.collectoryxApi.CollectoryxApiApplication" />
-      <module name="collectoryx_V2_api" />
+      <module name="Collectoryx-Api" />
       <extension name="coverage">
         <pattern>
           <option name="PATTERN" value="com.collectoryx.collectoryxApi.*" />
@@ -248,7 +249,6 @@
         </entry>
       </map>
     </option>
-    <option name="oldMeFiltersMigrated" value="true" />
   </component>
   <component name="VcsManagerConfiguration">
     <ignored-roots>
@@ -256,6 +256,25 @@
     </ignored-roots>
   </component>
   <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/com/collectoryx/collectoryxApi/collections/service/CollectionService.java</url>
+          <line>574</line>
+          <option name="timeStamp" value="33" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/com/collectoryx/collectoryxApi/collections/service/CollectionService.java</url>
+          <line>560</line>
+          <option name="timeStamp" value="38" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/com/collectoryx/collectoryxApi/collections/service/CollectionService.java</url>
+          <line>577</line>
+          <option name="timeStamp" value="39" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
     <watches-manager>
       <configuration name="Application">
         <watch expression="request" />

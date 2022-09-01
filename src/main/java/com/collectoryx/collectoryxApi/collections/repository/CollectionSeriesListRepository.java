@@ -2,6 +2,7 @@ package com.collectoryx.collectoryxApi.collections.repository;
 
 import com.collectoryx.collectoryxApi.collections.model.CollectionSeriesList;
 import java.util.List;
+import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -14,4 +15,6 @@ public interface CollectionSeriesListRepository extends JpaRepository<Collection
   List<CollectionSeriesList> findAllByCollection_Id(Long id);
 
   List<CollectionSeriesList> findAllByCollection_UserId(Long id);
+
+  Optional<CollectionSeriesList> findByName(String name);
 }

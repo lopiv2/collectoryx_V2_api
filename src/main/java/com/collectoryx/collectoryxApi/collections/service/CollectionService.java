@@ -47,6 +47,8 @@ import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
 import org.apache.commons.io.FilenameUtils;
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.springframework.data.crossstore.ChangeSetPersister.NotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -484,19 +486,17 @@ public class CollectionService {
         .collect(Collectors.toList());
   }
 
-  private CSVHeadersResponse toCSVHeadersResponse(CSVHeadersResponse request) {
-    return CSVHeadersResponse.builder()
-        .name(request.getName())
-        .build();
-  }
-
-  private void parseCSV(String[] HEADERS) {
-    File file = new File(finalFile);
+  public int parseCSV(String HEADERS) {
+    //Convierte el string Headers en un Array de JSON
+    JSONArray jsonArr = new JSONArray(HEADERS);
+    File files = null;
     try {
-      fileName.transferTo(file);
+      files = new File(System.getProperty("user.dir")).getCanonicalFile();
     } catch (IOException e) {
       e.printStackTrace();
     }
+    Path pathFinal = Paths.get(files + "/src/main/resources/file.csv");
+    File file = new File(pathFinal.toString());
     Reader in = null;
     try {
       in = new FileReader(file);
@@ -513,13 +513,97 @@ public class CollectionService {
     } catch (IOException e) {
       e.printStackTrace();
     }
-    for (CSVRecord record : records) {
-      String author = record.get("Image");
-      String title = record.get("Name");
-      cont++;
-      System.out.println(title);
+    int cont = 0;
+    CollectionList collectionList = null;
+    CollectionSeriesList collectionSeriesList = null;
+    String name = "";
+    String serie = "";
+    String collection = "";
+    String own = "";
+    String price = "";
+    String year = "";
+    String notes = "";
+    String image = "";
+    //Leo los mapeos de los headers
+    for (int v = 0; v < jsonArr.length(); v++) {
+      JSONObject jsonObj = jsonArr.getJSONObject(v);
+      if (!jsonObj.has("collection")) {
+        switch (jsonObj.getString("original")) {
+          case "name":
+            name = jsonObj.getString("new");
+            break;
+          case "notes":
+            notes = jsonObj.getString("new");
+            break;
+          case "serie":
+            serie = jsonObj.getString("new");
+            break;
+          case "collection":
+            collection = jsonObj.getString("new");
+            break;
+          case "image":
+            image = jsonObj.getString("new");
+            break;
+          case "own":
+            own = jsonObj.getString("new");
+            break;
+          case "price":
+            price = jsonObj.getString("new");
+            break;
+          case "year":
+            year = jsonObj.getString("new");
+            break;
+        }
+      } else {
+        collectionList = checkCollection(jsonObj.getLong("collection"));
+      }
     }
+    System.out.println(collectionList);
+    //Leo registro a registro del documento csv
+    /*for (CSVRecord record : records) {
+      collectionSeriesList = checkSerie(record.get(serie), collectionList);
+      CollectionItem collectionItem = CollectionItem.builder()
+          .name(record.get(name))
+          .own(Boolean.parseBoolean(record.get(own)))
+          .price(Float.valueOf(record.get(price)))
+          .notes(record.get(notes))
+          .year(Integer.valueOf(record.get(year)))
+          .wanted(false)
+          .serie(collectionSeriesList)
+          .collection(collectionList)
+          .build();
+      System.out.println(collectionItem);
+      cont++;
+    }*/
     return cont;
+  }
+
+  public CollectionList checkCollection(Long id) {
+    CollectionList collectionList = null;
+    try {
+      collectionList = this.collectionListRepository.findById(id)
+          .orElseThrow(NotFoundException::new);
+    } catch (NotFoundException e) {
+      e.printStackTrace();
+    }
+    return collectionList;
+  }
+
+  public CollectionSeriesList checkSerie(String name,
+      CollectionList collectionList) {
+    CollectionSeriesList collectionSeriesList = null;
+    try {
+      collectionSeriesList = this.collectionSeriesListRepository.findByName(
+              name)
+          .orElseThrow(NotFoundException::new);
+    } catch (NotFoundException e) {
+      //Creo la serie si no existe
+      collectionSeriesList = CollectionSeriesList.builder()
+          .name(name)
+          .collection(collectionList)
+          .build();
+    }
+    return collectionSeriesList;
   }
 
   public CollectionItemsResponse updateItem(CollectionCreateItemRequest request)
@@ -568,6 +652,12 @@ public class CollectionService {
         .collection(collectionListResponse)
         .build();
     return collectionItemsResponse;
+  }
+
+  private CSVHeadersResponse toCSVHeadersResponse(CSVHeadersResponse request) {
+    return CSVHeadersResponse.builder()
+        .name(request.getName())
+        .build();
   }
 
   private CollectionItemsResponse toCollectionItemsResponse(CollectionItem collection) {
