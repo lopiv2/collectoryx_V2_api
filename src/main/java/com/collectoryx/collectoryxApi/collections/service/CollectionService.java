@@ -579,6 +579,7 @@ public class CollectionService {
       } catch (IllegalArgumentException e) {
         ow = false;
       }
+
       CollectionItem collectionItem = CollectionItem.builder()
           .name(record.get(name))
           .own(ow)
@@ -589,7 +590,8 @@ public class CollectionService {
           .serie(collectionSeriesList)
           .collection(collectionList)
           .build();
-      System.out.println(collectionItem);
+      this.collectionItemRepository.save(collectionItem);
+      //System.out.println(collectionItem);
       cont++;
     }
     return cont;
@@ -609,17 +611,17 @@ public class CollectionService {
   public CollectionSeriesList checkSerie(String name,
       CollectionList collectionList) {
     CollectionSeriesList collectionSeriesList = null;
-    try {
-      collectionSeriesList = this.collectionSeriesListRepository.findByName(
-              name)
-          .orElseThrow(NotFoundException::new);
-    } catch (NotFoundException e) {
-      //Creo la serie si no existe
+    if (name.isBlank()) {
+      name = "Null";
+    }
+    collectionSeriesList = this.collectionSeriesListRepository.findByName(name);
+    if (collectionSeriesList == null) {
       collectionSeriesList = CollectionSeriesList.builder()
           .name(name)
           .collection(collectionList)
           .build();
     }
+    this.collectionSeriesListRepository.save(collectionSeriesList);
     return collectionSeriesList;
   }
 
