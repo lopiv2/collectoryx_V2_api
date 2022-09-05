@@ -8,12 +8,11 @@ import reactor.core.publisher.Mono;
 @Service
 public class FandomApiService {
 
-  public Mono<String> Prueba() {
-    WebClient client = WebClient.create("https://favicongrabber.com/api/grab/thefwoosh.com");
-    //WebClient client = WebClient.create("https://dc.fandom.com/api.php");
+  public Mono<String> Prueba(String searchString) {
+    WebClient client = WebClient.create("https://dc.fandom.com/api.php");
     return client
         .get()
-        .uri("?action=imageserving&wisId=90286")
+        .uri("?action=opensearch&search="+searchString)
         .accept(MediaType.APPLICATION_JSON)
         .retrieve()
         .bodyToMono(String.class);

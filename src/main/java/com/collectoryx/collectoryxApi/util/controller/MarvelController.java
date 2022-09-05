@@ -23,7 +23,7 @@ public class MarvelController {
   @GetMapping(value = "/item-images/{query}")
   public Mono<String> getCollectionItemsById(@PathVariable("query") String query,
       @RequestHeader(value = "Authorization") String token) {
-    return this.fandomApiService.Prueba();
+    return this.fandomApiService.Prueba(query);
     /*List<CollectionItemsResponse> collectionResponses = this.collectionService.getCollectionItemsById(
         id);*/
     //return Mono.just(collectionResponses);
