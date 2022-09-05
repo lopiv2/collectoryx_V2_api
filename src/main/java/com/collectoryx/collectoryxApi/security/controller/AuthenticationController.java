@@ -1,20 +1,15 @@
 package com.collectoryx.collectoryxApi.security.controller;
 
+import com.collectoryx.collectoryxApi.config.service.ConfigService;
 import com.collectoryx.collectoryxApi.security.rest.request.LoginRequest;
 import com.collectoryx.collectoryxApi.security.rest.request.RegisterRequest;
 import com.collectoryx.collectoryxApi.security.service.AuthService;
-import com.collectoryx.collectoryxApi.shop.rest.response.UserLicenseResponse;
 import com.collectoryx.collectoryxApi.shop.service.ShopService;
-import com.collectoryx.collectoryxApi.user.model.LicenseStateTypes;
-import com.collectoryx.collectoryxApi.user.model.LicenseTypes;
 import com.collectoryx.collectoryxApi.user.model.User;
 import com.collectoryx.collectoryxApi.user.repository.UserRepository;
 import com.collectoryx.collectoryxApi.user.rest.response.ThemeResponse;
 import com.collectoryx.collectoryxApi.user.service.JwtUserDetailsService;
 import com.collectoryx.collectoryxApi.util.JwtTokenUtil;
-import java.time.Duration;
-import java.time.LocalDateTime;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import javax.validation.Valid;
@@ -47,18 +42,20 @@ public class AuthenticationController {
   final JwtUserDetailsService userDetailsService;
   final JwtTokenUtil jwtTokenUtil;
   private final AuthService authService;
+  private final ConfigService configService;
   private final ShopService shopService;
 
   public AuthenticationController(UserRepository userRepository,
       AuthenticationManager authenticationManager,
       JwtUserDetailsService userDetailsService, JwtTokenUtil jwtTokenUtil,
-      AuthService authService, ShopService shopService) {
+      AuthService authService, ShopService shopService, ConfigService configService) {
     this.userRepository = userRepository;
     this.authenticationManager = authenticationManager;
     this.userDetailsService = userDetailsService;
     this.jwtTokenUtil = jwtTokenUtil;
     this.authService = authService;
     this.shopService = shopService;
+    this.configService = configService;
   }
 
   @PostMapping("/login")
@@ -79,7 +76,7 @@ public class AuthenticationController {
         String email = userDetailsService.getEmail(request.getUserName());
         ThemeResponse theme = userDetailsService.getTheme(request.getUserName());
         Long id = userDetailsService.getId(request.getUserName());
-        String licenseType = userDetailsService.getLicenseType(email).getType().toString();
+        /*String licenseType = userDetailsService.getLicenseType(email).getType().toString();
         String licenseState = userDetailsService.getLicenseType(email).getState().toString();
         Date expiringDate = userDetailsService.getLicenseType(email).getExpiryTime();
         if (licenseState.equals(LicenseStateTypes.Activated.toString()) && expiringDate != null) {
@@ -89,7 +86,7 @@ public class AuthenticationController {
         }
         //Si la licencia ha caducado y es Trial, pasamos automaticamente a Gratuita y ponemos a
         // trial utilizado
-        if (daysBetween <= 0 && licenseType.contains("Trial")) {
+        /*if (daysBetween <= 0 && licenseType.contains("Trial")) {
           responseMap.put("license", LicenseTypes.Free);
           userDetailsService.setTrialActivated(email);
         } else {
@@ -101,14 +98,14 @@ public class AuthenticationController {
             responseMap.put("license", licenseType);
           }
         }
-        trialActivated = userDetailsService.getLicenseType(email).isTrialActivated();
+        trialActivated = userDetailsService.getLicenseType(email).isTrialActivated();*/
         responseMap.put("id", id);
         responseMap.put("error", false);
         responseMap.put("message", "Logged In");
         responseMap.put("theme", theme);
-        responseMap.put("licenseState", licenseState);
-        responseMap.put("licenseDuration", daysBetween);
-        responseMap.put("trialActivated", trialActivated);
+        //responseMap.put("licenseState", licenseState);
+        //responseMap.put("licenseDuration", daysBetween);
+        //responseMap.put("trialActivated", trialActivated);
         responseMap.put("token", token);
         responseMap.put("role", role);
         responseMap.put("email", email);
@@ -155,10 +152,14 @@ public class AuthenticationController {
       return ResponseEntity.badRequest().body(responseMap);
     }
     userRepository.save(user);
-    //Se genera una licencia free por defecto al crear un usuario nuevo
-    UserLicenseResponse userLicenseResponse = this.shopService.SetClientLicensePetition(
+    //Se genera el listado de Apis por defecto que lleva la aplicacion
+    this.configService.createInitialApiList(user);
+    //Genera configuracion inicial del usuario
+    this.configService.createInitialConfig(user);
+    //Se genera una licencia free por defecto al crear un usuario nuevo, Esto solo para SASS
+    /*UserLicenseResponse userLicenseResponse = this.shopService.SetClientLicensePetition(
         request.getEmail(),
-        "Free");
+        "Free");*/
     responseMap.put("error", false);
     responseMap.put("username", request.getUserName());
     responseMap.put("message", "Account created successfully");

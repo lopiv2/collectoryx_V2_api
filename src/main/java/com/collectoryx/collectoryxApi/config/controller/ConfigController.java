@@ -1,6 +1,7 @@
 package com.collectoryx.collectoryxApi.config.controller;
 
 import com.collectoryx.collectoryxApi.config.rest.request.ConfigRequest;
+import com.collectoryx.collectoryxApi.config.rest.response.ConfigApiResponse;
 import com.collectoryx.collectoryxApi.config.rest.response.ConfigResponse;
 import com.collectoryx.collectoryxApi.config.service.ConfigService;
 import com.collectoryx.collectoryxApi.user.rest.request.ThemeRequest;
@@ -41,6 +42,14 @@ public class ConfigController {
       }
     }
     return Mono.just(themeResponse);
+  }
+
+  @GetMapping(value = "/get-api-list/{id}")
+  public Mono<List<ConfigApiResponse>> getAllApis(@PathVariable("id") Long id,
+      @RequestHeader(value = "Authorization") String token) {
+    List<ConfigApiResponse> configApiResponseList =
+        this.configService.getAllApisByUser(id);
+    return Mono.just(configApiResponseList);
   }
 
   @GetMapping(value = "/get-config/{id}")

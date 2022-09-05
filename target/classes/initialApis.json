@@ -1,0 +1,26 @@
+[
+ {
+  "name": "Pokemon TCG",
+  "keyCode": "",
+  "logo": "https://pokemontcg.io/images/favicon.ico",
+  "notDelete": true
+  },
+  {
+  "name": "MOTU",
+  "keyCode": "",
+  "logo": "+49 176 14890478",
+  "notDelete": true
+  },
+  {
+  "name": "Marvel Legends",
+  "keyCode": "",
+  "logo": "+49 176 14890478",
+  "notDelete": true
+  },
+  {
+  "name": "DC Multiverse",
+  "keyCode": "",
+  "logo": "+49 176 14890478",
+  "notDelete": true
+  }
+]
