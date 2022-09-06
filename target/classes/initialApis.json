@@ -2,25 +2,25 @@
  {
   "name": "Pokemon TCG",
   "keyCode": "",
-  "logo": "https://pokemontcg.io/images/favicon.ico",
-  "notDelete": true
+  "apiLink": "https://api.pokemontcg.io/v2",
+  "logo": "https://pokemontcg.io/images/favicon.ico"
   },
   {
   "name": "MOTU",
   "keyCode": "",
-  "logo": "+49 176 14890478",
-  "notDelete": true
+  "apiLink": "",
+  "logo": "+49 176 14890478"
   },
   {
   "name": "Marvel Legends",
   "keyCode": "",
-  "logo": "+49 176 14890478",
-  "notDelete": true
+  "apiLink": "",
+  "logo": "+49 176 14890478"
   },
   {
   "name": "DC Multiverse",
   "keyCode": "",
-  "logo": "+49 176 14890478",
-  "notDelete": true
+  "apiLink": "",
+  "logo": "+49 176 14890478"
   }
 ]

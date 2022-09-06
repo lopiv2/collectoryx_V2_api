@@ -16,6 +16,5 @@ public class ConfigApiResponse {
   private String keyCode;
   private String apiLink;
   private String logo;
-  private boolean notDelete;
 
 }

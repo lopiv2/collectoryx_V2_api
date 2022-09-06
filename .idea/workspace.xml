@@ -5,17 +5,26 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="e7725e87-06c9-4363-a7e7-9ec3adee6157" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/collectoryx/collectoryxApi/config/model/ConfigApiKeys.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/collectoryx/collectoryxApi/config/repository/ConfigApiKeysRepository.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/collectoryx/collectoryxApi/config/rest/request/ConfigApiRequest.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/collectoryx/collectoryxApi/config/rest/response/ConfigApiResponse.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/collectoryx/collectoryxApi/util/rest/request/ScrapperApiRequest.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/collectoryx/collectoryxApi/collections/controller/CollectionController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/collectoryx/collectoryxApi/collections/controller/CollectionController.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/collectoryx/collectoryxApi/config/controller/ConfigController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/collectoryx/collectoryxApi/config/controller/ConfigController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/collectoryx/collectoryxApi/config/model/ConfigApiKeys.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/collectoryx/collectoryxApi/config/model/ConfigApiKeys.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/collectoryx/collectoryxApi/config/rest/request/ConfigApiRequest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/collectoryx/collectoryxApi/config/rest/request/ConfigApiRequest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/collectoryx/collectoryxApi/config/rest/response/ConfigApiResponse.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/collectoryx/collectoryxApi/config/rest/response/ConfigApiResponse.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/collectoryx/collectoryxApi/config/service/ConfigService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/collectoryx/collectoryxApi/config/service/ConfigService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/collectoryx/collectoryxApi/security/controller/AuthenticationController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/collectoryx/collectoryxApi/security/controller/AuthenticationController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/collectoryx/collectoryxApi/util/controller/MarvelController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/collectoryx/collectoryxApi/util/controller/ScrapperController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/collectoryx/collectoryxApi/util/service/FandomApiService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/collectoryx/collectoryxApi/util/service/ScrapperApiService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/initialApis.json" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/initialApis.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/target/classes/com/collectoryx/collectoryxApi/config/controller/ConfigController.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/collectoryx/collectoryxApi/config/controller/ConfigController.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/collectoryx/collectoryxApi/config/model/ConfigApiKeys$ConfigApiKeysBuilder.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/collectoryx/collectoryxApi/config/model/ConfigApiKeys$ConfigApiKeysBuilder.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/collectoryx/collectoryxApi/config/model/ConfigApiKeys.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/collectoryx/collectoryxApi/config/model/ConfigApiKeys.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/collectoryx/collectoryxApi/config/rest/request/ConfigApiRequest$ConfigApiRequestBuilder.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/collectoryx/collectoryxApi/config/rest/request/ConfigApiRequest$ConfigApiRequestBuilder.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/collectoryx/collectoryxApi/config/rest/request/ConfigApiRequest.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/collectoryx/collectoryxApi/config/rest/request/ConfigApiRequest.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/collectoryx/collectoryxApi/config/rest/response/ConfigApiResponse$ConfigApiResponseBuilder.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/collectoryx/collectoryxApi/config/rest/response/ConfigApiResponse$ConfigApiResponseBuilder.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/collectoryx/collectoryxApi/config/rest/response/ConfigApiResponse.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/collectoryx/collectoryxApi/config/rest/response/ConfigApiResponse.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/target/classes/com/collectoryx/collectoryxApi/config/service/ConfigService.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/collectoryx/collectoryxApi/config/service/ConfigService.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/collectoryx/collectoryxApi/security/controller/AuthenticationController.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/collectoryx/collectoryxApi/security/controller/AuthenticationController.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/initialApis.json" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/initialApis.json" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -46,14 +55,14 @@
     </file-type-list>
   </component>
   <component name="HighlightingSettingsPerFile">
-    <setting file="file://$PROJECT_DIR$/src/main/java/com/collectoryx/collectoryxApi/shop/service/ShopService.java" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/src/main/java/com/collectoryx/collectoryxApi/config/controller/AdminController.java" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/src/main/java/com/collectoryx/collectoryxApi/config/service/AdminService.java" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/src/main/java/com/collectoryx/collectoryxApi/user/repository/UserLicensesRepository.java" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/src/main/java/com/collectoryx/collectoryxApi/collections/service/CollectionService.java" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/src/main/java/com/collectoryx/collectoryxApi/shop/rest/response/UserLicenseResponse.java" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/src/main/java/com/collectoryx/collectoryxApi/user/model/UserLicenses.java" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/src/main/java/com/collectoryx/collectoryxApi/user/model/LicenseStateTypes.java" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/src/main/java/com/collectoryx/collectoryxApi/shop/rest/response/UserLicenseResponse.java" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/src/main/java/com/collectoryx/collectoryxApi/shop/service/ShopService.java" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/src/main/java/com/collectoryx/collectoryxApi/user/repository/UserLicensesRepository.java" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/src/main/java/com/collectoryx/collectoryxApi/config/controller/AdminController.java" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/src/main/java/com/collectoryx/collectoryxApi/config/service/AdminService.java" root0="FORCE_HIGHLIGHTING" />
   </component>
   <component name="MarkdownSettingsMigration">
     <option name="stateVersion" value="1" />
@@ -93,11 +102,11 @@
       <recent name="" />
     </key>
     <key name="CopyClassDialog.RECENTS_KEY">
+      <recent name="com.collectoryx.collectoryxApi.util.rest.request" />
       <recent name="com.collectoryx.collectoryxApi.config.model" />
       <recent name="com.collectoryx.collectoryxApi.config.repository" />
       <recent name="com.collectoryx.collectoryxApi.config.rest.request" />
       <recent name="com.collectoryx.collectoryxApi.config.rest.response" />
-      <recent name="com.collectoryx.collectoryxApi.collections.rest.response" />
     </key>
   </component>
   <component name="RunManager" selected="Application.CollectoryxApiApplication">
@@ -105,7 +114,7 @@
       <option name="ALTERNATIVE_JRE_PATH" value="openjdk-18" />
       <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="true" />
       <option name="MAIN_CLASS_NAME" value="com.collectoryx.collectoryxApi.CollectoryxApiApplication" />
-      <module name="collectoryx_V2_api" />
+      <module name="Collectoryx-Api" />
       <extension name="coverage">
         <pattern>
           <option name="PATTERN" value="com.collectoryx.collectoryxApi.*" />
@@ -250,7 +259,6 @@
         </entry>
       </map>
     </option>
-    <option name="oldMeFiltersMigrated" value="true" />
   </component>
   <component name="VcsManagerConfiguration">
     <ignored-roots>

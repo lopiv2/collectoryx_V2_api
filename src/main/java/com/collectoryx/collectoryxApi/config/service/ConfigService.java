@@ -4,6 +4,7 @@ import com.collectoryx.collectoryxApi.config.model.Config;
 import com.collectoryx.collectoryxApi.config.model.ConfigApiKeys;
 import com.collectoryx.collectoryxApi.config.repository.ConfigApiKeysRepository;
 import com.collectoryx.collectoryxApi.config.repository.ConfigRepository;
+import com.collectoryx.collectoryxApi.config.rest.request.ConfigApiRequest;
 import com.collectoryx.collectoryxApi.config.rest.request.ConfigRequest;
 import com.collectoryx.collectoryxApi.config.rest.response.ConfigApiResponse;
 import com.collectoryx.collectoryxApi.config.rest.response.ConfigResponse;
@@ -45,6 +46,26 @@ public class ConfigService {
     this.configApiKeysRepository = configApiKeysRepository;
   }
 
+  public ConfigApiResponse createApi(ConfigApiRequest request) {
+    ConfigApiResponse configApiResponse = null;
+    User user = null;
+    try {
+      user = this.userRepository.findById(request.getUserId())
+          .orElseThrow(NotFoundException::new);
+    } catch (NotFoundException e) {
+      e.printStackTrace();
+    }
+    ConfigApiKeys configApiKeys = ConfigApiKeys.builder()
+        .apiLink(request.getApiLink())
+        .keyCode(request.getKeyCode())
+        .name(request.getName())
+        .logo(request.getLogo())
+        .user(user)
+        .build();
+    this.configApiKeysRepository.save(configApiKeys);
+    return toConfigApiResponse(configApiKeys);
+  }
+
   public void createInitialConfig(User user) {
     Themes theme = null;
     try {
@@ -82,6 +103,13 @@ public class ConfigService {
     } catch (IOException e) {
       e.printStackTrace();
     }
+  }
+
+  public boolean deleteApi(Long id) throws NotFoundException {
+    ConfigApiKeys col = this.configApiKeysRepository.findById(id)
+        .orElseThrow(NotFoundException::new);
+    this.configApiKeysRepository.deleteById(Long.valueOf(col.getId()));
+    return true;
   }
 
   public List<ConfigApiResponse> getAllApisByUser(Long id) {
@@ -159,7 +187,6 @@ public class ConfigService {
         .logo(request.getLogo())
         .apiLink(request.getApiLink())
         .keyCode(request.getKeyCode())
-        .notDelete(request.isNotDelete())
         .build();
   }
 

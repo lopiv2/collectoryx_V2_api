@@ -1,5 +1,6 @@
 package com.collectoryx.collectoryxApi.config.controller;
 
+import com.collectoryx.collectoryxApi.config.rest.request.ConfigApiRequest;
 import com.collectoryx.collectoryxApi.config.rest.request.ConfigRequest;
 import com.collectoryx.collectoryxApi.config.rest.response.ConfigApiResponse;
 import com.collectoryx.collectoryxApi.config.rest.response.ConfigResponse;
@@ -9,6 +10,7 @@ import com.collectoryx.collectoryxApi.user.rest.response.ThemeResponse;
 import java.util.List;
 import org.springframework.data.crossstore.ChangeSetPersister.NotFoundException;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -50,6 +52,22 @@ public class ConfigController {
     List<ConfigApiResponse> configApiResponseList =
         this.configService.getAllApisByUser(id);
     return Mono.just(configApiResponseList);
+  }
+
+  @PostMapping(value = "/create-api")
+  public Mono<ConfigApiResponse> createApi(
+      @RequestBody ConfigApiRequest configApiRequest,
+      @RequestHeader(value = "Authorization") String token) {
+    ConfigApiResponse configApiResponse = null;
+    configApiResponse = this.configService.createApi(configApiRequest);
+    return Mono.just(configApiResponse);
+  }
+
+  @DeleteMapping(value = "/delete-api/{id}")
+  public Mono<Boolean> deleteApi(@PathVariable("id") Long id,
+      @RequestHeader(value = "Authorization") String token) throws NotFoundException {
+    boolean isDeleted = this.configService.deleteApi(id);
+    return Mono.just(isDeleted);
   }
 
   @GetMapping(value = "/get-config/{id}")

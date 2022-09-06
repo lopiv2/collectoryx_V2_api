@@ -12,7 +12,7 @@ import com.collectoryx.collectoryxApi.collections.rest.response.CollectionRespon
 import com.collectoryx.collectoryxApi.collections.rest.response.CollectionSeriesListResponse;
 import com.collectoryx.collectoryxApi.collections.service.CollectionService;
 import com.collectoryx.collectoryxApi.image.service.ImageService;
-import com.collectoryx.collectoryxApi.util.service.FandomApiService;
+import com.collectoryx.collectoryxApi.util.service.ScrapperApiService;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import java.util.List;
@@ -41,14 +41,14 @@ public class CollectionController {
   private final CollectionService collectionService;
   private final ImageService imageService;
 
-  private final FandomApiService fandomApiService;
+  private final ScrapperApiService scrapperApiService;
 
 
   public CollectionController(CollectionService collectionService, ImageService imageService,
-      FandomApiService fandomApiService) {
+      ScrapperApiService scrapperApiService) {
     this.collectionService = collectionService;
     this.imageService = imageService;
-    this.fandomApiService = fandomApiService;
+    this.scrapperApiService = scrapperApiService;
   }
 
   @GetMapping(value = "/collections/{id}")

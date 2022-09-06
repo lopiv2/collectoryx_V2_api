@@ -34,8 +34,6 @@ public class ConfigApiKeys {
 
   private String logo;
 
-  private boolean notDelete;
-
   @OneToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "user_id")
   protected User user;
