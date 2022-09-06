@@ -30,6 +30,8 @@ public class ConfigApiKeys {
 
   private String keyCode;
 
+  private String header;
+
   private String apiLink;
 
   private String logo;

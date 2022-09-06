@@ -3,24 +3,28 @@
   "name": "Pokemon TCG",
   "keyCode": "",
   "apiLink": "https://api.pokemontcg.io/v2",
-  "logo": "https://pokemontcg.io/images/favicon.ico"
+  "logo": "https://pokemontcg.io/images/favicon.ico",
+  "header": "X-Api-Key"
   },
   {
   "name": "MOTU",
   "keyCode": "",
   "apiLink": "",
-  "logo": ""
+  "logo": "",
+   "header": ""
   },
   {
   "name": "Marvel Legends",
   "keyCode": "",
   "apiLink": "",
-  "logo": ""
+  "logo": "",
+   "header": ""
   },
   {
   "name": "DC Multiverse",
   "keyCode": "",
   "apiLink": "",
-  "logo": ""
+  "logo": "",
+   "header": ""
   }
 ]

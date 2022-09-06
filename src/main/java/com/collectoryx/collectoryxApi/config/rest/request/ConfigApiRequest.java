@@ -20,6 +20,9 @@ public class ConfigApiRequest {
   private String apiLink;
 
   @NotEmpty
+  private String header;
+
+  @NotEmpty
   private String name;
 
   @NotEmpty

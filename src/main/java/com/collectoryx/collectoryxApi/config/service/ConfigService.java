@@ -59,6 +59,7 @@ public class ConfigService {
         .apiLink(request.getApiLink())
         .keyCode(request.getKeyCode())
         .name(request.getName())
+        .header(request.getHeader())
         .logo(request.getLogo())
         .user(user)
         .build();
@@ -184,6 +185,7 @@ public class ConfigService {
     return ConfigApiResponse.builder()
         .id(request.getId())
         .name(request.getName())
+        .header(request.getHeader())
         .logo(request.getLogo())
         .apiLink(request.getApiLink())
         .keyCode(request.getKeyCode())

@@ -15,6 +15,10 @@ public class ScrapperApiRequest {
   @NotEmpty
   protected String searchQuery;
 
+  protected String header;
+
+  protected String keyCode;
+
   @NotEmpty
   protected String url;
 

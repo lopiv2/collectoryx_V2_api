@@ -14,6 +14,7 @@ public class ConfigApiResponse {
   private Integer id;
   private String name;
   private String keyCode;
+  private String header;
   private String apiLink;
   private String logo;
 
