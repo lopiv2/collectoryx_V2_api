@@ -1,6 +1,7 @@
 package com.collectoryx.collectoryxApi.collections.controller;
 
 import com.collectoryx.collectoryxApi.collections.model.CollectionTemplateType;
+import com.collectoryx.collectoryxApi.collections.rest.request.CollectionCreateItemImportApiRequest;
 import com.collectoryx.collectoryxApi.collections.rest.request.CollectionCreateItemRequest;
 import com.collectoryx.collectoryxApi.collections.rest.request.CollectionItemRequest;
 import com.collectoryx.collectoryxApi.collections.rest.request.CollectionRequest;
@@ -120,6 +121,19 @@ public class CollectionController {
       e.printStackTrace();
     }
     return Mono.just(collectionItemsResponse);
+  }
+
+  @PostMapping(value = "/create-item-new-serie")
+  public Mono<Void> createItemNewSerie(
+      @RequestBody CollectionCreateItemImportApiRequest collectionCreateItemRequest,
+      @RequestHeader(value = "Authorization") String token) {
+    try {
+      this.collectionService.createItemNewSerie(collectionCreateItemRequest);
+    } catch (NotFoundException e) {
+      e.printStackTrace();
+    }
+    return Mono.empty();
+    //return Mono.just(collectionItemsResponse);
   }
 
   @PostMapping(value = "/create-serie")

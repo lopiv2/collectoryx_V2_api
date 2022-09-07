@@ -8,6 +8,7 @@ import com.collectoryx.collectoryxApi.collections.repository.CollectionItemRepos
 import com.collectoryx.collectoryxApi.collections.repository.CollectionListRepository;
 import com.collectoryx.collectoryxApi.collections.repository.CollectionMetadataRepository;
 import com.collectoryx.collectoryxApi.collections.repository.CollectionSeriesListRepository;
+import com.collectoryx.collectoryxApi.collections.rest.request.CollectionCreateItemImportApiRequest;
 import com.collectoryx.collectoryxApi.collections.rest.request.CollectionCreateItemRequest;
 import com.collectoryx.collectoryxApi.collections.rest.request.CollectionItemRequest;
 import com.collectoryx.collectoryxApi.collections.rest.request.CollectionRequest;
@@ -239,6 +240,43 @@ public class CollectionService {
     this.collectionItemRepository.save(collectionItem);
 
     return collectionItemsResponse;
+  }
+
+  public void createItemNewSerie(CollectionCreateItemImportApiRequest request)
+      throws NotFoundException {
+    Image image = null;
+    if (request.getImage() != null) {
+      image = Image.builder()
+          .path(request.getImage())
+          .name(request.getName())
+          .build();
+    }
+    CollectionList collectionList = null;
+    collectionList = this.collectionListRepository.findById(request.getCollection())
+        .orElseThrow(NotFoundException::new);
+    CollectionSeriesList collectionSeriesList = null;
+    collectionSeriesList = this.collectionSeriesListRepository.findByName(request.getSerie());
+    if (collectionSeriesList == null) {
+      collectionSeriesList = CollectionSeriesList.builder()
+          .name(request.getSerie())
+          .collection(collectionList)
+          .build();
+    }
+    this.imagesRepository.save((image));
+    this.collectionSeriesListRepository.save(collectionSeriesList);
+    CollectionItem collectionItem = null;
+    collectionItem = CollectionItem.builder()
+        .name(request.getName())
+        .serie(collectionSeriesList)
+        .price(request.getPrice())
+        .year(request.getYear())
+        .adquiringDate(request.getAdquiringDate())
+        .own(request.isOwn())
+        .notes(request.getNotes())
+        .image(image)
+        .collection(collectionList)
+        .build();
+    this.collectionItemRepository.save(collectionItem);
   }
 
   public CollectionSeriesListResponse createSerie(CollectionSerieListRequest request)
