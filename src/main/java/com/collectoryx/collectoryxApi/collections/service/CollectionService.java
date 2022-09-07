@@ -92,6 +92,11 @@ public class CollectionService {
     return count;
   }
 
+  public CollectionItemsResponse getMostValuableItem(Long id) {
+    CollectionItem item = this.collectionItemRepository.getMostValuableItem(id);
+    return toCollectionItemsResponse(item);
+  }
+
   public CollectionResponse createCollection(CollectionRequest request) throws NotFoundException {
     Image image = null;
     CollectionList collectionList = null;

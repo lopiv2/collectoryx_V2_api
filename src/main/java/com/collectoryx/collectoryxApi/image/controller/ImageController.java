@@ -4,10 +4,13 @@ import com.collectoryx.collectoryxApi.image.rest.response.ImageResponse;
 import com.collectoryx.collectoryxApi.image.service.ImageService;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
+import java.util.List;
 import javax.validation.constraints.NotEmpty;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
@@ -31,9 +34,15 @@ public class ImageController {
       @Parameter(description = "Content of the image",
           content = @Content(mediaType = MediaType.APPLICATION_OCTET_STREAM_VALUE))
       @RequestPart("image") MultipartFile image) {
-    ImageResponse imageResponse = this.imageService.createImage(name,image);
+    ImageResponse imageResponse = this.imageService.createImage(name, image);
     //ImageResponse imageResponse=ImageResponse.builder().name("hola").path("hola").build();
     return Mono.just(imageResponse);
+  }
 
+  @GetMapping(value = "/get-images-local")
+  public Mono<List<ImageResponse>> getAllLocalImages(
+      @RequestHeader(value = "Authorization") String token) {
+    List<ImageResponse> imageResponses = this.imageService.getLocalImages();
+    return Mono.just(imageResponses);
   }
 }

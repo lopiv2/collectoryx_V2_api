@@ -27,4 +27,11 @@ public interface CollectionItemRepository extends JpaRepository<CollectionItem, 
       nativeQuery = true)
   List<CollectionItem> getItemsPerYear(@Param("userId") Long id, @Param("startDate") LocalDate start,
       @Param("endDate") LocalDate end);
+
+  @Query(value = "SELECT * FROM collection c "
+      + "JOIN collection_list l ON c.collection=l.id "
+      + "JOIN  users u ON l.user_id=u.id "
+      + "WHERE c.price=(SELECT MAX(price) FROM collection) AND u.id=:userId LIMIT 1",
+      nativeQuery = true)
+  CollectionItem getMostValuableItem(@Param("userId") Long id);
 }

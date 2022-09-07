@@ -9,6 +9,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Date;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 import javax.persistence.EntityNotFoundException;
 import javax.transaction.Transactional;
 import org.apache.commons.io.FilenameUtils;
@@ -28,7 +31,7 @@ public class ImageService {
 
   public void saveImage(MultipartFile file, String path) throws IOException {
     File files = new File(System.getProperty("user.dir")).getCanonicalFile();
-    path=files.getParent() + "\\images\\"+path;
+    path = files.getParent() + "\\images\\" + path;
     Path pathFinal = Paths.get(path);
     try {
       Files.copy(file.getInputStream(), pathFinal);
@@ -37,11 +40,18 @@ public class ImageService {
     }
   }
 
+  public List<ImageResponse> getLocalImages() {
+    List<Image> images = this.imageRepository.findAll();
+    return StreamSupport.stream(images.spliterator(), false)
+        .map(this::toImageResponse)
+        .collect(Collectors.toList());
+  }
+
   public ImageResponse createImage(String name, MultipartFile fileName) {
     String path = name
         + "-" + RandomStringUtils.randomAlphanumeric(8)
         + "." + FilenameUtils.getExtension(fileName.getOriginalFilename());
-    path=path.replaceAll(" ","_");
+    path = path.replaceAll(" ", "_");
     Image image = Image.builder()
         .name(name)
         .path(path)

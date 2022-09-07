@@ -222,6 +222,13 @@ public class CollectionController {
     return Mono.just(records);
   }
 
+  @GetMapping(value = "/most-valuable-item/{id}")
+  public Mono<CollectionItemsResponse> getMostValuableItem(@PathVariable("id") Long id,
+      @RequestHeader(value = "Authorization") String token) {
+    CollectionItemsResponse collectionItemsResponse = this.collectionService.getMostValuableItem(id);
+    return Mono.just(collectionItemsResponse);
+  }
+
   @PostMapping(value = "/parse-file")
   public Mono<Integer> parseFile(
       @RequestBody String fileJSON,
