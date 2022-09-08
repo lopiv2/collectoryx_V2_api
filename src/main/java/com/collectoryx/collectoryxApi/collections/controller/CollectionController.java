@@ -9,6 +9,7 @@ import com.collectoryx.collectoryxApi.collections.rest.request.CollectionSerieLi
 import com.collectoryx.collectoryxApi.collections.rest.response.CSVHeadersResponse;
 import com.collectoryx.collectoryxApi.collections.rest.response.CollectionItemsResponse;
 import com.collectoryx.collectoryxApi.collections.rest.response.CollectionListResponse;
+import com.collectoryx.collectoryxApi.collections.rest.response.CollectionMetadataResponse;
 import com.collectoryx.collectoryxApi.collections.rest.response.CollectionResponse;
 import com.collectoryx.collectoryxApi.collections.rest.response.CollectionSeriesListResponse;
 import com.collectoryx.collectoryxApi.collections.service.CollectionService;
@@ -210,6 +211,14 @@ public class CollectionController {
     List<CollectionItemsResponse> collectionItemsResponses =
         this.collectionService.getItemsYear(id);
     return Mono.just(collectionItemsResponses);
+  }
+
+  @GetMapping(value = "/get-metadata-fields/{id}")
+  public Mono<List<CollectionMetadataResponse>> getMetadataFields(@PathVariable("id") Long id,
+      @RequestHeader(value = "Authorization") String token) {
+    List<CollectionMetadataResponse> collectionMetadataResponseList =
+        this.collectionService.getMetadataFields(id);
+    return Mono.just(collectionMetadataResponseList);
   }
 
   @PutMapping(value = "/import-file", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})

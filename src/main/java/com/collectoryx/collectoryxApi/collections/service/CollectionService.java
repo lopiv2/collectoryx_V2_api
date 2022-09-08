@@ -391,6 +391,14 @@ public class CollectionService {
         .collect(Collectors.toList());
   }
 
+  public List<CollectionMetadataResponse> getMetadataFields(Long id) {
+    List<CollectionMetadata> collectionMetadata = this.collectionMetadataRepository
+        .findByCollection_Id(id);
+    return StreamSupport.stream(collectionMetadata.spliterator(), false)
+        .map(this::toCollectionMetadataResponse)
+        .collect(Collectors.toList());
+  }
+
   public List<CollectionItemsResponse> getMoneyFromAllItems(Long id) {
     //final List<CollectionItemsResponse> collectionResponseList = new LinkedList<>();
     List<CollectionItem> collections = this.collectionItemRepository
