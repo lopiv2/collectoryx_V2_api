@@ -56,8 +56,8 @@ public class CollectionController {
   @GetMapping(value = "/collections/{id}")
   public Mono<List<CollectionItemsResponse>> getCollectionItemsById(@PathVariable("id") Long id,
       @RequestHeader(value = "Authorization") String token) {
-    List<CollectionItemsResponse> collectionResponses = this.collectionService.getCollectionItemsById(
-        id);
+    List<CollectionItemsResponse> collectionResponses = this.collectionService.
+        getCollectionItemsById(id);
     return Mono.just(collectionResponses);
   }
 

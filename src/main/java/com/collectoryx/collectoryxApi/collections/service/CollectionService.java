@@ -1,19 +1,24 @@
 package com.collectoryx.collectoryxApi.collections.service;
 
 import com.collectoryx.collectoryxApi.collections.model.CollectionItem;
+import com.collectoryx.collectoryxApi.collections.model.CollectionItemsMetadata;
 import com.collectoryx.collectoryxApi.collections.model.CollectionList;
 import com.collectoryx.collectoryxApi.collections.model.CollectionMetadata;
+import com.collectoryx.collectoryxApi.collections.model.CollectionMetadataType;
 import com.collectoryx.collectoryxApi.collections.model.CollectionSeriesList;
 import com.collectoryx.collectoryxApi.collections.repository.CollectionItemRepository;
+import com.collectoryx.collectoryxApi.collections.repository.CollectionItemsMetadataRepository;
 import com.collectoryx.collectoryxApi.collections.repository.CollectionListRepository;
 import com.collectoryx.collectoryxApi.collections.repository.CollectionMetadataRepository;
 import com.collectoryx.collectoryxApi.collections.repository.CollectionSeriesListRepository;
 import com.collectoryx.collectoryxApi.collections.rest.request.CollectionCreateItemImportApiRequest;
 import com.collectoryx.collectoryxApi.collections.rest.request.CollectionCreateItemRequest;
+import com.collectoryx.collectoryxApi.collections.rest.request.CollectionItemMetadataRequest;
 import com.collectoryx.collectoryxApi.collections.rest.request.CollectionItemRequest;
 import com.collectoryx.collectoryxApi.collections.rest.request.CollectionRequest;
 import com.collectoryx.collectoryxApi.collections.rest.request.CollectionSerieListRequest;
 import com.collectoryx.collectoryxApi.collections.rest.response.CSVHeadersResponse;
+import com.collectoryx.collectoryxApi.collections.rest.response.CollectionItemMetadataResponse;
 import com.collectoryx.collectoryxApi.collections.rest.response.CollectionItemsResponse;
 import com.collectoryx.collectoryxApi.collections.rest.response.CollectionListResponse;
 import com.collectoryx.collectoryxApi.collections.rest.response.CollectionMetadataResponse;
@@ -65,6 +70,7 @@ public class CollectionService {
   private final CollectionMetadataRepository collectionMetadataRepository;
   private final CollectionSeriesListRepository collectionSeriesListRepository;
   private final UserRepository userRepository;
+  private final CollectionItemsMetadataRepository collectionItemsMetadataRepository;
   public WebClient webClient = WebClient.builder()
       .baseUrl("http://localhost:8083")
       .build();
@@ -73,6 +79,7 @@ public class CollectionService {
       CollectionListRepository collectionListRepository,
       ImageRepository imagesRepository, CollectionMetadataRepository collectionMetadataRepository,
       CollectionSeriesListRepository collectionSeriesListRepository,
+      CollectionItemsMetadataRepository collectionItemsMetadataRepository,
       UserRepository userRepository) {
     this.collectionItemRepository = collectionItemRepository;
     this.collectionListRepository = collectionListRepository;
@@ -80,6 +87,7 @@ public class CollectionService {
     this.collectionMetadataRepository = collectionMetadataRepository;
     this.collectionSeriesListRepository = collectionSeriesListRepository;
     this.userRepository = userRepository;
+    this.collectionItemsMetadataRepository = collectionItemsMetadataRepository;
   }
 
   public long getCountOfCollections(Long id) {
@@ -158,7 +166,6 @@ public class CollectionService {
             .id(m.getId())
             .name(m.getName())
             .type(m.getType())
-            .value("")
             .collection(collectionList)
             .build();
         collectionMetadataList.add(collectionMetadata);
@@ -208,6 +215,20 @@ public class CollectionService {
           .image(image)
           .collection(collectionList)
           .build();
+      this.collectionItemRepository.save(collectionItem);
+      List<CollectionItemMetadataResponse> collectionItemMetadataResponseList = new ArrayList<>();
+      for (CollectionItemMetadataRequest c : request.getMetadata()) {
+        CollectionMetadata collectionMetadata = this.collectionMetadataRepository.findById(
+            c.getId());
+        CollectionItemsMetadata collectionItemsMetadata = CollectionItemsMetadata.builder()
+            .item(collectionItem)
+            .metadata(collectionMetadata)
+            .value(c.getValue())
+            .build();
+        this.collectionItemsMetadataRepository.save(collectionItemsMetadata);
+        collectionItemMetadataResponseList.add(
+            toCollectionItemMetadataResponse(collectionItemsMetadata));
+      }
       collectionItemsResponse = CollectionItemsResponse.builder()
           .name(request.getName())
           .serie(collectionSeriesListResponse)
@@ -217,6 +238,7 @@ public class CollectionService {
           .own(request.isOwn())
           .notes(request.getNotes())
           .image(imageResponse)
+          .metadata(collectionItemMetadataResponseList)
           .collection(collectionListResponse)
           .build();
 
@@ -231,6 +253,20 @@ public class CollectionService {
           .notes(request.getNotes())
           .collection(collectionList)
           .build();
+      this.collectionItemRepository.save(collectionItem);
+      List<CollectionItemMetadataResponse> collectionItemMetadataResponseList = new ArrayList<>();
+      for (CollectionItemMetadataRequest c : request.getMetadata()) {
+        CollectionMetadata collectionMetadata = this.collectionMetadataRepository.findById(
+            c.getId());
+        CollectionItemsMetadata collectionItemsMetadata = CollectionItemsMetadata.builder()
+            .item(collectionItem)
+            .metadata(collectionMetadata)
+            .value(c.getValue())
+            .build();
+        this.collectionItemsMetadataRepository.save(collectionItemsMetadata);
+        collectionItemMetadataResponseList.add(
+            toCollectionItemMetadataResponse(collectionItemsMetadata));
+      }
       collectionItemsResponse = CollectionItemsResponse.builder()
           .name(request.getName())
           .serie(collectionSeriesListResponse)
@@ -239,11 +275,10 @@ public class CollectionService {
           .adquiringDate(request.getAdquiringDate())
           .own(request.isOwn())
           .notes(request.getNotes())
+          .metadata(collectionItemMetadataResponseList)
           .collection(collectionListResponse)
           .build();
     }
-    this.collectionItemRepository.save(collectionItem);
-
     return collectionItemsResponse;
   }
 
@@ -709,6 +744,29 @@ public class CollectionService {
           item.setImage(imageRight);
           return this.collectionItemRepository.save(item);
         }).orElseThrow(NotFoundException::new);
+    List<CollectionItemMetadataResponse> collectionItemMetadataResponseList = new ArrayList<>();
+    for (CollectionItemMetadataRequest c : request.getMetadata()) {
+      CollectionMetadata collectionMetadata = this.collectionMetadataRepository.findById(c.getId());
+      String tempVar=c.getValue();
+      if(c.getType()== CollectionMetadataType.BOOLEAN){
+        if(c.getValue().contains("1")){
+          tempVar=1;
+        }
+        else{
+          tempVar=0;
+        }
+      }
+      else{
+
+      }
+      CollectionItemsMetadata collectionItemsMetadata = this.collectionItemsMetadataRepository.
+          findById(Long.parseLong(c.getId())).map(item -> {
+            item.setValue(tempVar);
+            return this.collectionItemsMetadataRepository.save(item);
+          }).orElseThrow(NotFoundException::new);
+      collectionItemMetadataResponseList.add(
+          toCollectionItemMetadataResponse(collectionItemsMetadata));
+    }
     CollectionItemsResponse collectionItemsResponse = null;
     collectionItemsResponse = CollectionItemsResponse.builder()
         .name(request.getName())
@@ -720,6 +778,7 @@ public class CollectionService {
         .notes(request.getNotes())
         .image(imageResponse)
         .collection(collectionListResponse)
+        .metadata(collectionItemMetadataResponseList)
         .build();
     return collectionItemsResponse;
   }
@@ -760,11 +819,11 @@ public class CollectionService {
       e.printStackTrace();
     }
 
-    List<CollectionMetadataResponse> collectionMetadata = null;
-    collectionMetadata = StreamSupport.stream(
-            this.collectionMetadataRepository.findByCollection_Id(
-                collection.getId()).spliterator(), false).map(this::toCollectionMetadataResponse)
-        .collect(Collectors.toList());
+    List<CollectionItemMetadataResponse> collectionItemMetadataResponseList = StreamSupport
+        .stream(this.collectionItemsMetadataRepository
+            .findByItem_Id(collection.getId()).spliterator(), false)
+        .map(this::toCollectionItemMetadataResponse).collect(
+            Collectors.toList());
     return CollectionItemsResponse.builder()
         .id(collection.getId())
         .name(collection.getName())
@@ -777,7 +836,7 @@ public class CollectionService {
         .wanted(collection.isWanted())
         .notes(collection.getNotes())
         .adquiringDate(collection.getAdquiringDate())
-        .metadata(collectionMetadata)
+        .metadata(collectionItemMetadataResponseList)
         .build();
   }
 
@@ -961,11 +1020,26 @@ public class CollectionService {
   }
 
   private CollectionMetadataResponse toCollectionMetadataResponse(CollectionMetadata request) {
-    return CollectionMetadataResponse.builder()
+    if (request != null) {
+      return CollectionMetadataResponse.builder()
+          .id(request.getId())
+          .name(request.getName())
+          .type(request.getType())
+          .build();
+    }
+    return null;
+  }
+
+  private CollectionItemMetadataResponse toCollectionItemMetadataResponse(
+      CollectionItemsMetadata request) {
+    CollectionMetadata collectionMetadata = null;
+    collectionMetadata = this.collectionMetadataRepository.findById(
+        request.getMetadata().getId());
+    return CollectionItemMetadataResponse.builder()
         .id(request.getId())
         .value(request.getValue())
-        .name(request.getName())
-        .type(request.getType())
+        .type(collectionMetadata.getType())
+        .name(collectionMetadata.getName())
         .build();
   }
 

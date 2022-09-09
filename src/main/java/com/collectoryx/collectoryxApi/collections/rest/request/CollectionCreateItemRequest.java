@@ -1,6 +1,5 @@
 package com.collectoryx.collectoryxApi.collections.rest.request;
 
-import com.collectoryx.collectoryxApi.collections.rest.response.CollectionMetadataResponse;
 import java.util.Date;
 import java.util.List;
 import javax.validation.constraints.NotEmpty;
@@ -42,6 +41,6 @@ public class CollectionCreateItemRequest {
 
   private Date adquiringDate;
 
-  private List<CollectionMetadataResponse> metadata;
+  private List<CollectionItemMetadataRequest> metadata;
 
 }

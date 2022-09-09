@@ -2,6 +2,8 @@ package com.collectoryx.collectoryxApi.collections.rest.response;
 
 import com.collectoryx.collectoryxApi.collections.model.CollectionMetadataType;
 import io.swagger.v3.oas.annotations.media.Schema;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -11,14 +13,17 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class CollectionMetadataResponse {
+public class CollectionItemMetadataResponse {
 
-  private String id;
+  private Long id;
 
-  @Schema(description = "Metadata name", example = "Tag")
+  @Schema(description = "Metadata name", example = "Title")
   private String name;
 
-  @Schema(description = "Metadata type", example = "INTEGER")
-  private CollectionMetadataType type;
+  @Enumerated(EnumType.STRING)
+  private CollectionMetadataType type = CollectionMetadataType.STRING;
+
+  @Schema(description = "Metadata value", example = "Foo")
+  private String value;
 
 }

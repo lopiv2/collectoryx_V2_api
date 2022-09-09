@@ -27,8 +27,6 @@ public class CollectionMetadata {
 
   private String name;
 
-  private String value;
-
   @Enumerated(EnumType.STRING)
   @Default
   private CollectionMetadataType type = CollectionMetadataType.STRING;

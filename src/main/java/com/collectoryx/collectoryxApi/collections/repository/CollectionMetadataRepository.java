@@ -10,4 +10,5 @@ public interface CollectionMetadataRepository extends JpaRepository<CollectionMe
 
   List<CollectionMetadata> findByCollection_Id(Long collection_id);
 
+  CollectionMetadata findById(String id);
 }

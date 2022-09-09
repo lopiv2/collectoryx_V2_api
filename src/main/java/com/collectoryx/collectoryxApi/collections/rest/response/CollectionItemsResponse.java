@@ -36,6 +36,6 @@ public class CollectionItemsResponse {
 
   private Date adquiringDate;
 
-  private List<CollectionMetadataResponse> metadata;
+  private List<CollectionItemMetadataResponse> metadata;
 
 }
