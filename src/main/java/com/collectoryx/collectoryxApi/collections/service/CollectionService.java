@@ -4,7 +4,6 @@ import com.collectoryx.collectoryxApi.collections.model.CollectionItem;
 import com.collectoryx.collectoryxApi.collections.model.CollectionItemsMetadata;
 import com.collectoryx.collectoryxApi.collections.model.CollectionList;
 import com.collectoryx.collectoryxApi.collections.model.CollectionMetadata;
-import com.collectoryx.collectoryxApi.collections.model.CollectionMetadataType;
 import com.collectoryx.collectoryxApi.collections.model.CollectionSeriesList;
 import com.collectoryx.collectoryxApi.collections.repository.CollectionItemRepository;
 import com.collectoryx.collectoryxApi.collections.repository.CollectionItemsMetadataRepository;
@@ -172,12 +171,23 @@ public class CollectionService {
       }
       this.collectionMetadataRepository.saveAll(collectionMetadataList);
     }
-    ImageResponse imageResponse = toImageResponse(image);
-    CollectionResponse collectionResponse = CollectionResponse.builder()
-        .collection(request.getName())
-        .template(request.getTemplate())
-        .logo(imageResponse)
-        .build();
+    ImageResponse imageResponse = null;
+    CollectionResponse collectionResponse = null;
+    if (image == null) {
+      collectionResponse = CollectionResponse.builder()
+          .collection(request.getName())
+          .template(request.getTemplate())
+          .logo(null)
+          .build();
+    } else {
+      imageResponse= toImageResponse(image);
+      collectionResponse = CollectionResponse.builder()
+          .collection(request.getName())
+          .template(request.getTemplate())
+          .logo(imageResponse)
+          .build();
+    }
+
     return collectionResponse;
   }
 
@@ -746,22 +756,10 @@ public class CollectionService {
         }).orElseThrow(NotFoundException::new);
     List<CollectionItemMetadataResponse> collectionItemMetadataResponseList = new ArrayList<>();
     for (CollectionItemMetadataRequest c : request.getMetadata()) {
-      CollectionMetadata collectionMetadata = this.collectionMetadataRepository.findById(c.getId());
-      String tempVar=c.getValue();
-      if(c.getType()== CollectionMetadataType.BOOLEAN){
-        if(c.getValue().contains("1")){
-          tempVar=1;
-        }
-        else{
-          tempVar=0;
-        }
-      }
-      else{
-
-      }
+      //CollectionMetadata collectionMetadata = this.collectionMetadataRepository.findById(c.getId());
       CollectionItemsMetadata collectionItemsMetadata = this.collectionItemsMetadataRepository.
           findById(Long.parseLong(c.getId())).map(item -> {
-            item.setValue(tempVar);
+            item.setValue(c.getValue());
             return this.collectionItemsMetadataRepository.save(item);
           }).orElseThrow(NotFoundException::new);
       collectionItemMetadataResponseList.add(
