@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -60,6 +61,19 @@ public class ConfigController {
       @RequestHeader(value = "Authorization") String token) {
     ConfigApiResponse configApiResponse = null;
     configApiResponse = this.configService.createApi(configApiRequest);
+    return Mono.just(configApiResponse);
+  }
+
+  @PutMapping(value = "/update-api")
+  public Mono<ConfigApiResponse> updateItem(
+      @RequestBody ConfigApiRequest configApiRequest,
+      @RequestHeader(value = "Authorization") String token) {
+    ConfigApiResponse configApiResponse = null;
+    try {
+      configApiResponse = this.configService.updateApi(configApiRequest);
+    } catch (NotFoundException e) {
+      e.printStackTrace();
+    }
     return Mono.just(configApiResponse);
   }
 

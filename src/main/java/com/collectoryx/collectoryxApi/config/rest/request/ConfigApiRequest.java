@@ -13,6 +13,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class ConfigApiRequest {
 
+  protected Long id;
+
   @NotNull
   protected Long userId;
 
