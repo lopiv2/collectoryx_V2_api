@@ -24,15 +24,15 @@ public class ConfigApiKeys {
 
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
-  private Integer id;
+  private Long id;
 
   private String name;
 
-  private String keyCode;
+  private String keyCode="";
 
-  private String header;
+  private String header="";
 
-  private String apiLink;
+  private String apiLink="";
 
   private String logo;
 

@@ -69,7 +69,6 @@ public class ConfigService {
 
   public ConfigApiResponse updateApi(ConfigApiRequest request)
       throws NotFoundException {
-    ConfigApiResponse configApiResponse = null;
     ConfigApiKeys configApiKeys = this.configApiKeysRepository.findById(request.getId())
         .map(item -> {
           item.setName(request.getName());
@@ -78,13 +77,7 @@ public class ConfigService {
           item.setLogo(request.getLogo());
           return this.configApiKeysRepository.save(item);
         }).orElseThrow(NotFoundException::new);
-    configApiResponse = ConfigApiResponse.builder()
-        .name(request.getName())
-        .apiLink(request.getApiLink())
-        .keyCode(request.getKeyCode())
-        .logo(request.getLogo())
-        .build();
-    return configApiResponse;
+    return toConfigApiResponse(configApiKeys);
   }
 
   public void createInitialConfig(User user) {
