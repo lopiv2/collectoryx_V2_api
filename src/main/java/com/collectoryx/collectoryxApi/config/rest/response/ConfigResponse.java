@@ -14,6 +14,7 @@ public class ConfigResponse {
 
   private Integer id;
   private ThemeResponse theme;
+  private boolean expensivePanel;
   private Boolean darkTheme;
 
 }

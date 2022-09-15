@@ -34,4 +34,6 @@ public interface CollectionItemRepository extends JpaRepository<CollectionItem, 
       + "WHERE c.price=(SELECT MAX(price) FROM collection) AND u.id=:userId LIMIT 1",
       nativeQuery = true)
   CollectionItem getMostValuableItem(@Param("userId") Long id);
+
+  List<CollectionItem> findAllBySerie_Id(Long id);
 }

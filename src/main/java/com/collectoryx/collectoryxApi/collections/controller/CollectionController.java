@@ -234,7 +234,8 @@ public class CollectionController {
   @GetMapping(value = "/most-valuable-item/{id}")
   public Mono<CollectionItemsResponse> getMostValuableItem(@PathVariable("id") Long id,
       @RequestHeader(value = "Authorization") String token) {
-    CollectionItemsResponse collectionItemsResponse = this.collectionService.getMostValuableItem(id);
+    CollectionItemsResponse collectionItemsResponse = this.collectionService.getMostValuableItem(
+        id);
     return Mono.just(collectionItemsResponse);
   }
 
@@ -304,6 +305,19 @@ public class CollectionController {
       e.printStackTrace();
     }
     return Mono.just(collectionItemsResponse);
+  }
+
+  @PutMapping(value = "/update-serie")
+  public Mono<CollectionSeriesListResponse> updateSerie(
+      @RequestBody CollectionSerieListRequest collectionSerieListRequest,
+      @RequestHeader(value = "Authorization") String token) {
+    CollectionSeriesListResponse collectionSeriesListResponse = null;
+    try {
+      collectionSeriesListResponse = this.collectionService.updateSerie(collectionSerieListRequest);
+    } catch (NotFoundException e) {
+      e.printStackTrace();
+    }
+    return Mono.just(collectionSeriesListResponse);
   }
 
   @GetMapping(value = "/view-collections/{id}")

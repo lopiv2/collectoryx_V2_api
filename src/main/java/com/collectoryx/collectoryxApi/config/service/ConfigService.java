@@ -146,15 +146,23 @@ public class ConfigService {
   }
 
   public ConfigResponse saveConfig(ConfigRequest item) throws NotFoundException {
+    if (item.getConfig().contains("dashboard")) {
+      Config config = this.configRepository.findByUser_Id(item.getId());
+      config.setExpensiveItemPanel(item.isExpensivePanel());
+      this.configRepository.save(config);
+      return toConfigResponse(config);
+    }
     if (item.getConfig().contains("appearance")) {
       Config config = this.configRepository.findByUser_Id(item.getId());
       config.setDarkTheme(item.isDark());
-      User user = this.userRepository.findById(item.getId()).orElseThrow(NotFoundException::new);
-      Themes themes = this.userThemesRepository.findById(item.getTheme())
-          .orElseThrow(NotFoundException::new);
-      config.setTheme(themes);
+      //Si se modifica el tema
+      Themes themes = null;
+      if (item.getTheme() != null) {
+        themes = this.userThemesRepository.findById(item.getTheme())
+            .orElseThrow(NotFoundException::new);
+        config.setTheme(themes);
+      }
       this.configRepository.save(config);
-      this.userRepository.save(user);
       return toConfigResponse(config, themes);
     } else {
       return null;
@@ -190,6 +198,7 @@ public class ConfigService {
   private ConfigResponse toConfigResponse(Config request) {
     return ConfigResponse.builder()
         .id(request.getId())
+        .expensivePanel(request.isExpensiveItemPanel())
         .darkTheme(request.isDarkTheme())
         .build();
   }

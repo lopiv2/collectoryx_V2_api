@@ -180,7 +180,7 @@ public class CollectionService {
           .logo(null)
           .build();
     } else {
-      imageResponse= toImageResponse(image);
+      imageResponse = toImageResponse(image);
       collectionResponse = CollectionResponse.builder()
           .collection(request.getName())
           .template(request.getTemplate())
@@ -333,8 +333,8 @@ public class CollectionService {
       throws NotFoundException {
     Image image = null;
     ImageResponse imageResponse = null;
-    if (request.getFile() != null) {
-      image = this.imagesRepository.findImageByPath(request.getFile()).orElseThrow(
+    if (request.getPath() != null) {
+      image = this.imagesRepository.findImageByPath(request.getPath()).orElseThrow(
           NotFoundException::new);
       imageResponse = toImageResponse(image);
     }
@@ -392,6 +392,14 @@ public class CollectionService {
   }
 
   public boolean deleteSerie(Long id) throws NotFoundException {
+    List<CollectionItem> collectionItemList = this.collectionItemRepository
+        .findAllBySerie_Id(id);
+    CollectionSeriesList collectionSeriesList = this.collectionSeriesListRepository.findByName(
+        "default");
+    for (CollectionItem item : collectionItemList) {
+      item.setSerie(collectionSeriesList);
+      this.collectionItemRepository.save(item);
+    }
     CollectionSeriesList col = this.collectionSeriesListRepository.findById(id)
         .orElseThrow(NotFoundException::new);
     this.collectionSeriesListRepository.deleteById(col.getId());
@@ -779,6 +787,33 @@ public class CollectionService {
         .metadata(collectionItemMetadataResponseList)
         .build();
     return collectionItemsResponse;
+  }
+
+  public CollectionSeriesListResponse updateSerie(CollectionSerieListRequest request)
+      throws NotFoundException {
+    Image image = null;
+    ImageResponse imageResponse = null;
+    if (request.getPath() != null) {
+      image = this.imagesRepository.findImageByPath(request.getPath()).orElseThrow(
+          NotFoundException::new);
+      imageResponse = toImageResponse(image);
+    }
+    final Image imageRight = image;
+    CollectionList collectionList = null;
+    collectionList = this.collectionListRepository.findById(request.getCollection())
+        .orElseThrow(NotFoundException::new);
+    CollectionListResponse collectionListResponse = toCollectionListResponse(collectionList);
+
+    CollectionList finalCollectionList = collectionList;
+    CollectionSeriesList collectionSeriesList = this.collectionSeriesListRepository
+        .findById(request.getId())
+        .map(item -> {
+          item.setName(request.getName());
+          item.setCollection(finalCollectionList);
+          item.setLogo(imageRight);
+          return this.collectionSeriesListRepository.save(item);
+        }).orElseThrow(NotFoundException::new);
+    return toCollectionSerieListResponse(collectionSeriesList);
   }
 
   private CSVHeadersResponse toCSVHeadersResponse(CSVHeadersResponse request) {

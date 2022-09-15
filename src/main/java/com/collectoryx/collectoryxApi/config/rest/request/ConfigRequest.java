@@ -19,6 +19,9 @@ public class ConfigRequest {
   protected Long theme;
 
   @NotEmpty
+  protected boolean expensivePanel;
+
+  @NotEmpty
   protected boolean dark;
 
   @NotEmpty

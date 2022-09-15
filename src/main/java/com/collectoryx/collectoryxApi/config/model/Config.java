@@ -29,6 +29,8 @@ public class Config {
 
   private boolean darkTheme;
 
+  private boolean expensiveItemPanel=true;
+
   @OneToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "theme_id")
   protected Themes theme;

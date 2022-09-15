@@ -13,13 +13,16 @@ import lombok.NoArgsConstructor;
 public class CollectionSerieListRequest {
 
   @NotEmpty
+  protected Long id;
+
+  @NotEmpty
   protected String name;
 
   @NotEmpty
   protected Long collection;
 
   @NotEmpty
-  protected String file;
+  protected String path;
 
 
 }
