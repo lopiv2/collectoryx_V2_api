@@ -4,8 +4,5 @@ VALUES ('admin@collectoryx.com', 'admin', 'collectoryx', '$2a$10$umwc.UQOHeU4edy
 INSERT INTO user_licenses (consumer_type, paid, state, type, license_check_machine, trial_activated)
 VALUES ('user', 1, 'Activated', 'Lifetime', 1, 0);
 
-INSERT INTO collection_list (id,name)
-VALUES (1,'default');
-
-INSERT INTO collection_series_list (id,name,collection)
-VALUES (1,'default',1);
+INSERT INTO config_api_keys (api_link,logo,name,header)
+VALUES ('https://api.pokemontcg.io/v2','https://pokemontcg.io/images/favicon.ico','Pokemon TCG','X-Api-Key')

@@ -835,12 +835,14 @@ public class CollectionService {
     }
 
     CollectionSeriesListResponse collectionSeriesListResponse = null;
-    try {
-      collectionSeriesListResponse = toCollectionSerieListResponse(
-          this.collectionSeriesListRepository.findById(collection.getSerie().getId())
-              .orElseThrow(NotFoundException::new));
-    } catch (NotFoundException e) {
-      e.printStackTrace();
+    if(collection.getSerie()!=null){
+      try {
+        collectionSeriesListResponse = toCollectionSerieListResponse(
+            this.collectionSeriesListRepository.findById(collection.getSerie().getId())
+                .orElseThrow(NotFoundException::new));
+      } catch (NotFoundException e) {
+        e.printStackTrace();
+      }
     }
 
     CollectionListResponse collectionListResponse = null;
@@ -922,12 +924,14 @@ public class CollectionService {
       }
     }
     CollectionSeriesListResponse collectionSeriesListResponse = null;
-    try {
-      collectionSeriesListResponse = toCollectionSerieListResponse(
-          this.collectionSeriesListRepository.findById(collection.getSerie().getId())
-              .orElseThrow(NotFoundException::new));
-    } catch (NotFoundException e) {
-      e.printStackTrace();
+    if(collection.getSerie()!=null){
+      try {
+        collectionSeriesListResponse = toCollectionSerieListResponse(
+            this.collectionSeriesListRepository.findById(collection.getSerie().getId())
+                .orElseThrow(NotFoundException::new));
+      } catch (NotFoundException e) {
+        e.printStackTrace();
+      }
     }
     CollectionListResponse collectionListResponse = null;
     try {
