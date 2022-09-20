@@ -14,6 +14,8 @@ import com.collectoryx.collectoryxApi.collections.rest.response.CollectionRespon
 import com.collectoryx.collectoryxApi.collections.rest.response.CollectionSeriesListResponse;
 import com.collectoryx.collectoryxApi.collections.service.CollectionService;
 import com.collectoryx.collectoryxApi.image.service.ImageService;
+import com.collectoryx.collectoryxApi.page.rest.request.PageFrontRequest;
+import com.collectoryx.collectoryxApi.page.rest.response.PagingResponse;
 import com.collectoryx.collectoryxApi.util.service.ScrapperApiService;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -53,13 +55,28 @@ public class CollectionController {
     this.scrapperApiService = scrapperApiService;
   }
 
-  @GetMapping(value = "/collections/{id}")
+  @PostMapping(value = "/collections")
+  public Mono<PagingResponse<CollectionItemsResponse>> getCollectionItemsById(
+      @RequestBody PageFrontRequest pageFrontRequest,
+      @RequestHeader(value = "Authorization") String token) {
+    PagingResponse<CollectionItemsResponse> collectionResponses = null;
+    if (pageFrontRequest.getSearch() != null) {
+      collectionResponses = this.collectionService.
+          getCollectionItemsByIdSearchQuery(pageFrontRequest);
+    } else {
+      collectionResponses = this.collectionService.
+          getCollectionItemsById(pageFrontRequest);
+    }
+    return Mono.just(collectionResponses);
+  }
+
+  /*@GetMapping(value = "/collections/{id}")
   public Mono<List<CollectionItemsResponse>> getCollectionItemsById(@PathVariable("id") Long id,
       @RequestHeader(value = "Authorization") String token) {
     List<CollectionItemsResponse> collectionResponses = this.collectionService.
         getCollectionItemsById(id);
     return Mono.just(collectionResponses);
-  }
+  }*/
 
   @GetMapping(value = "/count-collections/{id}")
   public Mono<Long> getCountCollectionsById(@PathVariable("id") Long id,

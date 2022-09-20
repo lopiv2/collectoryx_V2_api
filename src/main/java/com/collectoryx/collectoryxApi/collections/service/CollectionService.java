@@ -26,6 +26,8 @@ import com.collectoryx.collectoryxApi.collections.rest.response.CollectionSeries
 import com.collectoryx.collectoryxApi.image.model.Image;
 import com.collectoryx.collectoryxApi.image.repository.ImageRepository;
 import com.collectoryx.collectoryxApi.image.rest.response.ImageResponse;
+import com.collectoryx.collectoryxApi.page.rest.request.PageFrontRequest;
+import com.collectoryx.collectoryxApi.page.rest.response.PagingResponse;
 import com.collectoryx.collectoryxApi.user.model.User;
 import com.collectoryx.collectoryxApi.user.repository.UserRepository;
 import java.io.File;
@@ -55,6 +57,10 @@ import org.apache.commons.io.FilenameUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.data.crossstore.ChangeSetPersister.NotFoundException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Sort.Order;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -425,13 +431,37 @@ public class CollectionService {
     return collectionItemsResponse;
   }
 
-  public List<CollectionItemsResponse> getCollectionItemsById(Long id) {
-    //final List<CollectionItemsResponse> collectionResponseList = new LinkedList<>();
-    List<CollectionItem> collections = this.collectionItemRepository
-        .findByCollection_Id(id);
-    return StreamSupport.stream(collections.spliterator(), false)
-        .map(this::toCollectionItemsResponse)
-        .collect(Collectors.toList());
+  public PagingResponse<CollectionItemsResponse> getCollectionItemsById(PageFrontRequest request) {
+    PageRequest pageRequest = PageRequest.of(request.getPage() != null ? request.getPage() : 0,
+        request.getSize() != null ? request.getSize() : 500,
+        Sort.by(Order.asc(request.getOrderField())));
+    Page<CollectionItem> collections = this.collectionItemRepository.findByCollection_Id(
+        Long.valueOf(request.getId()),
+        pageRequest);
+    return getCollectionItemResponsePagingResponse(collections);
+  }
+
+  public PagingResponse<CollectionItemsResponse> getCollectionItemsByIdSearchQuery(
+      PageFrontRequest request) {
+    PageRequest pageRequest = PageRequest.of(request.getPage() != null ? request.getPage() : 0,
+        request.getSize() != null ? request.getSize() : 500,
+        Sort.by(Order.asc(request.getOrderField())));
+    Page<CollectionItem> collections = this.collectionItemRepository
+        .findByCollection_IdAndNameContaining(Long.valueOf(request.getId()), request.getSearch(),
+            pageRequest);
+    return getCollectionItemResponsePagingResponse(collections);
+  }
+
+  private PagingResponse<CollectionItemsResponse> getCollectionItemResponsePagingResponse(
+      Page<CollectionItem> collectionItems) {
+    List<CollectionItemsResponse> collectionItemsResponseList = toCollectionItemsResponse(
+        collectionItems.getContent());
+    return new PagingResponse<>(
+        collectionItemsResponseList,
+        collectionItems.getNumber(),
+        collectionItems.getSize(),
+        collectionItems.getTotalPages(),
+        collectionItems.getTotalElements(), collectionItems.isLast());
   }
 
   public List<CollectionItemsResponse> getItemsYear(Long id) {
@@ -822,6 +852,13 @@ public class CollectionService {
         .build();
   }
 
+  private List<CollectionItemsResponse> toCollectionItemsResponse(
+      Iterable<CollectionItem> collectionItems) {
+    return StreamSupport.stream(collectionItems.spliterator(), false)
+        .map(p -> this.toCollectionItemsResponse(p))
+        .collect(Collectors.toList());
+  }
+
   private CollectionItemsResponse toCollectionItemsResponse(CollectionItem collection) {
     ImageResponse image = null;
     if (collection.getImage() != null) {
@@ -835,7 +872,7 @@ public class CollectionService {
     }
 
     CollectionSeriesListResponse collectionSeriesListResponse = null;
-    if(collection.getSerie()!=null){
+    if (collection.getSerie() != null) {
       try {
         collectionSeriesListResponse = toCollectionSerieListResponse(
             this.collectionSeriesListRepository.findById(collection.getSerie().getId())
@@ -924,7 +961,7 @@ public class CollectionService {
       }
     }
     CollectionSeriesListResponse collectionSeriesListResponse = null;
-    if(collection.getSerie()!=null){
+    if (collection.getSerie() != null) {
       try {
         collectionSeriesListResponse = toCollectionSerieListResponse(
             this.collectionSeriesListRepository.findById(collection.getSerie().getId())

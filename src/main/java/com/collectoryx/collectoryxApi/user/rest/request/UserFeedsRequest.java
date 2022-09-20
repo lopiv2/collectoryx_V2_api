@@ -14,6 +14,9 @@ import lombok.NoArgsConstructor;
 public class UserFeedsRequest {
 
   @NotNull
+  protected Long id;
+
+  @NotNull
   protected Long userId;
 
   @NotEmpty

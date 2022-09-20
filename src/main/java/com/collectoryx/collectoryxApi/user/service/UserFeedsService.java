@@ -111,6 +111,10 @@ public class UserFeedsService {
                   Locale.US);
             }
             Date pubDate = formatter.parse(date);
+            if(element.getElementsByTagName("media:content")!=null){
+              //String im=element.getTextContent();
+              System.out.println(element.getFirstChild());
+            }
             if (description.contains("img")) {
               org.jsoup.nodes.Document docDesc = Jsoup.parse(description);
               org.jsoup.nodes.Element img = docDesc.select("img").first();
@@ -208,6 +212,18 @@ public class UserFeedsService {
     return StreamSupport.stream(userFeeds.spliterator(), false)
         .map(this::toUserFeedsWithDataResponse)
         .collect(Collectors.toList());
+  }
+
+  public UserFeedsResponse updateFeed(UserFeedsRequest request)
+      throws NotFoundException {
+    UserFeeds userFeeds = this.userFeedsRepository
+        .findById(request.getId())
+        .map(item -> {
+          item.setName(request.getName());
+          item.setRssUrl(request.getUrl());
+          return this.userFeedsRepository.save(item);
+        }).orElseThrow(NotFoundException::new);
+    return toUserFeedsResponse(userFeeds);
   }
 
   private UserFeedsResponse toUserFeedsWithDataResponse(UserFeeds request) {
