@@ -111,10 +111,6 @@ public class UserFeedsService {
                   Locale.US);
             }
             Date pubDate = formatter.parse(date);
-            if(element.getElementsByTagName("media:content")!=null){
-              //String im=element.getTextContent();
-              System.out.println(element.getFirstChild());
-            }
             if (description.contains("img")) {
               org.jsoup.nodes.Document docDesc = Jsoup.parse(description);
               org.jsoup.nodes.Element img = docDesc.select("img").first();
@@ -125,7 +121,14 @@ public class UserFeedsService {
               if (element.getElementsByTagName("image").item(0) != null) {
                 image = element.getElementsByTagName("image").item(0).getTextContent();
               } else {
-                image = "";
+                Element enclosure = (Element) element.getElementsByTagName("media:content")
+                    .item(0);
+                if (enclosure != null) {
+                  String url = enclosure.getAttribute("url");
+                  image = url;
+                } else {
+                  image = "";
+                }
               }
             }
             UserFeedsContentResponse userFeedsContentResponse = UserFeedsContentResponse.builder()

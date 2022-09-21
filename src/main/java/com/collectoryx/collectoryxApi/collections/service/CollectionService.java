@@ -44,6 +44,7 @@ import java.time.LocalDateTime;
 import java.time.Year;
 import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -103,6 +104,46 @@ public class CollectionService {
   public long getCountOfCollectionItems(Long id) {
     long count = this.collectionItemRepository.countByCollection_UserId_Id(id);
     return count;
+  }
+
+  public long getCountOfWishlist(Long id) {
+    long count = this.collectionItemRepository.countWantedItems(id);
+    return count;
+  }
+
+  public long getCountOfCompletedCollections(Long id) {
+    List<CollectionList> collectionLists = this.collectionListRepository.findAllByUser_Id(id);
+    List<CollectionItem> collectionItemList = this.collectionItemRepository
+        .findByCollection_UserId_IdOrderByCollection_Id(id);
+    long completedCollections = 0;
+    for (CollectionList c : collectionLists
+    ) {
+      int owned = 0;
+      int elementsInCollection = 0;
+      List<CollectionItem> filtered=Arrays.stream(collectionItemList).filter
+      for (int x = 0; x < collectionItemList.size(); x++
+      ) {
+        if (collectionItemList.get(x).getCollection().getId() == c.getId()) {
+          if (collectionItemList.get(x).isOwn()) {
+            owned++;
+            elementsInCollection++;
+          } else {
+            elementsInCollection++;
+          }
+          if (x + 1 != collectionItemList.size()) {
+            if (collectionItemList.get(x + 1).getCollection().getId() != collectionItemList.get(x)
+                .getCollection().getId()) {
+              if (owned == elementsInCollection) {
+                completedCollections++;
+                elementsInCollection = 0;
+                owned = 0;
+              }
+            }
+          }
+        }
+      }
+    }
+    return completedCollections;
   }
 
   public CollectionItemsResponse getMostValuableItem(Long id) {
@@ -445,7 +486,9 @@ public class CollectionService {
       PageFrontRequest request) {
     PageRequest pageRequest = PageRequest.of(request.getPage() != null ? request.getPage() : 0,
         request.getSize() != null ? request.getSize() : 500,
-        Sort.by(Order.asc(request.getOrderField())));
+        request.getOrderField().contains("wanted") || request.getOrderField().contains("own")
+            ? Sort.by(Order.desc(request.getOrderField()))
+            : Sort.by(Order.asc(request.getOrderField())));
     Page<CollectionItem> collections = this.collectionItemRepository
         .findByCollection_IdAndNameContaining(Long.valueOf(request.getId()), request.getSearch(),
             pageRequest);

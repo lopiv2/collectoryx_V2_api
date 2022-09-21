@@ -150,6 +150,9 @@ public class ConfigService {
     if (item.getConfig().contains("dashboard")) {
       Config config = this.configRepository.findByUser_Id(item.getId());
       config.setExpensiveItemPanel(item.isExpensivePanel());
+      config.setWishlistPanel(item.isWishlistPanel());
+      config.setCompletedCollectionsPanel(item.isCompletedCollectionsPanel());
+      config.setRecentPurchasePanel(item.isRecentPurchasePanel());
       this.configRepository.save(config);
       return toConfigResponse(config);
     }
@@ -199,7 +202,10 @@ public class ConfigService {
   private ConfigResponse toConfigResponse(Config request) {
     return ConfigResponse.builder()
         .id(request.getId())
+        .wishlistPanel(request.isWishlistPanel())
         .expensivePanel(request.isExpensiveItemPanel())
+        .completedCollectionsPanel(request.isCompletedCollectionsPanel())
+        .recentPurchasePanel(request.isRecentPurchasePanel())
         .darkTheme(request.isDarkTheme())
         .build();
   }

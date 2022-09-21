@@ -22,6 +22,15 @@ public class ConfigRequest {
   protected boolean expensivePanel;
 
   @NotEmpty
+  protected boolean wishlistPanel;
+
+  @NotEmpty
+  protected boolean recentPurchasePanel;
+
+  @NotEmpty
+  protected boolean completedCollectionsPanel;
+
+  @NotEmpty
   protected boolean dark;
 
   @NotEmpty

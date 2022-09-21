@@ -31,6 +31,12 @@ public class Config {
 
   private boolean expensiveItemPanel=true;
 
+  private boolean wishlistPanel=true;
+
+  private boolean recentPurchasePanel=true;
+
+  private boolean completedCollectionsPanel=true;
+
   @OneToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "theme_id")
   protected Themes theme;

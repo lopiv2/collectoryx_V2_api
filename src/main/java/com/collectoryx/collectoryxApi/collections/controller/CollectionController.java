@@ -101,6 +101,22 @@ public class CollectionController {
     return Mono.just(collectionResponses);
   }
 
+  @GetMapping(value = "/count-collections-wishlist/{id}")
+  public Mono<Long> getWishlistSize(
+      @PathVariable("id") Long id,
+      @RequestHeader(value = "Authorization") String token) {
+    Long count = this.collectionService.getCountOfWishlist(id);
+    return Mono.just(count);
+  }
+
+  @GetMapping(value = "/count-completed-collections/{id}")
+  public Mono<Long> getCompletedCollections(
+      @PathVariable("id") Long id,
+      @RequestHeader(value = "Authorization") String token) {
+    Long count = this.collectionService.getCountOfCompletedCollections(id);
+    return Mono.just(count);
+  }
+
   @PostMapping(value = "/create-collection")
   public Mono<CollectionResponse> createCollection(
       @RequestBody CollectionRequest collectionRequest,
