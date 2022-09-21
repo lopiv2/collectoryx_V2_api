@@ -118,29 +118,13 @@ public class CollectionService {
     long completedCollections = 0;
     for (CollectionList c : collectionLists
     ) {
-      int owned = 0;
-      int elementsInCollection = 0;
-      List<CollectionItem> filtered=Arrays.stream(collectionItemList).filter
-      for (int x = 0; x < collectionItemList.size(); x++
-      ) {
-        if (collectionItemList.get(x).getCollection().getId() == c.getId()) {
-          if (collectionItemList.get(x).isOwn()) {
-            owned++;
-            elementsInCollection++;
-          } else {
-            elementsInCollection++;
-          }
-          if (x + 1 != collectionItemList.size()) {
-            if (collectionItemList.get(x + 1).getCollection().getId() != collectionItemList.get(x)
-                .getCollection().getId()) {
-              if (owned == elementsInCollection) {
-                completedCollections++;
-                elementsInCollection = 0;
-                owned = 0;
-              }
-            }
-          }
-        }
+      CollectionItem[] filtered = Arrays
+          .stream(collectionItemList.stream().toArray(CollectionItem[]::new))
+          .filter(x -> x.getCollection().getId() == c.getId()).toArray(CollectionItem[]::new);
+      CollectionItem[] owned = Arrays.stream(filtered)
+          .filter(x -> x.isOwn()).toArray(CollectionItem[]::new);
+      if (filtered.length == owned.length && filtered.length > 0) {
+        completedCollections++;
       }
     }
     return completedCollections;
