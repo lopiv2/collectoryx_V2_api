@@ -70,6 +70,16 @@ public class CollectionController {
     return Mono.just(collectionResponses);
   }
 
+  @PostMapping(value = "/collections/recent")
+  public Mono<PagingResponse<CollectionItemsResponse>> getRecentCollectionItemsById(
+      @RequestBody PageFrontRequest pageFrontRequest,
+      @RequestHeader(value = "Authorization") String token) {
+    PagingResponse<CollectionItemsResponse> collectionResponses = null;
+    collectionResponses = this.collectionService.
+        getAllCollectionItemsByUserId(pageFrontRequest);
+    return Mono.just(collectionResponses);
+  }
+
   /*@GetMapping(value = "/collections/{id}")
   public Mono<List<CollectionItemsResponse>> getCollectionItemsById(@PathVariable("id") Long id,
       @RequestHeader(value = "Authorization") String token) {

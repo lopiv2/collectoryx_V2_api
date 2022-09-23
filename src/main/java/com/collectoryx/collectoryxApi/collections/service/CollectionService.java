@@ -437,6 +437,20 @@ public class CollectionService {
     return true;
   }
 
+  public PagingResponse<CollectionItemsResponse> getAllCollectionItemsByUserId(
+      PageFrontRequest request) {
+    PageRequest pageRequest = PageRequest.of(request.getPage() != null ? request.getPage() : 0,
+        request.getSize() != null ? request.getSize() : 500,
+        Sort.by(Order.asc(request.getOrderField())));
+    /*Page<CollectionItem> collections = this.collectionItemRepository.findRecentItems(
+        Long.valueOf(request.getId()),
+        pageRequest);*/
+    Page<CollectionItem> collections = this.collectionItemRepository
+        .findAllByCollection_UserId_IdOrderByAdquiringDateDesc(Long.valueOf(request.getId()),
+            pageRequest);
+    return getCollectionItemResponsePagingResponse(collections);
+  }
+
   public CollectionListResponse getCollectionById(Long id) {
     CollectionList collection = null;
     try {

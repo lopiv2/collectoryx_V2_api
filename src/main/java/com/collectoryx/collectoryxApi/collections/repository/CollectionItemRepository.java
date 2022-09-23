@@ -53,4 +53,14 @@ public interface CollectionItemRepository extends JpaRepository<CollectionItem, 
   long countWantedItems(@Param("userId") Long id);
 
   List<CollectionItem> findByCollection_UserId_IdOrderByCollection_Id(Long id);
+
+  @Query(value = "SELECT * FROM collection c "
+      + "JOIN collection_list l ON c.collection=l.id "
+      + "JOIN  users u ON l.user_id=u.id "
+      + "WHERE c.wanted=true AND u.id=:userId order by c.adquiring_date desc",
+      nativeQuery = true)
+  Page<CollectionItem> findRecentItems(@Param("userId") Long id, Pageable pageable);
+
+  Page<CollectionItem> findAllByCollection_UserId_IdOrderByAdquiringDateDesc(Long valueOf,
+      Pageable pageable);
 }
