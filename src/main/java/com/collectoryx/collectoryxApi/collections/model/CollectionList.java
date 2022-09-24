@@ -48,4 +48,16 @@ public class CollectionList {
   @JoinColumn(name = "user_id")
   protected User user;
 
+  @Column
+  protected Integer owned=0;
+
+  @Column
+  protected Integer wanted=0;
+
+  @Column
+  protected Integer totalItems=0;
+
+  @Column
+  protected float totalPrice= 0;
+
 }

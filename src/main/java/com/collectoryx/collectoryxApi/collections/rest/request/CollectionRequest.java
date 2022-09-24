@@ -33,5 +33,13 @@ public class CollectionRequest {
 
   protected Long userId;
 
+  protected Integer owned;
+
+  protected Integer wanted;
+
+  protected Integer totalItems;
+
+  protected float totalPrice;
+
 
 }

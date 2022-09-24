@@ -44,7 +44,6 @@ import java.time.LocalDateTime;
 import java.time.Year;
 import java.time.ZoneId;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -102,28 +101,21 @@ public class CollectionService {
   }
 
   public long getCountOfCollectionItems(Long id) {
-    long count = this.collectionItemRepository.countByCollection_UserId_Id(id);
+    long count = this.collectionListRepository.sumItemsByCollectionUser(id);
     return count;
   }
 
   public long getCountOfWishlist(Long id) {
-    long count = this.collectionItemRepository.countWantedItems(id);
+    long count = this.collectionListRepository.countByWantedAndUserId_Id(1,id);
     return count;
   }
 
   public long getCountOfCompletedCollections(Long id) {
     List<CollectionList> collectionLists = this.collectionListRepository.findAllByUser_Id(id);
-    List<CollectionItem> collectionItemList = this.collectionItemRepository
-        .findByCollection_UserId_IdOrderByCollection_Id(id);
     long completedCollections = 0;
     for (CollectionList c : collectionLists
     ) {
-      CollectionItem[] filtered = Arrays
-          .stream(collectionItemList.stream().toArray(CollectionItem[]::new))
-          .filter(x -> x.getCollection().getId() == c.getId()).toArray(CollectionItem[]::new);
-      CollectionItem[] owned = Arrays.stream(filtered)
-          .filter(x -> x.isOwn()).toArray(CollectionItem[]::new);
-      if (filtered.length == owned.length && filtered.length > 0) {
+      if(c.getTotalItems()==c.getOwned() && c.getOwned()!=0 && c.getTotalItems()!=0){
         completedCollections++;
       }
     }
@@ -442,9 +434,6 @@ public class CollectionService {
     PageRequest pageRequest = PageRequest.of(request.getPage() != null ? request.getPage() : 0,
         request.getSize() != null ? request.getSize() : 500,
         Sort.by(Order.asc(request.getOrderField())));
-    /*Page<CollectionItem> collections = this.collectionItemRepository.findRecentItems(
-        Long.valueOf(request.getId()),
-        pageRequest);*/
     Page<CollectionItem> collections = this.collectionItemRepository
         .findAllByCollection_UserId_IdOrderByAdquiringDateDesc(Long.valueOf(request.getId()),
             pageRequest);
@@ -577,6 +566,16 @@ public class CollectionService {
   public CollectionItemsResponse toggleOwn(CollectionItemRequest item) throws NotFoundException {
     CollectionItem collection = this.collectionItemRepository.findById(item.getId())
         .orElseThrow(NotFoundException::new);
+    CollectionList collectionList = this.collectionListRepository.findById(
+        collection.getCollection().getId()).orElseThrow(NotFoundException::new);
+    if (collection.isOwn()) {
+      collectionList.setOwned(collectionList.getOwned() - 1);
+      collectionList.setTotalPrice(collectionList.getTotalPrice() - collection.getPrice());
+    } else {
+      collectionList.setOwned(collectionList.getOwned() + 1);
+      collectionList.setTotalPrice(collectionList.getTotalPrice() + collection.getPrice());
+    }
+    this.collectionListRepository.save(collectionList);
     collection.setOwn(!item.getOwn());
     LocalDateTime today = LocalDateTime.now();
     if (item.getOwn()) {
@@ -592,6 +591,14 @@ public class CollectionService {
   public CollectionItemsResponse toggleWish(CollectionItemRequest item) throws NotFoundException {
     CollectionItem collection = this.collectionItemRepository.findById(item.getId())
         .orElseThrow(NotFoundException::new);
+    CollectionList collectionList = this.collectionListRepository.findById(
+        collection.getCollection().getId()).orElseThrow(NotFoundException::new);
+    if (collection.isWanted()) {
+      collectionList.setWanted(collectionList.getWanted() - 1);
+    } else {
+      collectionList.setWanted(collectionList.getWanted() + 1);
+    }
+    this.collectionListRepository.save(collectionList);
     collection.setWanted(!item.getWanted());
     this.collectionItemRepository.save(collection);
     CollectionItemsResponse collectionItemsResponse = toCollectionItemResponse(collection);
@@ -1072,6 +1079,10 @@ public class CollectionService {
           .ambit(request.getAmbit())
           .logo(image)
           .template(request.getTemplate())
+          .owned(request.getOwned())
+          .wanted(request.getWanted())
+          .totalItems(request.getTotalItems())
+          .totalPrice(request.getTotalPrice())
           .metadata(collectionMetadata)
           .build();
     } else {
@@ -1080,6 +1091,10 @@ public class CollectionService {
           .name(request.getName())
           .ambit(request.getAmbit())
           .template(request.getTemplate())
+          .owned(request.getOwned())
+          .wanted(request.getWanted())
+          .totalItems(request.getTotalItems())
+          .totalPrice(request.getTotalPrice())
           .metadata(collectionMetadata)
           .build();
     }

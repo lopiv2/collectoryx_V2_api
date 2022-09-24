@@ -6,11 +6,12 @@
   <component name="ChangeListManager">
     <list default="true" id="e7725e87-06c9-4363-a7e7-9ec3adee6157" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/collectoryx/collectoryxApi/collections/controller/CollectionController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/collectoryx/collectoryxApi/collections/controller/CollectionController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/collectoryx/collectoryxApi/collections/model/CollectionList.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/collectoryx/collectoryxApi/collections/model/CollectionList.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/collectoryx/collectoryxApi/collections/repository/CollectionItemRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/collectoryx/collectoryxApi/collections/repository/CollectionItemRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/collectoryx/collectoryxApi/collections/repository/CollectionListRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/collectoryx/collectoryxApi/collections/repository/CollectionListRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/collectoryx/collectoryxApi/collections/rest/request/CollectionRequest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/collectoryx/collectoryxApi/collections/rest/request/CollectionRequest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/collectoryx/collectoryxApi/collections/rest/response/CollectionListResponse.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/collectoryx/collectoryxApi/collections/rest/response/CollectionListResponse.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/collectoryx/collectoryxApi/collections/service/CollectionService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/collectoryx/collectoryxApi/collections/service/CollectionService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/collectoryx/collectoryxApi/collections/controller/CollectionController$1.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/collectoryx/collectoryxApi/collections/controller/CollectionController$1.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/collectoryx/collectoryxApi/collections/controller/CollectionController.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/collectoryx/collectoryxApi/collections/controller/CollectionController.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/target/classes/com/collectoryx/collectoryxApi/collections/repository/CollectionItemRepository.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/collectoryx/collectoryxApi/collections/repository/CollectionItemRepository.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/target/classes/com/collectoryx/collectoryxApi/collections/service/CollectionService.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/collectoryx/collectoryxApi/collections/service/CollectionService.class" afterDir="false" />
     </list>
@@ -43,14 +44,14 @@
     </file-type-list>
   </component>
   <component name="HighlightingSettingsPerFile">
-    <setting file="file://$PROJECT_DIR$/src/main/java/com/collectoryx/collectoryxApi/collections/service/CollectionService.java" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/src/main/java/com/collectoryx/collectoryxApi/shop/rest/response/UserLicenseResponse.java" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/src/main/java/com/collectoryx/collectoryxApi/user/model/UserLicenses.java" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/src/main/java/com/collectoryx/collectoryxApi/user/model/LicenseStateTypes.java" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/src/main/java/com/collectoryx/collectoryxApi/shop/service/ShopService.java" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/src/main/java/com/collectoryx/collectoryxApi/user/repository/UserLicensesRepository.java" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/src/main/java/com/collectoryx/collectoryxApi/config/controller/AdminController.java" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/src/main/java/com/collectoryx/collectoryxApi/config/service/AdminService.java" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/src/main/java/com/collectoryx/collectoryxApi/user/repository/UserLicensesRepository.java" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/src/main/java/com/collectoryx/collectoryxApi/collections/service/CollectionService.java" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/src/main/java/com/collectoryx/collectoryxApi/user/model/UserLicenses.java" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/src/main/java/com/collectoryx/collectoryxApi/user/model/LicenseStateTypes.java" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/src/main/java/com/collectoryx/collectoryxApi/shop/rest/response/UserLicenseResponse.java" root0="FORCE_HIGHLIGHTING" />
   </component>
   <component name="MarkdownSettingsMigration">
     <option name="stateVersion" value="1" />
@@ -102,7 +103,7 @@
       <option name="ALTERNATIVE_JRE_PATH" value="openjdk-18" />
       <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="true" />
       <option name="MAIN_CLASS_NAME" value="com.collectoryx.collectoryxApi.CollectoryxApiApplication" />
-      <module name="Collectoryx-Api" />
+      <module name="collectoryx_V2_api" />
       <extension name="coverage">
         <pattern>
           <option name="PATTERN" value="com.collectoryx.collectoryxApi.*" />
@@ -247,6 +248,7 @@
         </entry>
       </map>
     </option>
+    <option name="oldMeFiltersMigrated" value="true" />
   </component>
   <component name="VcsManagerConfiguration">
     <ignored-roots>
@@ -254,15 +256,6 @@
     </ignored-roots>
   </component>
   <component name="XDebuggerManager">
-    <breakpoint-manager>
-      <breakpoints>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/main/java/com/collectoryx/collectoryxApi/collections/controller/CollectionController.java</url>
-          <line>59</line>
-          <option name="timeStamp" value="15" />
-        </line-breakpoint>
-      </breakpoints>
-    </breakpoint-manager>
     <watches-manager>
       <configuration name="Application">
         <watch expression="request" />

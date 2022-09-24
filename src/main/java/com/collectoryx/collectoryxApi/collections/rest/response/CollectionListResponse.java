@@ -26,4 +26,12 @@ public class CollectionListResponse {
 
   private CollectionTemplateType template;
 
+  private Integer owned;
+
+  private Integer wanted;
+
+  private Integer totalItems;
+
+  private float totalPrice;
+
 }

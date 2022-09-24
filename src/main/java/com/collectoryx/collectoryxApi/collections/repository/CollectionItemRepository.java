@@ -20,8 +20,6 @@ public interface CollectionItemRepository extends JpaRepository<CollectionItem, 
 
   Page<CollectionItem> findByCollection_Id(Long collection_id, Pageable pageable);
 
-  long countByCollection_UserId_Id(Long id);
-
   List<CollectionItem> findByCollection_UserId_Id(Long id);
 
   @Query(value = "SELECT * FROM collection c "
@@ -44,22 +42,6 @@ public interface CollectionItemRepository extends JpaRepository<CollectionItem, 
 
   Page<CollectionItem> findByCollection_IdAndNameContaining(Long valueOf, String search,
       Pageable pageable);
-
-  @Query(value = "SELECT COUNT(*) FROM collection c "
-      + "JOIN collection_list l ON c.collection=l.id "
-      + "JOIN  users u ON l.user_id=u.id "
-      + "WHERE c.wanted=true AND u.id=:userId LIMIT 1",
-      nativeQuery = true)
-  long countWantedItems(@Param("userId") Long id);
-
-  List<CollectionItem> findByCollection_UserId_IdOrderByCollection_Id(Long id);
-
-  @Query(value = "SELECT * FROM collection c "
-      + "JOIN collection_list l ON c.collection=l.id "
-      + "JOIN  users u ON l.user_id=u.id "
-      + "WHERE c.wanted=true AND u.id=:userId order by c.adquiring_date desc",
-      nativeQuery = true)
-  Page<CollectionItem> findRecentItems(@Param("userId") Long id, Pageable pageable);
 
   Page<CollectionItem> findAllByCollection_UserId_IdOrderByAdquiringDateDesc(Long valueOf,
       Pageable pageable);

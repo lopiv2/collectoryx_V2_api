@@ -16,10 +16,9 @@ public interface CollectionListRepository extends JpaRepository<CollectionList, 
 
   long countByUserId_Id(Long id);
 
-  @Query(value = "SELECT COUNT(*) FROM collection c "
-      + "JOIN collection_list l ON c.collection=l.id "
-      + "JOIN  users u ON l.user_id=u.id "
-      + "WHERE c.own=true AND u.id=:userId LIMIT 1 GROUP BY l.name",
+  @Query(value = "SELECT SUM(total_items) from collection_list cl where user_id =:userId ",
       nativeQuery = true)
-  long getCompletedCollections(@Param("userId") Long id);
+  long sumItemsByCollectionUser(@Param("userId") Long id);
+
+  long countByWantedAndUserId_Id(int i, Long id);
 }
