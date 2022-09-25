@@ -106,7 +106,7 @@ public class CollectionService {
   }
 
   public long getCountOfWishlist(Long id) {
-    long count = this.collectionListRepository.countByWantedAndUserId_Id(1,id);
+    long count = this.collectionListRepository.countByWantedAndUserId_Id(1, id);
     return count;
   }
 
@@ -115,7 +115,7 @@ public class CollectionService {
     long completedCollections = 0;
     for (CollectionList c : collectionLists
     ) {
-      if(c.getTotalItems()==c.getOwned() && c.getOwned()!=0 && c.getTotalItems()!=0){
+      if (c.getTotalItems() == c.getOwned() && c.getOwned() != 0 && c.getTotalItems() != 0) {
         completedCollections++;
       }
     }
@@ -171,12 +171,20 @@ public class CollectionService {
           .name(request.getName())
           .template(request.getTemplate())
           .logo(image)
+          .totalItems(0)
+          .owned(0)
+          .wanted(0)
+          .totalPrice(0)
           .user(user)
           .build();
     } else {
       collectionList = CollectionList.builder()
           .name(request.getName())
           .template(request.getTemplate())
+          .totalItems(0)
+          .owned(0)
+          .wanted(0)
+          .totalPrice(0)
           .user(user)
           .build();
     }
@@ -227,8 +235,7 @@ public class CollectionService {
     CollectionListResponse collectionListResponse = null;
     collectionList = this.collectionListRepository.findById(request.getCollection())
         .orElseThrow(NotFoundException::new);
-    collectionListResponse = toCollectionListResponse(collectionList);
-
+    collectionList.setTotalItems(collectionList.getTotalItems() + 1);
     CollectionSeriesList collectionSeriesList = null;
     CollectionSeriesListResponse collectionSeriesListResponse = null;
     collectionSeriesList = this.collectionSeriesListRepository.findById(request.getSerie())
@@ -248,6 +255,10 @@ public class CollectionService {
           .image(image)
           .collection(collectionList)
           .build();
+      if (request.isOwn()) {
+        collectionList.setOwned(collectionList.getOwned() + 1);
+        collectionList.setTotalPrice(collectionList.getTotalPrice() + request.getPrice());
+      }
       this.collectionItemRepository.save(collectionItem);
       List<CollectionItemMetadataResponse> collectionItemMetadataResponseList = new ArrayList<>();
       for (CollectionItemMetadataRequest c : request.getMetadata()) {
@@ -262,6 +273,7 @@ public class CollectionService {
         collectionItemMetadataResponseList.add(
             toCollectionItemMetadataResponse(collectionItemsMetadata));
       }
+      collectionListResponse = toCollectionListResponse(collectionList);
       collectionItemsResponse = CollectionItemsResponse.builder()
           .name(request.getName())
           .serie(collectionSeriesListResponse)
@@ -336,6 +348,8 @@ public class CollectionService {
           .build();
     }
     this.imagesRepository.save((image));
+    collectionList.setTotalItems(collectionList.getTotalItems() + 1);
+    this.collectionListRepository.save(collectionList);
     this.collectionSeriesListRepository.save(collectionSeriesList);
     CollectionItem collectionItem = null;
     collectionItem = CollectionItem.builder()
@@ -393,6 +407,16 @@ public class CollectionService {
   public boolean deleteCollectionItem(Long id) throws NotFoundException {
     CollectionItem col = this.collectionItemRepository.findById(id)
         .orElseThrow(NotFoundException::new);
+    CollectionList collectionList = this.collectionListRepository.findById(
+        col.getCollection().getId()).orElseThrow(NotFoundException::new);
+    collectionList.setTotalItems(collectionList.getTotalItems() - 1);
+    collectionList.setTotalPrice(collectionList.getTotalPrice() - col.getPrice());
+    if (col.isOwn()) {
+      collectionList.setOwned(collectionList.getOwned() - 1);
+    }
+    if (col.isWanted()) {
+      collectionList.setWanted(collectionList.getWanted() - 1);
+    }
     this.collectionItemRepository.deleteById(col.getId());
     return true;
   }
@@ -772,6 +796,12 @@ public class CollectionService {
           .serie(collectionSeriesList)
           .collection(collectionList)
           .build();
+      collectionList.setTotalItems(collectionList.getTotalItems() + 1);
+      if (ow == true) {
+        collectionList.setOwned(collectionList.getOwned() + 1);
+        collectionList.setTotalPrice(collectionList.getTotalPrice() + pric);
+      }
+      this.collectionListRepository.save(collectionList);
       this.collectionItemRepository.save(collectionItem);
       //System.out.println(collectionItem);
       cont++;
@@ -821,25 +851,44 @@ public class CollectionService {
     CollectionListResponse collectionListResponse = null;
     collectionList = this.collectionListRepository.findById(request.getCollection())
         .orElseThrow(NotFoundException::new);
-    collectionListResponse = toCollectionListResponse(collectionList);
-
     CollectionSeriesListResponse collectionSeriesListResponse = null;
     final CollectionSeriesList collectionSeriesList = this.collectionSeriesListRepository.findById(
             request.getSerie())
         .orElseThrow(NotFoundException::new);
     collectionSeriesListResponse = toCollectionSerieListResponse(collectionSeriesList);
     CollectionItem collectionItem = this.collectionItemRepository.findById(request.getId())
-        .map(item -> {
-          item.setName(request.getName());
-          item.setSerie(collectionSeriesList);
-          item.setPrice(request.getPrice());
-          item.setYear(request.getYear());
-          item.setAdquiringDate(request.getAdquiringDate());
-          item.setOwn(request.isOwn());
-          item.setNotes(request.getNotes());
-          item.setImage(imageRight);
-          return this.collectionItemRepository.save(item);
-        }).orElseThrow(NotFoundException::new);
+        .orElseThrow(NotFoundException::new);
+    //Si no se tenia el item, y ahora si...
+    if (request.isOwn() && !collectionItem.isOwn()) {
+      collectionList.setOwned(collectionList.getOwned() + 1);
+      collectionList.setTotalPrice(collectionList.getTotalPrice() + collectionItem.getPrice());
+    } else {
+      //Si se tenia el item, y ahora no...
+      if (!request.isOwn() && collectionItem.isOwn()) {
+        collectionList.setTotalPrice(collectionList.getTotalPrice() - collectionItem.getPrice());
+        collectionList.setOwned(collectionList.getOwned() - 1);
+      } else {
+        //Si la posesion no ha cambiado, pero si el precio
+        if (request.isOwn() && collectionItem.isOwn()) {
+          if (request.getPrice() != collectionItem.getPrice()) {
+            collectionList.setTotalPrice(
+                collectionList.getTotalPrice() - collectionItem.getPrice());
+            collectionList.setTotalPrice(collectionList.getTotalPrice() + request.getPrice());
+          }
+        }
+      }
+    }
+    collectionItem.setName(request.getName());
+    collectionItem.setSerie(collectionSeriesList);
+    collectionItem.setPrice(request.getPrice());
+    collectionItem.setYear(request.getYear());
+    collectionItem.setAdquiringDate(request.getAdquiringDate());
+    collectionItem.setOwn(request.isOwn());
+    collectionItem.setNotes(request.getNotes());
+    collectionItem.setImage(imageRight);
+    this.collectionItemRepository.save(collectionItem);
+    this.collectionListRepository.save(collectionList);
+    collectionListResponse = toCollectionListResponse(collectionList);
     List<CollectionItemMetadataResponse> collectionItemMetadataResponseList = new ArrayList<>();
     for (CollectionItemMetadataRequest c : request.getMetadata()) {
       //CollectionMetadata collectionMetadata = this.collectionMetadataRepository.findById(c.getId());
