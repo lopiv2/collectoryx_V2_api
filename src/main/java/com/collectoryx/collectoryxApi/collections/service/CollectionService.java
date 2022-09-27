@@ -139,22 +139,40 @@ public class CollectionService {
           .name(request.getName())
           .logo(image)
           .template(request.getTemplate())
+          .totalItems(0)
+          .ambit(false)
+          .owned(0)
+          .wanted(0)
+          .totalPrice(0)
           .user(user)
           .build();
     } else {
       collectionList = CollectionList.builder()
           .name(request.getName())
           .template(request.getTemplate())
+          .totalItems(0)
+          .ambit(false)
+          .owned(0)
+          .wanted(0)
+          .totalPrice(0)
           .user(user)
           .build();
     }
     this.collectionListRepository.save(collectionList);
-    ImageResponse imageResponse = toImageResponse(image);
-    CollectionResponse collectionResponse = CollectionResponse.builder()
-        .collection(request.getName())
-        .template(request.getTemplate())
-        .logo(imageResponse)
-        .build();
+    CollectionResponse collectionResponse = null;
+    if (image != null) {
+      ImageResponse imageResponse = toImageResponse(image);
+      collectionResponse = CollectionResponse.builder()
+          .collection(request.getName())
+          .template(request.getTemplate())
+          .logo(imageResponse)
+          .build();
+    } else {
+      collectionResponse = CollectionResponse.builder()
+          .collection(request.getName())
+          .template(request.getTemplate())
+          .build();
+    }
     return collectionResponse;
   }
 
@@ -172,6 +190,7 @@ public class CollectionService {
           .template(request.getTemplate())
           .logo(image)
           .totalItems(0)
+          .ambit(false)
           .owned(0)
           .wanted(0)
           .totalPrice(0)
@@ -182,6 +201,7 @@ public class CollectionService {
           .name(request.getName())
           .template(request.getTemplate())
           .totalItems(0)
+          .ambit(false)
           .owned(0)
           .wanted(0)
           .totalPrice(0)
