@@ -1,6 +1,5 @@
 package com.collectoryx.collectoryxApi.user.controller;
 
-import com.collectoryx.collectoryxApi.user.rest.request.UserEventsPeriodRequest;
 import com.collectoryx.collectoryxApi.user.rest.request.UserEventsRequest;
 import com.collectoryx.collectoryxApi.user.rest.response.UserEventsResponse;
 import com.collectoryx.collectoryxApi.user.service.UserEventsService;
@@ -10,6 +9,7 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -49,25 +49,25 @@ public class UserEventsController {
 
   @PostMapping(value = "/get-period")
   public Mono<List<UserEventsResponse>> getPeriodEvents(
-      @RequestBody UserEventsPeriodRequest userEventsPeriodRequest,
+      @RequestBody UserEventsRequest userEventsPeriodRequest,
       @RequestHeader(value = "Authorization") String token) {
     List<UserEventsResponse> userEventsResponseList = this.userEventsService
         .listEventsByMonthAndYear(userEventsPeriodRequest);
     return Mono.just(userEventsResponseList);
   }
 
-  /*@PutMapping(value = "/update")
+  @PutMapping(value = "/update")
   public Mono<UserEventsResponse> updateFeed(
       @RequestBody UserEventsRequest userEventsRequest,
       @RequestHeader(value = "Authorization") String token) {
     UserEventsResponse userEventsResponse = null;
     try {
-      userEventsResponse = this.userEventsService.updateFeed(userEventsRequest);
+      userEventsResponse = this.userEventsService.updateEvent(userEventsRequest);
     } catch (NotFoundException e) {
       e.printStackTrace();
     }
     return Mono.just(userEventsResponse);
-  }*/
+  }
 
   /*@GetMapping(value = "/view/{id}")
   public Mono<List<UserEventsResponse>> getUserFeeds(@PathVariable("id") Long id,

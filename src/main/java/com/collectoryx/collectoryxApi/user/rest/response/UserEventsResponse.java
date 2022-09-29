@@ -28,6 +28,8 @@ public class UserEventsResponse {
 
   protected String description;
 
+  protected boolean allDay;
+
   protected Date start;
 
   protected Date end;

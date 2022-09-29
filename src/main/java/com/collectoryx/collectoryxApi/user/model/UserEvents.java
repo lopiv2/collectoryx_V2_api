@@ -57,4 +57,7 @@ public class UserEvents {
   @Default
   private EventTypes type = EventTypes.Event;
 
+  @Column
+  private boolean allDay=false;
+
 }

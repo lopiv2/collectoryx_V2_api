@@ -18,6 +18,9 @@ import lombok.NoArgsConstructor;
 public class UserEventsRequest {
 
   @NotNull
+  protected Long id;
+
+  @NotNull
   protected Long userId;
 
   @NotEmpty
@@ -28,6 +31,8 @@ public class UserEventsRequest {
   protected Date start;
 
   protected Date end;
+
+  protected boolean allDay;
 
   @Enumerated(EnumType.STRING)
   private EventTypes type;
