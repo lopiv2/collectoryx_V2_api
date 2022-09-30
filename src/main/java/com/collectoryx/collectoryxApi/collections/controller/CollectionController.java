@@ -119,11 +119,11 @@ public class CollectionController {
     return Mono.just(count);
   }
 
-  @GetMapping(value = "/count-completed-collections/{id}")
+  @PostMapping(value = "/count-completed-collections")
   public Mono<Long> getCompletedCollections(
-      @PathVariable("id") Long id,
+      @RequestBody PageFrontRequest pageFrontRequest,
       @RequestHeader(value = "Authorization") String token) {
-    Long count = this.collectionService.getCountOfCompletedCollections(id);
+    Long count = this.collectionService.getCountOfCompletedCollections(pageFrontRequest);
     return Mono.just(count);
   }
 
@@ -363,12 +363,13 @@ public class CollectionController {
     return Mono.just(collectionSeriesListResponse);
   }
 
-  @GetMapping(value = "/view-collections/{id}")
-  public Mono<List<CollectionListResponse>> getCollections(@PathVariable("id") Long id,
+  @PostMapping(value = "/view-collections")
+  public Mono<PagingResponse> getCollections(@RequestBody PageFrontRequest pageFrontRequest,
       @RequestHeader(value = "Authorization") String token) {
-    List<CollectionListResponse> collectionListResponses =
-        this.collectionService.listCollections(id);
-    return Mono.just(collectionListResponses);
+    PagingResponse<CollectionListResponse> collectionListResponsePagingResponse = null;
+    collectionListResponsePagingResponse =
+        this.collectionService.listCollections(pageFrontRequest);
+    return Mono.just(collectionListResponsePagingResponse);
   }
 
   @GetMapping(value = "/view-series/{id}")

@@ -27,4 +27,7 @@ public class PageFrontRequest {
   @NotEmpty
   protected String orderField;
 
+  @NotEmpty
+  protected String orderDirection;
+
 }

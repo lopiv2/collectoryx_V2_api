@@ -110,8 +110,16 @@ public class CollectionService {
     return count;
   }
 
-  public long getCountOfCompletedCollections(Long id) {
-    List<CollectionList> collectionLists = this.collectionListRepository.findAllByUser_Id(id);
+  public long getCountOfCompletedCollections(PageFrontRequest request) {
+    /*PageRequest pageRequest = PageRequest.of(request.getPage() != null ? request.getPage() : 0,
+        request.getSize() != null ? request.getSize() : 500,
+        Sort.by(Order.asc(request.getOrderField())));*/
+    PageRequest pageRequest = PageRequest.of(request.getPage() != null ? request.getPage() : 0,
+        request.getSize() != null ? request.getSize() : 500,
+        Sort.by(request.getOrderDirection().contains("up") ? Order.asc(request.getOrderField())
+            : Order.desc(request.getOrderField())));
+    Page<CollectionList> collectionLists = this.collectionListRepository.findAllByUser_Id(
+        Long.valueOf(request.getId()), pageRequest);
     long completedCollections = 0;
     for (CollectionList c : collectionLists
     ) {
@@ -473,17 +481,6 @@ public class CollectionService {
     return true;
   }
 
-  public PagingResponse<CollectionItemsResponse> getAllCollectionItemsByUserId(
-      PageFrontRequest request) {
-    PageRequest pageRequest = PageRequest.of(request.getPage() != null ? request.getPage() : 0,
-        request.getSize() != null ? request.getSize() : 500,
-        Sort.by(Order.asc(request.getOrderField())));
-    Page<CollectionItem> collections = this.collectionItemRepository
-        .findAllByCollection_UserId_IdOrderByAdquiringDateDesc(Long.valueOf(request.getId()),
-            pageRequest);
-    return getCollectionItemResponsePagingResponse(collections);
-  }
-
   public CollectionListResponse getCollectionById(Long id) {
     CollectionList collection = null;
     try {
@@ -506,7 +503,8 @@ public class CollectionService {
   public PagingResponse<CollectionItemsResponse> getCollectionItemsById(PageFrontRequest request) {
     PageRequest pageRequest = PageRequest.of(request.getPage() != null ? request.getPage() : 0,
         request.getSize() != null ? request.getSize() : 500,
-        Sort.by(Order.asc(request.getOrderField())));
+        Sort.by(request.getOrderDirection().contains("up") ? Order.asc(request.getOrderField())
+            : Order.desc(request.getOrderField())));
     Page<CollectionItem> collections = this.collectionItemRepository.findByCollection_Id(
         Long.valueOf(request.getId()),
         pageRequest);
@@ -517,13 +515,24 @@ public class CollectionService {
       PageFrontRequest request) {
     PageRequest pageRequest = PageRequest.of(request.getPage() != null ? request.getPage() : 0,
         request.getSize() != null ? request.getSize() : 500,
-        request.getOrderField().contains("wanted") || request.getOrderField().contains("own")
-            ? Sort.by(Order.desc(request.getOrderField()))
-            : Sort.by(Order.asc(request.getOrderField())));
+        Sort.by(request.getOrderDirection().contains("up") ? Order.asc(request.getOrderField())
+            : Order.desc(request.getOrderField())));
     Page<CollectionItem> collections = this.collectionItemRepository
         .findByCollection_IdAndNameContaining(Long.valueOf(request.getId()), request.getSearch(),
             pageRequest);
     return getCollectionItemResponsePagingResponse(collections);
+  }
+
+  private PagingResponse<CollectionListResponse> getCollectionListResponsePagingResponse(
+      Page<CollectionList> collectionLists) {
+    List<CollectionListResponse> collectionListResponses = toCollectionListResponse(
+        collectionLists.getContent());
+    return new PagingResponse<>(
+        collectionListResponses,
+        collectionLists.getNumber(),
+        collectionLists.getSize(),
+        collectionLists.getTotalPages(),
+        collectionLists.getTotalElements(), collectionLists.isLast());
   }
 
   private PagingResponse<CollectionItemsResponse> getCollectionItemResponsePagingResponse(
@@ -573,12 +582,27 @@ public class CollectionService {
         .collect(Collectors.toList());
   }
 
-  public List<CollectionListResponse> listCollections(Long id) {
-    List<CollectionList> collections = this.collectionListRepository
-        .findAllByUser_Id(id);
-    return StreamSupport.stream(collections.spliterator(), false)
-        .map(this::toCollectionListResponse)
-        .collect(Collectors.toList());
+  public PagingResponse<CollectionListResponse> listCollections(PageFrontRequest request) {
+    PageRequest pageRequest = PageRequest.of(request.getPage() != null ? request.getPage() : 0,
+        request.getSize() != null ? request.getSize() : 500,
+        Sort.by(request.getOrderDirection().contains("up") ? Order.asc(request.getOrderField())
+            : Order.desc(request.getOrderField())));
+    Page<CollectionList> collections = this.collectionListRepository
+        .findAllByUser_Id(Long.valueOf(request.getId()), pageRequest);
+    return getCollectionListResponsePagingResponse(collections);
+
+  }
+
+  public PagingResponse<CollectionItemsResponse> getAllCollectionItemsByUserId(
+      PageFrontRequest request) {
+    PageRequest pageRequest = PageRequest.of(request.getPage() != null ? request.getPage() : 0,
+        request.getSize() != null ? request.getSize() : 500,
+        Sort.by(request.getOrderDirection().contains("up") ? Order.asc(request.getOrderField())
+            : Order.desc(request.getOrderField())));
+    Page<CollectionItem> collections = this.collectionItemRepository
+        .findAllByCollection_UserId_IdOrderByAdquiringDateDesc(Long.valueOf(request.getId()),
+            pageRequest);
+    return getCollectionItemResponsePagingResponse(collections);
   }
 
   public List<CollectionMetadataResponse> listMetadataByCollection(Long id) {
@@ -1124,7 +1148,13 @@ public class CollectionService {
           .wanted(collection.isWanted())
           .build();
     }
+  }
 
+  private List<CollectionListResponse> toCollectionListResponse(
+      Iterable<CollectionList> collectionItems) {
+    return StreamSupport.stream(collectionItems.spliterator(), false)
+        .map(p -> this.toCollectionListResponse(p))
+        .collect(Collectors.toList());
   }
 
   private CollectionListResponse toCollectionListResponse(CollectionList request) {
