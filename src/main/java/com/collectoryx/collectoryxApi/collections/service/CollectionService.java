@@ -111,9 +111,6 @@ public class CollectionService {
   }
 
   public long getCountOfCompletedCollections(PageFrontRequest request) {
-    /*PageRequest pageRequest = PageRequest.of(request.getPage() != null ? request.getPage() : 0,
-        request.getSize() != null ? request.getSize() : 500,
-        Sort.by(Order.asc(request.getOrderField())));*/
     PageRequest pageRequest = PageRequest.of(request.getPage() != null ? request.getPage() : 0,
         request.getSize() != null ? request.getSize() : 500,
         Sort.by(request.getOrderDirection().contains("up") ? Order.asc(request.getOrderField())
@@ -566,7 +563,6 @@ public class CollectionService {
   }
 
   public List<CollectionItemsResponse> getMoneyFromAllItems(Long id) {
-    //final List<CollectionItemsResponse> collectionResponseList = new LinkedList<>();
     List<CollectionItem> collections = this.collectionItemRepository
         .findByCollection_UserId_Id(id);
     return StreamSupport.stream(collections.spliterator(), false)
