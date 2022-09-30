@@ -1,4 +1,4 @@
-package com.collectoryx.collectoryxApi.user.rest.response;
+package com.collectoryx.collectoryxApi.user.rest.request;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class UserResponse {
+public class UserRequest {
 
   private Long id;
 
