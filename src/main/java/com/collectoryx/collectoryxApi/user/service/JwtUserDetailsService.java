@@ -88,6 +88,15 @@ public class JwtUserDetailsService implements UserDetailsService {
     }
   }
 
+  public Boolean checkUserExists(String username) {
+    User user = this.userRepository.findByUserName(username);
+    if (user == null) {
+      return false;
+    } else {
+      return true;
+    }
+  }
+
   @Override
   public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
     User user = userRepository.findUserByUsername(username);

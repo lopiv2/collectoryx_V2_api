@@ -26,5 +26,26 @@
   "apiLink": "",
   "logo": "",
    "header": ""
-  }
+  },
+  {
+  "name": "Musicbrainz",
+  "keyCode": "",
+  "apiLink": "",
+  "logo": "",
+   "header": ""
+  },
+  {
+  "name": "Discogs",
+  "keyCode": "",
+  "apiLink": "",
+  "logo": "",
+   "header": ""
+  },
+  {
+  "name": "Marvel Comics",
+  "keyCode": "",
+  "apiLink": "http(s)://gateway.marvel.com/",
+  "logo": "",
+   "header": ""
+  },
 ]

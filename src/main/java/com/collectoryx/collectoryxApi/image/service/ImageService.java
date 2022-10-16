@@ -60,7 +60,7 @@ public class ImageService {
     try {
       saveImage(fileName, path);
     } catch (IOException e) {
-      e.printStackTrace();
+      throw new RuntimeException(e);
     }
     image = this.imageRepository.save(image);
     ImageResponse imageResponse = toImageResponse(image);

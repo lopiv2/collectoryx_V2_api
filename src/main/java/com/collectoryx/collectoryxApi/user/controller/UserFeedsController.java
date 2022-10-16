@@ -71,7 +71,7 @@ public class UserFeedsController {
     try {
       userFeedsResponse = this.userFeedsService.updateFeed(userFeedsRequest);
     } catch (NotFoundException e) {
-      e.printStackTrace();
+      throw new RuntimeException(e);
     }
     return Mono.just(userFeedsResponse);
   }
@@ -92,7 +92,7 @@ public class UserFeedsController {
     try {
       userFeedsResponse = this.userFeedsService.createFeed(userFeedsRequest);
     } catch (NotFoundException e) {
-      e.printStackTrace();
+      throw new RuntimeException(e);
     }
     return Mono.just(userFeedsResponse);
   }

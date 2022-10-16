@@ -138,14 +138,14 @@ public class CollectionController {
         try {
           collectionResponse = this.collectionService.createCollectionNew(collectionRequest);
         } catch (NotFoundException e) {
-          e.printStackTrace();
+          throw new RuntimeException(e);
         }
         break;
       case Action_Figures:
         try {
           collectionResponse = this.collectionService.createCollection(collectionRequest);
         } catch (NotFoundException e) {
-          e.printStackTrace();
+          throw new RuntimeException(e);
         }
         break;
     }
@@ -162,7 +162,7 @@ public class CollectionController {
         collectionItemsResponse = this.collectionService.createItem(collectionCreateItemRequest);
       }
     } catch (NotFoundException e) {
-      e.printStackTrace();
+      throw new RuntimeException(e);
     }
     return Mono.just(collectionItemsResponse);
   }
@@ -174,7 +174,7 @@ public class CollectionController {
     try {
       this.collectionService.createItemNewSerie(collectionCreateItemRequest);
     } catch (NotFoundException e) {
-      e.printStackTrace();
+      throw new RuntimeException(e);
     }
     return Mono.empty();
     //return Mono.just(collectionItemsResponse);
@@ -188,7 +188,7 @@ public class CollectionController {
     try {
       collectionSerieListResponse = this.collectionService.createSerie(collectionSerieRequest);
     } catch (NotFoundException e) {
-      e.printStackTrace();
+      throw new RuntimeException(e);
     }
     return Mono.just(collectionSerieListResponse);
   }
@@ -299,7 +299,7 @@ public class CollectionController {
       try {
         collectionResponse = this.collectionService.toggleAmbit(collectionRequest);
       } catch (NotFoundException e) {
-        e.printStackTrace();
+        throw new RuntimeException(e);
       }
     }
     return Mono.just(collectionResponse);
@@ -314,7 +314,7 @@ public class CollectionController {
       try {
         collectionItemsResponse = this.collectionService.toggleOwn(collectionItemRequest);
       } catch (NotFoundException e) {
-        e.printStackTrace();
+        throw new RuntimeException(e);
       }
     }
     return Mono.just(collectionItemsResponse);
@@ -329,7 +329,7 @@ public class CollectionController {
       try {
         collectionItemsResponse = this.collectionService.toggleWish(collectionItemRequest);
       } catch (NotFoundException e) {
-        e.printStackTrace();
+        throw new RuntimeException(e);
       }
     }
     return Mono.just(collectionItemsResponse);
@@ -345,7 +345,7 @@ public class CollectionController {
         collectionItemsResponse = this.collectionService.updateItem(collectionCreateItemRequest);
       }
     } catch (NotFoundException e) {
-      e.printStackTrace();
+      throw new RuntimeException(e);
     }
     return Mono.just(collectionItemsResponse);
   }
@@ -358,7 +358,7 @@ public class CollectionController {
     try {
       collectionSeriesListResponse = this.collectionService.updateSerie(collectionSerieListRequest);
     } catch (NotFoundException e) {
-      e.printStackTrace();
+      throw new RuntimeException(e);
     }
     return Mono.just(collectionSeriesListResponse);
   }

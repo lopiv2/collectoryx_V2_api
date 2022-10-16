@@ -15,6 +15,7 @@ import java.util.Map;
 import javax.validation.Valid;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.data.crossstore.ChangeSetPersister.NotFoundException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -133,7 +134,8 @@ public class AuthenticationController {
   }
 
   @PostMapping("/register")
-  public ResponseEntity<?> saveUser(@RequestBody @Valid RegisterRequest request) {
+  public ResponseEntity<?> saveUser(@RequestBody @Valid RegisterRequest request)
+      throws NotFoundException {
     Map<String, Object> responseMap = new HashMap<>();
     User user = new User();
     user.setFirstName(request.getFirstName());
@@ -151,9 +153,16 @@ public class AuthenticationController {
       responseMap.put("message", "Email already exists");
       return ResponseEntity.badRequest().body(responseMap);
     }
+    Boolean checkUserName = this.userDetailsService.checkUserExists(request.getUserName());
+    if (checkUserName) {
+      responseMap.put("error", true);
+      responseMap.put("message", "Username already exists");
+      return ResponseEntity.badRequest().body(responseMap);
+    }
     userRepository.save(user);
     //Se genera el listado de Apis por defecto que lleva la aplicacion
     this.configService.createInitialApiList(user);
+    this.configService.createInitialThemes();
     //Genera configuracion inicial del usuario
     this.configService.createInitialConfig(user);
     //Se genera una licencia free por defecto al crear un usuario nuevo, Esto solo para SASS

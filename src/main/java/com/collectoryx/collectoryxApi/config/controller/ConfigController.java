@@ -41,7 +41,7 @@ public class ConfigController {
       try {
         themeResponse = this.configService.saveTheme(themeRequest);
       } catch (NotFoundException e) {
-        e.printStackTrace();
+        throw new RuntimeException(e);
       }
     }
     return Mono.just(themeResponse);
@@ -72,7 +72,7 @@ public class ConfigController {
     try {
       configApiResponse = this.configService.updateApi(configApiRequest);
     } catch (NotFoundException e) {
-      e.printStackTrace();
+      throw new RuntimeException(e);
     }
     return Mono.just(configApiResponse);
   }
@@ -109,7 +109,7 @@ public class ConfigController {
       try {
         configResponse = this.configService.saveConfig(configRequest);
       } catch (NotFoundException e) {
-        e.printStackTrace();
+        throw new RuntimeException(e);
       }
     }
     return Mono.just(configResponse);

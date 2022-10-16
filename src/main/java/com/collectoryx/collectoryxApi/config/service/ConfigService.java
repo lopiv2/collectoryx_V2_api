@@ -17,12 +17,16 @@ import com.collectoryx.collectoryxApi.user.rest.response.ThemeResponse;
 import com.collectoryx.collectoryxApi.user.rest.response.UserResponse;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import java.io.File;
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 import javax.transaction.Transactional;
+import org.json.JSONArray;
 import org.springframework.data.crossstore.ChangeSetPersister.NotFoundException;
 import org.springframework.stereotype.Service;
 
@@ -53,7 +57,7 @@ public class ConfigService {
       user = this.userRepository.findById(request.getUserId())
           .orElseThrow(NotFoundException::new);
     } catch (NotFoundException e) {
-      e.printStackTrace();
+      throw new RuntimeException(e);
     }
     ConfigApiKeys configApiKeys = ConfigApiKeys.builder()
         .apiLink(request.getApiLink())
@@ -80,17 +84,37 @@ public class ConfigService {
     return toConfigApiResponse(configApiKeys);
   }
 
+  public void createInitialThemes() throws NotFoundException {
+    Themes theme = this.userThemesRepository.findByName("defaultLight")
+        .orElse(theme = Themes.builder()
+            .name("defaultLight")
+            .backgroundColor("")
+            .listItemColor("#000000")
+            .backgroundImage("")
+            .mode("light")
+            .primaryTextColor("#000000")
+            .secondaryTextColor("rgba(0,0,0,0.6)")
+            .sideBarColor("#fff")
+            .topBarColor("#1976d2")
+            .build());
+    this.userThemesRepository.save(theme);
+  }
+
   public void createInitialConfig(User user) {
     Themes theme = null;
     try {
-      theme = this.userThemesRepository.findById(Long.valueOf(2))
+      theme = this.userThemesRepository.findByName("defaultLight")
           .orElseThrow(NotFoundException::new);
     } catch (NotFoundException e) {
-      e.printStackTrace();
+      throw new RuntimeException(e);
     }
     Config config = Config.builder()
         .darkTheme(true)
         .theme(theme)
+        .expensiveItemPanel(true)
+        .completedCollectionsPanel(true)
+        .recentPurchasePanel(true)
+        .wishlistPanel(true)
         .user(user)
         .build();
     this.configRepository.save(config);
@@ -99,21 +123,34 @@ public class ConfigService {
   public void createInitialApiList(User user) {
     ObjectMapper mapper = new ObjectMapper();
     mapper.configure(DeserializationFeature.USE_JAVA_ARRAY_FOR_JSON_ARRAY, true);
-    File files = null;
-    try {
-      files = new File(System.getProperty("user.dir")).getCanonicalFile();
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
-    try {
-      ConfigApiKeys[] configApiKeys = mapper.readValue(
-          new File(files + "/src/main/resources/initialApis.json"), ConfigApiKeys[].class);
-      for (ConfigApiKeys conf : configApiKeys) {
-        conf.setUser(user);
-        this.configApiKeysRepository.save(conf);
-        System.out.println(conf);
+    InputStream input = getClass().getClassLoader().getResourceAsStream("initialApis.json");
+    StringBuilder sb = new StringBuilder();
+    try (InputStreamReader streamReader =
+        new InputStreamReader(input, StandardCharsets.UTF_8);
+        BufferedReader reader = new BufferedReader(streamReader)) {
+      String line;
+      while ((line = reader.readLine()) != null) {
+        sb.append(line);
       }
-
+      JSONArray jsonArray = new JSONArray(sb.toString());
+      //System.out.println(jsonArray);
+      try {
+        ConfigApiKeys[] configApiKeysList = mapper.readValue(jsonArray.toString(),
+            ConfigApiKeys[].class);
+        for (ConfigApiKeys conf : configApiKeysList) {
+          ConfigApiKeys configApiKeys = ConfigApiKeys.builder()
+              .user(user)
+              .name(conf.getName())
+              .header(conf.getHeader())
+              .keyCode(conf.getKeyCode())
+              .apiLink(conf.getApiLink())
+              .logo(conf.getLogo())
+              .build();
+          this.configApiKeysRepository.save(configApiKeys);
+        }
+      } catch (Exception e) {
+        e.printStackTrace();
+      }
     } catch (IOException e) {
       e.printStackTrace();
     }

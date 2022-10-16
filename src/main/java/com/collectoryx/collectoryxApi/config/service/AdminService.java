@@ -137,7 +137,7 @@ public class AdminService {
       MessageDigest md = MessageDigest.getInstance("SHA3-256");
       hash = md.digest(msg);
     } catch (NoSuchAlgorithmException e) {
-      e.printStackTrace();
+      throw new RuntimeException(e);
     }
     StringBuilder strBuilder = new StringBuilder();
     for (byte b : hash) {

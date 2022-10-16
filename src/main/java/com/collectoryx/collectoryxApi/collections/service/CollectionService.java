@@ -101,7 +101,10 @@ public class CollectionService {
   }
 
   public long getCountOfCollectionItems(Long id) {
-    long count = this.collectionListRepository.sumItemsByCollectionUser(id);
+    Long count = this.collectionListRepository.sumItemsByCollectionUser(id);
+    if (count == null) {
+      count = Long.valueOf(0);
+    }
     return count;
   }
 
@@ -484,7 +487,7 @@ public class CollectionService {
       collection = this.collectionListRepository
           .findById(id).orElseThrow(NotFoundException::new);
     } catch (NotFoundException e) {
-      e.printStackTrace();
+      throw new RuntimeException(e);
     }
 
     return toCollectionListResponse(collection);
@@ -672,7 +675,8 @@ public class CollectionService {
   public String saveFile(MultipartFile file, String path) throws IOException {
     File files = new File(System.getProperty("user.dir")).getCanonicalFile();
     //path = files + "/src/main/resources/" + file;
-    Path pathFinal = Paths.get(files + "/src/main/resources/" + path);
+    Path pathFinal = Paths.get(files + "/" + path);
+    System.out.println(files);
     try {
       Files.copy(file.getInputStream(), pathFinal, StandardCopyOption.REPLACE_EXISTING);
     } catch (Exception e) {
@@ -690,19 +694,19 @@ public class CollectionService {
     try {
       finalFile = saveFile(fileName, path);
     } catch (IOException e) {
-      e.printStackTrace();
+      throw new RuntimeException(e);
     }
     File file = new File(finalFile);
     try {
       fileName.transferTo(file);
     } catch (IOException e) {
-      e.printStackTrace();
+      throw new RuntimeException(e);
     }
     Reader in = null;
     try {
       in = new FileReader(file);
     } catch (FileNotFoundException e) {
-      e.printStackTrace();
+      throw new RuntimeException(e);
     }
 
     String[] HEADERS = {"Image", "Name", "Collection", "Serie", "Year", "Price", "Own", "Notes"};
@@ -725,7 +729,7 @@ public class CollectionService {
       }
       //System.out.println(result2);
     } catch (IOException e) {
-      e.printStackTrace();
+      throw new RuntimeException(e);
     }
     return StreamSupport.stream(csvHeadersResponseList.spliterator(), false)
         .map(this::toCSVHeadersResponse)
@@ -739,15 +743,15 @@ public class CollectionService {
     try {
       files = new File(System.getProperty("user.dir")).getCanonicalFile();
     } catch (IOException e) {
-      e.printStackTrace();
+      throw new RuntimeException(e);
     }
-    Path pathFinal = Paths.get(files + "/src/main/resources/file.csv");
-    File file = new File(pathFinal.toString());
+    Path pathFinal = Paths.get(files.toString());
+    File file = new File(pathFinal + "/" + "file.csv");
     Reader in = null;
     try {
       in = new FileReader(file);
     } catch (FileNotFoundException e) {
-      e.printStackTrace();
+      throw new RuntimeException(e);
     }
 
     Iterable<CSVRecord> records = null;
@@ -757,7 +761,7 @@ public class CollectionService {
           .withFirstRecordAsHeader()
           .parse(in);
     } catch (IOException e) {
-      e.printStackTrace();
+      throw new RuntimeException(e);
     }
     int cont = 0;
     CollectionList collectionList = null;
@@ -820,10 +824,11 @@ public class CollectionService {
       } catch (NumberFormatException e) {
         ye = 2022;
       }
-      try {
-        ow = Boolean.parseBoolean(record.get(own));
-      } catch (IllegalArgumentException e) {
-        ow = false;
+      if(record.get(own).contains("1")){
+        ow=true;
+      }
+      else{
+        ow=false;
       }
 
       CollectionItem collectionItem = CollectionItem.builder()
@@ -843,8 +848,12 @@ public class CollectionService {
       }
       this.collectionListRepository.save(collectionList);
       this.collectionItemRepository.save(collectionItem);
-      //System.out.println(collectionItem);
       cont++;
+    }
+    if (file.delete()) {
+      System.out.println("Deleted the file: " + file.getName());
+    } else {
+      System.out.println("Failed to delete the file.");
     }
     return cont;
   }
@@ -855,7 +864,7 @@ public class CollectionService {
       collectionList = this.collectionListRepository.findById(id)
           .orElseThrow(NotFoundException::new);
     } catch (NotFoundException e) {
-      e.printStackTrace();
+      throw new RuntimeException(e);
     }
     return collectionList;
   }
@@ -998,55 +1007,58 @@ public class CollectionService {
 
   private CollectionItemsResponse toCollectionItemsResponse(CollectionItem collection) {
     ImageResponse image = null;
-    if (collection.getImage() != null) {
+    if(collection!=null){
+      if (collection.getImage() != null) {
+        try {
+          image = toImageResponse(
+              this.imagesRepository.findById(collection.getImage().getId())
+                  .orElseThrow(NotFoundException::new));
+        } catch (NotFoundException e) {
+          throw new RuntimeException(e);
+        }
+      }
+
+      CollectionSeriesListResponse collectionSeriesListResponse = null;
+      if (collection.getSerie() != null) {
+        try {
+          collectionSeriesListResponse = toCollectionSerieListResponse(
+              this.collectionSeriesListRepository.findById(collection.getSerie().getId())
+                  .orElseThrow(NotFoundException::new));
+        } catch (NotFoundException e) {
+          throw new RuntimeException(e);
+        }
+      }
+
+      CollectionListResponse collectionListResponse = null;
       try {
-        image = toImageResponse(
-            this.imagesRepository.findById(collection.getImage().getId())
+        collectionListResponse = toCollectionListResponse(
+            this.collectionListRepository.findById(collection.getCollection().getId())
                 .orElseThrow(NotFoundException::new));
       } catch (NotFoundException e) {
-        e.printStackTrace();
+        throw new RuntimeException(e);
       }
-    }
 
-    CollectionSeriesListResponse collectionSeriesListResponse = null;
-    if (collection.getSerie() != null) {
-      try {
-        collectionSeriesListResponse = toCollectionSerieListResponse(
-            this.collectionSeriesListRepository.findById(collection.getSerie().getId())
-                .orElseThrow(NotFoundException::new));
-      } catch (NotFoundException e) {
-        e.printStackTrace();
-      }
+      List<CollectionItemMetadataResponse> collectionItemMetadataResponseList = StreamSupport
+          .stream(this.collectionItemsMetadataRepository
+              .findByItem_Id(collection.getId()).spliterator(), false)
+          .map(this::toCollectionItemMetadataResponse).collect(
+              Collectors.toList());
+      return CollectionItemsResponse.builder()
+          .id(collection.getId())
+          .name(collection.getName())
+          .image(image)
+          .serie(collectionSeriesListResponse)
+          .collection(collectionListResponse)
+          .year(collection.getYear())
+          .price(collection.getPrice())
+          .own(collection.isOwn())
+          .wanted(collection.isWanted())
+          .notes(collection.getNotes())
+          .adquiringDate(collection.getAdquiringDate())
+          .metadata(collectionItemMetadataResponseList)
+          .build();
     }
-
-    CollectionListResponse collectionListResponse = null;
-    try {
-      collectionListResponse = toCollectionListResponse(
-          this.collectionListRepository.findById(collection.getCollection().getId())
-              .orElseThrow(NotFoundException::new));
-    } catch (NotFoundException e) {
-      e.printStackTrace();
-    }
-
-    List<CollectionItemMetadataResponse> collectionItemMetadataResponseList = StreamSupport
-        .stream(this.collectionItemsMetadataRepository
-            .findByItem_Id(collection.getId()).spliterator(), false)
-        .map(this::toCollectionItemMetadataResponse).collect(
-            Collectors.toList());
-    return CollectionItemsResponse.builder()
-        .id(collection.getId())
-        .name(collection.getName())
-        .image(image)
-        .serie(collectionSeriesListResponse)
-        .collection(collectionListResponse)
-        .year(collection.getYear())
-        .price(collection.getPrice())
-        .own(collection.isOwn())
-        .wanted(collection.isWanted())
-        .notes(collection.getNotes())
-        .adquiringDate(collection.getAdquiringDate())
-        .metadata(collectionItemMetadataResponseList)
-        .build();
+    return null;
   }
 
   private CollectionSeriesListResponse toCollectionSerieListResponse(
@@ -1058,7 +1070,7 @@ public class CollectionService {
             this.imagesRepository.findById(collection.getLogo().getId())
                 .orElseThrow(NotFoundException::new));
       } catch (NotFoundException e) {
-        e.printStackTrace();
+        throw new RuntimeException(e);
       }
     }
     CollectionList collectionList = null;
@@ -1067,7 +1079,7 @@ public class CollectionService {
           collection.getCollection().getId()).orElseThrow(
           NotFoundException::new);
     } catch (NotFoundException e) {
-      e.printStackTrace();
+      throw new RuntimeException(e);
     }
     CollectionResponse collectionResponse = toCollectionResponse(collectionList);
     if (image != null) {
@@ -1094,7 +1106,7 @@ public class CollectionService {
             this.imagesRepository.findById(collection.getImage().getId())
                 .orElseThrow(NotFoundException::new));
       } catch (NotFoundException e) {
-        e.printStackTrace();
+        throw new RuntimeException(e);
       }
     }
     CollectionSeriesListResponse collectionSeriesListResponse = null;
@@ -1104,7 +1116,7 @@ public class CollectionService {
             this.collectionSeriesListRepository.findById(collection.getSerie().getId())
                 .orElseThrow(NotFoundException::new));
       } catch (NotFoundException e) {
-        e.printStackTrace();
+        throw new RuntimeException(e);
       }
     }
     CollectionListResponse collectionListResponse = null;
@@ -1113,7 +1125,7 @@ public class CollectionService {
           this.collectionListRepository.findById(collection.getCollection().getId())
               .orElseThrow(NotFoundException::new));
     } catch (NotFoundException e) {
-      e.printStackTrace();
+      throw new RuntimeException(e);
     }
 
     if (image != null) {
@@ -1166,7 +1178,7 @@ public class CollectionService {
             this.imagesRepository.findById(request.getLogo().getId())
                 .orElseThrow(NotFoundException::new));
       } catch (NotFoundException e) {
-        e.printStackTrace();
+        throw new RuntimeException(e);
       }
       return CollectionListResponse.builder()
           .id(request.getId())
@@ -1204,7 +1216,7 @@ public class CollectionService {
             this.imagesRepository.findById(collection.getLogo().getId())
                 .orElseThrow(NotFoundException::new));
       } catch (NotFoundException e) {
-        e.printStackTrace();
+        throw new RuntimeException(e);
       }
       return CollectionSeriesListResponse.builder()
           .id(collection.getId())
@@ -1227,7 +1239,7 @@ public class CollectionService {
             this.imagesRepository.findById(request.getLogo().getId())
                 .orElseThrow(NotFoundException::new));
       } catch (NotFoundException e) {
-        e.printStackTrace();
+        throw new RuntimeException(e);
       }
       return CollectionResponse.builder()
           .id(request.getId())

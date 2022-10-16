@@ -20,7 +20,7 @@ public interface CollectionListRepository extends JpaRepository<CollectionList, 
 
   @Query(value = "SELECT SUM(total_items) from collection_list cl where user_id =:userId ",
       nativeQuery = true)
-  long sumItemsByCollectionUser(@Param("userId") Long id);
+  Long sumItemsByCollectionUser(@Param("userId") Long id);
 
   long countByWantedAndUserId_Id(int i, Long id);
 }

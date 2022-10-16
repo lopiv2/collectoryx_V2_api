@@ -46,7 +46,7 @@ public class UserController {
     try {
       userResponse = this.userService.getUserDetails(id);
     } catch (NotFoundException e) {
-      e.printStackTrace();
+      throw new RuntimeException(e);
     }
     return Mono.just(userResponse);
   }
@@ -59,7 +59,7 @@ public class UserController {
     try {
       userResponse = this.userService.updateUserDetails(userRequest);
     } catch (NotFoundException e) {
-      e.printStackTrace();
+      throw new RuntimeException(e);
     }
     return Mono.just(userResponse);
   }

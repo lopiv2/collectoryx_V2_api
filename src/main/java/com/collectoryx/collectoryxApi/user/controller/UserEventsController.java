@@ -35,7 +35,7 @@ public class UserEventsController {
     try {
       userEventsResponse = this.userEventsService.createEvent(userEventsRequest);
     } catch (NotFoundException e) {
-      e.printStackTrace();
+      throw new RuntimeException(e);
     }
     return Mono.just(userEventsResponse);
   }
@@ -64,7 +64,7 @@ public class UserEventsController {
     try {
       userEventsResponse = this.userEventsService.updateEvent(userEventsRequest);
     } catch (NotFoundException e) {
-      e.printStackTrace();
+      throw new RuntimeException(e);
     }
     return Mono.just(userEventsResponse);
   }
