@@ -3,7 +3,6 @@ package com.collectoryx.collectoryxApi.image.service;
 import com.collectoryx.collectoryxApi.image.model.Image;
 import com.collectoryx.collectoryxApi.image.repository.ImageRepository;
 import com.collectoryx.collectoryxApi.image.rest.response.ImageResponse;
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -16,6 +15,7 @@ import javax.persistence.EntityNotFoundException;
 import javax.transaction.Transactional;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.RandomStringUtils;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -23,6 +23,8 @@ import org.springframework.web.multipart.MultipartFile;
 @Transactional
 public class ImageService {
 
+  @Value("${collectoryx.upload-directory}")
+  private String uploadDirectory;
   private final ImageRepository imageRepository;
 
   public ImageService(ImageRepository imageRepository) {
@@ -30,8 +32,7 @@ public class ImageService {
   }
 
   public void saveImage(MultipartFile file, String path) throws IOException {
-    File files = new File(System.getProperty("user.dir")).getCanonicalFile();
-    path = files.getParent() + "\\images\\" + path;
+    path = uploadDirectory + path;
     Path pathFinal = Paths.get(path);
     try {
       Files.copy(file.getInputStream(), pathFinal);
