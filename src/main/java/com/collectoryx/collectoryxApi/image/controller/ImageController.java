@@ -1,11 +1,15 @@
 package com.collectoryx.collectoryxApi.image.controller;
 
+import com.collectoryx.collectoryxApi.collections.rest.request.CollectionSerieListRequest;
+import com.collectoryx.collectoryxApi.collections.rest.response.CollectionSeriesListResponse;
+import com.collectoryx.collectoryxApi.collections.service.CollectionService;
 import com.collectoryx.collectoryxApi.image.rest.response.ImageResponse;
 import com.collectoryx.collectoryxApi.image.service.ImageService;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import java.util.List;
 import javax.validation.constraints.NotEmpty;
+import org.springframework.data.crossstore.ChangeSetPersister.NotFoundException;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -23,9 +27,11 @@ import reactor.core.publisher.Mono;
 public class ImageController {
 
   private final ImageService imageService;
+  private final CollectionService collectionService;
 
-  public ImageController(ImageService imageService) {
+  public ImageController(ImageService imageService, CollectionService collectionService) {
     this.imageService = imageService;
+    this.collectionService = collectionService;
   }
 
   @PutMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
@@ -37,6 +43,28 @@ public class ImageController {
     ImageResponse imageResponse = this.imageService.createImage(name, image);
     //ImageResponse imageResponse=ImageResponse.builder().name("hola").path("hola").build();
     return Mono.just(imageResponse);
+  }
+
+  @PutMapping(value = "/create-serie", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+  public Mono<CollectionSeriesListResponse> putImageForSerie(
+      @Parameter(description = "Name of the image") @RequestPart("name") @NotEmpty String name,
+      @Parameter(description = "Name of the image") @RequestPart("collection") @NotEmpty String collection,
+      @Parameter(description = "Content of the image",
+          content = @Content(mediaType = MediaType.APPLICATION_OCTET_STREAM_VALUE))
+      @RequestPart("image") MultipartFile image) {
+    ImageResponse imageResponse = this.imageService.createImage(name, image);
+    CollectionSeriesListResponse collectionSerieListResponse = null;
+    CollectionSerieListRequest collectionSerieListRequest = CollectionSerieListRequest.builder()
+        .collection(Long.valueOf(collection))
+        .name(name)
+        .path(imageResponse.getPath())
+        .build();
+    try {
+      collectionSerieListResponse = this.collectionService.createSerie(collectionSerieListRequest);
+    } catch (NotFoundException e) {
+      throw new RuntimeException(e);
+    }
+    return Mono.just(collectionSerieListResponse);
   }
 
   @GetMapping(value = "/get-images-local")

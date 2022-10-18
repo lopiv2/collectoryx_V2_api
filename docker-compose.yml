@@ -19,6 +19,7 @@ services:
     depends_on:
       - api
     volumes:
+      - images:/
       - ./public:/usr/src/app/public
 
 
@@ -31,4 +32,7 @@ services:
       MARIADB_PASSWORD: password
       MARIADB_ROOT_PASSWORD: root-password
       MARIADB_DATABASE: collectoryx
+
+volumes:
+  - images:
 

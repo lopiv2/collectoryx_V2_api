@@ -428,7 +428,6 @@ public class CollectionService {
           .collection(collectionResponse)
           .build();
     }
-
     return collectionSeriesListResponse;
   }
 
@@ -824,11 +823,10 @@ public class CollectionService {
       } catch (NumberFormatException e) {
         ye = 2022;
       }
-      if(record.get(own).contains("1")){
-        ow=true;
-      }
-      else{
-        ow=false;
+      if (record.get(own).contains("1")) {
+        ow = true;
+      } else {
+        ow = false;
       }
 
       CollectionItem collectionItem = CollectionItem.builder()
@@ -1007,7 +1005,7 @@ public class CollectionService {
 
   private CollectionItemsResponse toCollectionItemsResponse(CollectionItem collection) {
     ImageResponse image = null;
-    if(collection!=null){
+    if (collection != null) {
       if (collection.getImage() != null) {
         try {
           image = toImageResponse(
