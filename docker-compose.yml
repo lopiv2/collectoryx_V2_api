@@ -8,8 +8,10 @@ services:
       - "8080:8080"
     depends_on:
       - mariadb
+    volumes:
+      - uploads:/app/uploads:rw
     environment:
-      SPRING_APPLICATION_JSON: '{"spring":{"datasource":{"url":"jdbc:mariadb://mariadb:3306/collectoryx", "username": "root", "password": "root-password"}}}'
+      SPRING_APPLICATION_JSON: '{"spring":{"datasource":{"url":"jdbc:mariadb://mariadb:3306/collectoryx", "username": "root", "password": "root-password"}},"collectoryx.upload-directory":"/app/uploads/"}'
 
   front:
     #build: .
@@ -19,8 +21,7 @@ services:
     depends_on:
       - api
     volumes:
-      - images:/
-      - ./public:/usr/src/app/public
+      - uploads:/app/public/images/uploads:ro
 
 
   mariadb:
@@ -34,5 +35,5 @@ services:
       MARIADB_DATABASE: collectoryx
 
 volumes:
-  - images:
+  uploads:
 
