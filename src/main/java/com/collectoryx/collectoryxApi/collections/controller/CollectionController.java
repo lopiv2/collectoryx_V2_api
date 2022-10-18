@@ -335,6 +335,19 @@ public class CollectionController {
     return Mono.just(collectionItemsResponse);
   }
 
+  @PutMapping(value = "/update-collection")
+  public Mono<CollectionResponse> updateCollection(
+      @RequestBody CollectionRequest collectionRequest,
+      @RequestHeader(value = "Authorization") String token) {
+    CollectionResponse collectionResponse = null;
+    try {
+      collectionResponse = this.collectionService.updateCollection(collectionRequest);
+    } catch (NotFoundException e) {
+      throw new RuntimeException(e);
+    }
+    return Mono.just(collectionResponse);
+  }
+
   @PutMapping(value = "/update-item")
   public Mono<CollectionItemsResponse> updateItem(
       @RequestBody CollectionCreateItemRequest collectionCreateItemRequest,

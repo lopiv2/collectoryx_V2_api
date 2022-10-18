@@ -15,6 +15,16 @@ public class CollectionResponse {
 
   private Long id;
 
+  private String name;
+
+  private Integer owned;
+
+  private Integer wanted;
+
+  private Integer totalItems;
+
+  private float totalPrice;
+
   private String collection;
 
   protected Boolean ambit;

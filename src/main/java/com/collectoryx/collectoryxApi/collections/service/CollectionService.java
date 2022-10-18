@@ -884,6 +884,26 @@ public class CollectionService {
     return collectionSeriesList;
   }
 
+  public CollectionResponse updateCollection(CollectionRequest request)
+      throws NotFoundException {
+    Image image = null;
+    ImageResponse imageResponse = null;
+    if (request.getPath() != null) {
+      image = this.imagesRepository.findImageByPath(request.getPath()).orElseThrow(
+          NotFoundException::new);
+      imageResponse = toImageResponse(image);
+    }
+    final Image imageRight = image;
+    CollectionList collectionList = null;
+    collectionList = this.collectionListRepository.findById(request.getId()).map(item -> {
+      item.setName(request.getName());
+      item.setLogo(imageRight);
+      return this.collectionListRepository.save(item);
+    }).orElseThrow(NotFoundException::new);
+    return toCollectionResponse(collectionList);
+
+  }
+
   public CollectionItemsResponse updateItem(CollectionCreateItemRequest request)
       throws NotFoundException {
     Image image = null;
@@ -1241,6 +1261,11 @@ public class CollectionService {
       }
       return CollectionResponse.builder()
           .id(request.getId())
+          .name(request.getName())
+          .owned(request.getOwned())
+          .wanted(request.getWanted())
+          .totalItems(request.getTotalItems())
+          .totalPrice(request.getTotalPrice())
           .collection(request.getName())
           .ambit(request.getAmbit())
           .logo(image)
@@ -1248,6 +1273,11 @@ public class CollectionService {
     } else {
       return CollectionResponse.builder()
           .id(request.getId())
+          .name(request.getName())
+          .owned(request.getOwned())
+          .wanted(request.getWanted())
+          .totalItems(request.getTotalItems())
+          .totalPrice(request.getTotalPrice())
           .collection(request.getName())
           .ambit(request.getAmbit())
           .build();

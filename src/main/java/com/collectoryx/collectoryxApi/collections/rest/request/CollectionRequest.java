@@ -25,6 +25,9 @@ public class CollectionRequest {
   protected String file;
 
   @NotEmpty
+  protected String path;
+
+  @NotEmpty
   protected Boolean ambit;
 
   protected List<CollectionMetadata> metadata;
