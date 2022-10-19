@@ -5,15 +5,17 @@ import com.collectoryx.collectoryxApi.collections.rest.response.CollectionSeries
 import com.collectoryx.collectoryxApi.collections.service.CollectionService;
 import com.collectoryx.collectoryxApi.image.rest.response.ImageResponse;
 import com.collectoryx.collectoryxApi.image.service.ImageService;
+import com.collectoryx.collectoryxApi.page.rest.request.PageFrontRequest;
+import com.collectoryx.collectoryxApi.page.rest.response.PagingResponse;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
-import java.util.List;
 import javax.validation.constraints.NotEmpty;
 import org.springframework.data.crossstore.ChangeSetPersister.NotFoundException;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestPart;
@@ -67,10 +69,24 @@ public class ImageController {
     return Mono.just(collectionSerieListResponse);
   }
 
-  @GetMapping(value = "/get-images-local")
+  /*@GetMapping(value = "/get-images-local")
   public Mono<List<ImageResponse>> getAllLocalImages(
       @RequestHeader(value = "Authorization") String token) {
     List<ImageResponse> imageResponses = this.imageService.getLocalImages();
+    return Mono.just(imageResponses);
+  }*/
+
+  @PostMapping(value = "/get-images-local")
+  public Mono<PagingResponse> getAllLocalImages(@RequestBody PageFrontRequest pageFrontRequest,
+      @RequestHeader(value = "Authorization") String token) {
+    PagingResponse<ImageResponse> imageResponses = null;
+    if (pageFrontRequest.getSearch() != null) {
+      imageResponses =
+          this.imageService.getLocalImagesSearchQuery(pageFrontRequest);
+    } else {
+      imageResponses = this.imageService.getLocalImages(
+          pageFrontRequest);
+    }
     return Mono.just(imageResponses);
   }
 }

@@ -23,4 +23,6 @@ public interface CollectionListRepository extends JpaRepository<CollectionList, 
   Long sumItemsByCollectionUser(@Param("userId") Long id);
 
   long countByWantedAndUserId_Id(int i, Long id);
+
+  Page<CollectionList> findByNameContaining(String search, Pageable pageable);
 }

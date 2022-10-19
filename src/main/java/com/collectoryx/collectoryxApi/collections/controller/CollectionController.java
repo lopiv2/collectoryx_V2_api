@@ -380,8 +380,13 @@ public class CollectionController {
   public Mono<PagingResponse> getCollections(@RequestBody PageFrontRequest pageFrontRequest,
       @RequestHeader(value = "Authorization") String token) {
     PagingResponse<CollectionListResponse> collectionListResponsePagingResponse = null;
-    collectionListResponsePagingResponse =
-        this.collectionService.listCollections(pageFrontRequest);
+    if (pageFrontRequest.getSearch() != null) {
+      collectionListResponsePagingResponse =
+          this.collectionService.listCollectionsSearchQuery(pageFrontRequest);
+    } else {
+      collectionListResponsePagingResponse = this.collectionService.listCollections(
+          pageFrontRequest);
+    }
     return Mono.just(collectionListResponsePagingResponse);
   }
 

@@ -580,6 +580,18 @@ public class CollectionService {
         .collect(Collectors.toList());
   }
 
+  public PagingResponse<CollectionListResponse> listCollectionsSearchQuery(
+      PageFrontRequest request) {
+    PageRequest pageRequest = PageRequest.of(request.getPage() != null ? request.getPage() : 0,
+        request.getSize() != null ? request.getSize() : 500,
+        Sort.by(request.getOrderDirection().contains("up") ? Order.asc(request.getOrderField())
+            : Order.desc(request.getOrderField())));
+    Page<CollectionList> collections = this.collectionListRepository
+        .findByNameContaining(request.getSearch(),
+            pageRequest);
+    return getCollectionListResponsePagingResponse(collections);
+  }
+
   public PagingResponse<CollectionListResponse> listCollections(PageFrontRequest request) {
     PageRequest pageRequest = PageRequest.of(request.getPage() != null ? request.getPage() : 0,
         request.getSize() != null ? request.getSize() : 500,
@@ -588,7 +600,6 @@ public class CollectionService {
     Page<CollectionList> collections = this.collectionListRepository
         .findAllByUser_Id(Long.valueOf(request.getId()), pageRequest);
     return getCollectionListResponsePagingResponse(collections);
-
   }
 
   public PagingResponse<CollectionItemsResponse> getAllCollectionItemsByUserId(
