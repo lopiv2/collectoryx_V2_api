@@ -14,5 +14,8 @@ public interface ImageRepository extends JpaRepository<Image, Long> {
 
   Optional<Image> findImageByPath(String imageName);
 
-  Page<Image> findByNameContaining(String search, Pageable pageable);
+  Page<Image> findAllByPathNotContaining(String http, Pageable pageable);
+
+  Page<Image> findByNameContainingAndPathNotContaining(String search, String http,
+      Pageable pageable);
 }

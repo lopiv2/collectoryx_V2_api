@@ -16,4 +16,6 @@ public interface CollectionSeriesListRepository extends JpaRepository<Collection
   List<CollectionSeriesList> findAllByCollection_UserId(Long id);
 
   CollectionSeriesList findByName(String name);
+
+  List<CollectionSeriesList> findByLogo_Id(Long id);
 }

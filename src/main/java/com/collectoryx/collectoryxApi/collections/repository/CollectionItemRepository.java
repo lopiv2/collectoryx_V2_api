@@ -45,4 +45,6 @@ public interface CollectionItemRepository extends JpaRepository<CollectionItem, 
 
   Page<CollectionItem> findAllByCollection_UserId_IdOrderByAdquiringDateDesc(Long valueOf,
       Pageable pageable);
+
+  List<CollectionItem> findByImage_Id(Long id);
 }

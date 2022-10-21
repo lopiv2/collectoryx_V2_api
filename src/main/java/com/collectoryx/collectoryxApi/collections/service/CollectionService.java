@@ -56,6 +56,7 @@ import org.apache.commons.csv.CSVRecord;
 import org.apache.commons.io.FilenameUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.crossstore.ChangeSetPersister.NotFoundException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -71,24 +72,26 @@ public class CollectionService {
 
   private final CollectionItemRepository collectionItemRepository;
   private final CollectionListRepository collectionListRepository;
-  private final ImageRepository imagesRepository;
+  private final ImageRepository imageRepository;
   private final CollectionMetadataRepository collectionMetadataRepository;
   private final CollectionSeriesListRepository collectionSeriesListRepository;
   private final UserRepository userRepository;
   private final CollectionItemsMetadataRepository collectionItemsMetadataRepository;
+  @Value("${collectoryx.upload-directory}")
+  private String uploadDirectory;
   public WebClient webClient = WebClient.builder()
       .baseUrl("http://localhost:8083")
       .build();
 
   public CollectionService(CollectionItemRepository collectionItemRepository,
       CollectionListRepository collectionListRepository,
-      ImageRepository imagesRepository, CollectionMetadataRepository collectionMetadataRepository,
+      ImageRepository imageRepository, CollectionMetadataRepository collectionMetadataRepository,
       CollectionSeriesListRepository collectionSeriesListRepository,
       CollectionItemsMetadataRepository collectionItemsMetadataRepository,
       UserRepository userRepository) {
     this.collectionItemRepository = collectionItemRepository;
     this.collectionListRepository = collectionListRepository;
-    this.imagesRepository = imagesRepository;
+    this.imageRepository = imageRepository;
     this.collectionMetadataRepository = collectionMetadataRepository;
     this.collectionSeriesListRepository = collectionSeriesListRepository;
     this.userRepository = userRepository;
@@ -141,7 +144,7 @@ public class CollectionService {
     User user = this.userRepository.findById(request.getUserId())
         .orElseThrow(NotFoundException::new);
     if (request.getFile() != null) {
-      image = this.imagesRepository.findImageByPath(request.getFile()).orElseThrow(
+      image = this.imageRepository.findImageByPath(request.getFile()).orElseThrow(
           NotFoundException::new);
       collectionList = CollectionList.builder()
           .name(request.getName())
@@ -191,7 +194,7 @@ public class CollectionService {
     User user = this.userRepository.findById(request.getUserId())
         .orElseThrow(NotFoundException::new);
     if (request.getFile() != null) {
-      image = this.imagesRepository.findImageByPath(request.getFile()).orElseThrow(
+      image = this.imageRepository.findImageByPath(request.getFile()).orElseThrow(
           NotFoundException::new);
       collectionList = CollectionList.builder()
           .name(request.getName())
@@ -255,7 +258,7 @@ public class CollectionService {
     Image image = null;
     ImageResponse imageResponse = null;
     if (request.getImage() != null) {
-      image = this.imagesRepository.findImageByPath(request.getImage()).orElseThrow(
+      image = this.imageRepository.findImageByPath(request.getImage()).orElseThrow(
           NotFoundException::new);
       imageResponse = toImageResponse(image);
     }
@@ -375,7 +378,7 @@ public class CollectionService {
           .collection(collectionList)
           .build();
     }
-    this.imagesRepository.save((image));
+    this.imageRepository.save((image));
     collectionList.setTotalItems(collectionList.getTotalItems() + 1);
     this.collectionListRepository.save(collectionList);
     this.collectionSeriesListRepository.save(collectionSeriesList);
@@ -399,7 +402,7 @@ public class CollectionService {
     Image image = null;
     ImageResponse imageResponse = null;
     if (request.getPath() != null) {
-      image = this.imagesRepository.findImageByPath(request.getPath()).orElseThrow(
+      image = this.imageRepository.findImageByPath(request.getPath()).orElseThrow(
           NotFoundException::new);
       imageResponse = toImageResponse(image);
     }
@@ -683,16 +686,13 @@ public class CollectionService {
   }
 
   public String saveFile(MultipartFile file, String path) throws IOException {
-    File files = new File(System.getProperty("user.dir")).getCanonicalFile();
-    //path = files + "/src/main/resources/" + file;
-    Path pathFinal = Paths.get(files + "/" + path);
-    System.out.println(files);
+    path = uploadDirectory + path;
+    Path pathFinal = Paths.get(path);
     try {
-      Files.copy(file.getInputStream(), pathFinal, StandardCopyOption.REPLACE_EXISTING);
+      Files.copy(file.getInputStream(), pathFinal,StandardCopyOption.REPLACE_EXISTING);
     } catch (Exception e) {
       throw new RuntimeException("Could not store the file. Error: " + e.getMessage());
     }
-
     return pathFinal.toString();
   }
 
@@ -749,14 +749,7 @@ public class CollectionService {
   public int parseCSV(String HEADERS) {
     //Convierte el string Headers en un Array de JSON
     JSONArray jsonArr = new JSONArray(HEADERS);
-    File files = null;
-    try {
-      files = new File(System.getProperty("user.dir")).getCanonicalFile();
-    } catch (IOException e) {
-      throw new RuntimeException(e);
-    }
-    Path pathFinal = Paths.get(files.toString());
-    File file = new File(pathFinal + "/" + "file.csv");
+    File file = new File(uploadDirectory + "/" + "file.csv");
     Reader in = null;
     try {
       in = new FileReader(file);
@@ -900,7 +893,7 @@ public class CollectionService {
     Image image = null;
     ImageResponse imageResponse = null;
     if (request.getPath() != null) {
-      image = this.imagesRepository.findImageByPath(request.getPath()).orElseThrow(
+      image = this.imageRepository.findImageByPath(request.getPath()).orElseThrow(
           NotFoundException::new);
       imageResponse = toImageResponse(image);
     }
@@ -920,7 +913,7 @@ public class CollectionService {
     Image image = null;
     ImageResponse imageResponse = null;
     if (request.getImage() != null) {
-      image = this.imagesRepository.findImageByPath(request.getImage()).orElseThrow(
+      image = this.imageRepository.findImageByPath(request.getImage()).orElseThrow(
           NotFoundException::new);
       imageResponse = toImageResponse(image);
     }
@@ -999,7 +992,7 @@ public class CollectionService {
     Image image = null;
     ImageResponse imageResponse = null;
     if (request.getPath() != null) {
-      image = this.imagesRepository.findImageByPath(request.getPath()).orElseThrow(
+      image = this.imageRepository.findImageByPath(request.getPath()).orElseThrow(
           NotFoundException::new);
       imageResponse = toImageResponse(image);
     }
@@ -1040,7 +1033,7 @@ public class CollectionService {
       if (collection.getImage() != null) {
         try {
           image = toImageResponse(
-              this.imagesRepository.findById(collection.getImage().getId())
+              this.imageRepository.findById(collection.getImage().getId())
                   .orElseThrow(NotFoundException::new));
         } catch (NotFoundException e) {
           throw new RuntimeException(e);
@@ -1096,7 +1089,7 @@ public class CollectionService {
     if (collection.getLogo() != null) {
       try {
         image = toImageResponse(
-            this.imagesRepository.findById(collection.getLogo().getId())
+            this.imageRepository.findById(collection.getLogo().getId())
                 .orElseThrow(NotFoundException::new));
       } catch (NotFoundException e) {
         throw new RuntimeException(e);
@@ -1132,7 +1125,7 @@ public class CollectionService {
     if (collection.getImage() != null) {
       try {
         image = toImageResponse(
-            this.imagesRepository.findById(collection.getImage().getId())
+            this.imageRepository.findById(collection.getImage().getId())
                 .orElseThrow(NotFoundException::new));
       } catch (NotFoundException e) {
         throw new RuntimeException(e);
@@ -1204,7 +1197,7 @@ public class CollectionService {
     if (request.getLogo() != null) {
       try {
         image = toImageResponse(
-            this.imagesRepository.findById(request.getLogo().getId())
+            this.imageRepository.findById(request.getLogo().getId())
                 .orElseThrow(NotFoundException::new));
       } catch (NotFoundException e) {
         throw new RuntimeException(e);
@@ -1242,7 +1235,7 @@ public class CollectionService {
     if (collection.getLogo() != null) {
       try {
         image = toImageResponse(
-            this.imagesRepository.findById(collection.getLogo().getId())
+            this.imageRepository.findById(collection.getLogo().getId())
                 .orElseThrow(NotFoundException::new));
       } catch (NotFoundException e) {
         throw new RuntimeException(e);
@@ -1265,7 +1258,7 @@ public class CollectionService {
     if (request.getLogo() != null) {
       try {
         image = toImageResponse(
-            this.imagesRepository.findById(request.getLogo().getId())
+            this.imageRepository.findById(request.getLogo().getId())
                 .orElseThrow(NotFoundException::new));
       } catch (NotFoundException e) {
         throw new RuntimeException(e);

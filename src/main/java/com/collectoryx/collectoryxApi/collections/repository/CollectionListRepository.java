@@ -25,4 +25,6 @@ public interface CollectionListRepository extends JpaRepository<CollectionList, 
   long countByWantedAndUserId_Id(int i, Long id);
 
   Page<CollectionList> findByNameContaining(String search, Pageable pageable);
+
+  List<CollectionList> findByLogo_Id(Long id);
 }

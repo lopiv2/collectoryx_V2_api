@@ -16,4 +16,8 @@ public class ImageResponse {
 
   private Date created;
 
+  private String dimensions;
+
+  private String size;
+
 }

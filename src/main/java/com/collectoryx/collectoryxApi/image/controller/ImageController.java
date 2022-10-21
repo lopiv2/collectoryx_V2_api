@@ -3,16 +3,20 @@ package com.collectoryx.collectoryxApi.image.controller;
 import com.collectoryx.collectoryxApi.collections.rest.request.CollectionSerieListRequest;
 import com.collectoryx.collectoryxApi.collections.rest.response.CollectionSeriesListResponse;
 import com.collectoryx.collectoryxApi.collections.service.CollectionService;
+import com.collectoryx.collectoryxApi.image.rest.request.ImageRequest;
 import com.collectoryx.collectoryxApi.image.rest.response.ImageResponse;
 import com.collectoryx.collectoryxApi.image.service.ImageService;
 import com.collectoryx.collectoryxApi.page.rest.request.PageFrontRequest;
 import com.collectoryx.collectoryxApi.page.rest.response.PagingResponse;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
+import java.io.IOException;
 import javax.validation.constraints.NotEmpty;
 import org.springframework.data.crossstore.ChangeSetPersister.NotFoundException;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -41,7 +45,7 @@ public class ImageController {
       @Parameter(description = "Name of the image") @RequestPart("name") @NotEmpty String name,
       @Parameter(description = "Content of the image",
           content = @Content(mediaType = MediaType.APPLICATION_OCTET_STREAM_VALUE))
-      @RequestPart("image") MultipartFile image) {
+      @RequestPart("image") MultipartFile image) throws IOException {
     ImageResponse imageResponse = this.imageService.createImage(name, image);
     //ImageResponse imageResponse=ImageResponse.builder().name("hola").path("hola").build();
     return Mono.just(imageResponse);
@@ -53,7 +57,7 @@ public class ImageController {
       @Parameter(description = "Name of the image") @RequestPart("collection") @NotEmpty String collection,
       @Parameter(description = "Content of the image",
           content = @Content(mediaType = MediaType.APPLICATION_OCTET_STREAM_VALUE))
-      @RequestPart("image") MultipartFile image) {
+      @RequestPart("image") MultipartFile image) throws IOException {
     ImageResponse imageResponse = this.imageService.createImage(name, image);
     CollectionSeriesListResponse collectionSerieListResponse = null;
     CollectionSerieListRequest collectionSerieListRequest = CollectionSerieListRequest.builder()
@@ -69,12 +73,12 @@ public class ImageController {
     return Mono.just(collectionSerieListResponse);
   }
 
-  /*@GetMapping(value = "/get-images-local")
-  public Mono<List<ImageResponse>> getAllLocalImages(
-      @RequestHeader(value = "Authorization") String token) {
-    List<ImageResponse> imageResponses = this.imageService.getLocalImages();
-    return Mono.just(imageResponses);
-  }*/
+  @DeleteMapping(value = "/delete-image/{id}")
+  public Mono<Boolean> deleteImage(@PathVariable("id") Long id,
+      @RequestHeader(value = "Authorization") String token) throws NotFoundException {
+    boolean isDeleted = this.imageService.deleteImage(id);
+    return Mono.just(isDeleted);
+  }
 
   @PostMapping(value = "/get-images-local")
   public Mono<PagingResponse> getAllLocalImages(@RequestBody PageFrontRequest pageFrontRequest,
@@ -88,5 +92,18 @@ public class ImageController {
           pageFrontRequest);
     }
     return Mono.just(imageResponses);
+  }
+
+  @PutMapping(value = "/update-image")
+  public Mono<ImageResponse> updateCollection(
+      @RequestBody ImageRequest imageRequest,
+      @RequestHeader(value = "Authorization") String token) {
+    ImageResponse imageResponse = null;
+    try {
+      imageResponse = this.imageService.updateImage(imageRequest);
+    } catch (NotFoundException e) {
+      throw new RuntimeException(e);
+    }
+    return Mono.just(imageResponse);
   }
 }
