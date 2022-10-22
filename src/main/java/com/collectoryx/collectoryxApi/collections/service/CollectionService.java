@@ -44,9 +44,11 @@ import java.time.LocalDateTime;
 import java.time.Year;
 import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 import javax.transaction.Transactional;
@@ -77,11 +79,11 @@ public class CollectionService {
   private final CollectionSeriesListRepository collectionSeriesListRepository;
   private final UserRepository userRepository;
   private final CollectionItemsMetadataRepository collectionItemsMetadataRepository;
-  @Value("${collectoryx.upload-directory}")
-  private String uploadDirectory;
   public WebClient webClient = WebClient.builder()
       .baseUrl("http://localhost:8083")
       .build();
+  @Value("${collectoryx.upload-directory}")
+  private String uploadDirectory;
 
   public CollectionService(CollectionItemRepository collectionItemRepository,
       CollectionListRepository collectionListRepository,
@@ -689,7 +691,7 @@ public class CollectionService {
     path = uploadDirectory + path;
     Path pathFinal = Paths.get(path);
     try {
-      Files.copy(file.getInputStream(), pathFinal,StandardCopyOption.REPLACE_EXISTING);
+      Files.copy(file.getInputStream(), pathFinal, StandardCopyOption.REPLACE_EXISTING);
     } catch (Exception e) {
       throw new RuntimeException("Could not store the file. Error: " + e.getMessage());
     }
@@ -747,7 +749,7 @@ public class CollectionService {
   }
 
   public int parseCSV(String HEADERS) {
-    //Convierte el string Headers en un Array de JSON
+    //Convert String headers into JSON Array
     JSONArray jsonArr = new JSONArray(HEADERS);
     File file = new File(uploadDirectory + "/" + "file.csv");
     Reader in = null;
@@ -771,51 +773,57 @@ public class CollectionService {
     CollectionSeriesList collectionSeriesList = null;
     String name = "";
     String serie = "";
-    String collection = "";
+    long collection = 0;
     String own = "";
+    String wanted = "";
     String price = "";
     String year = "";
     String notes = "";
     String image = "";
-    //Leo los mapeos de los headers
+    Map<String, String> metaMaps = new HashMap<>();
+    //Headers mapping reader
     for (int v = 0; v < jsonArr.length(); v++) {
       JSONObject jsonObj = jsonArr.getJSONObject(v);
-      if (!jsonObj.has("collection")) {
-        switch (jsonObj.getString("original")) {
-          case "name":
-            name = jsonObj.getString("new");
-            break;
-          case "notes":
-            notes = jsonObj.getString("new");
-            break;
-          case "serie":
-            serie = jsonObj.getString("new");
-            break;
-          case "collection":
-            collection = jsonObj.getString("new");
-            break;
-          case "image":
-            image = jsonObj.getString("new");
-            break;
-          case "own":
-            own = jsonObj.getString("new");
-            break;
-          case "price":
-            price = jsonObj.getString("new");
-            break;
-          case "year":
-            year = jsonObj.getString("new");
-            break;
-        }
-      } else {
-        collectionList = checkCollection(jsonObj.getLong("collection"));
+      switch (jsonObj.getString("original")) {
+        case "name":
+          name = jsonObj.getString("new");
+          break;
+        case "notes":
+          notes = jsonObj.getString("new");
+          break;
+        case "serie":
+          serie = jsonObj.getString("new");
+          break;
+        case "collection":
+          collection = jsonObj.getLong("new");
+          break;
+        case "image":
+          image = jsonObj.getString("new");
+          break;
+        case "own":
+          own = jsonObj.getString("new");
+          break;
+        case "wanted":
+          wanted = jsonObj.getString("new");
+          break;
+        case "price":
+          price = jsonObj.getString("new");
+          break;
+        case "year":
+          year = jsonObj.getString("new");
+          break;
+        default:
+          //Check Metadata field and assign
+          metaMaps.put(jsonObj.getString("new"), jsonObj.getString("original"));
       }
     }
-    //Leo registro a registro del documento csv
+    collectionList = checkCollection(collection);
+    //Register reading of CSV Document
     for (CSVRecord record : records) {
       collectionSeriesList = checkSerie(record.get(serie), collectionList);
       float pric;
       boolean ow = false;
+      boolean want = false;
       int ye;
       try {
         pric = Float.valueOf(record.get(price));
@@ -832,17 +840,22 @@ public class CollectionService {
       } else {
         ow = false;
       }
-
+      if (record.get(wanted).contains("1")) {
+        want = true;
+      } else {
+        want = false;
+      }
       CollectionItem collectionItem = CollectionItem.builder()
           .name(record.get(name))
           .own(ow)
           .price(pric)
           .notes(record.get(notes))
           .year(ye)
-          .wanted(false)
+          .wanted(want)
           .serie(collectionSeriesList)
           .collection(collectionList)
           .build();
+
       collectionList.setTotalItems(collectionList.getTotalItems() + 1);
       if (ow == true) {
         collectionList.setOwned(collectionList.getOwned() + 1);
@@ -850,6 +863,11 @@ public class CollectionService {
       }
       this.collectionListRepository.save(collectionList);
       this.collectionItemRepository.save(collectionItem);
+      try {
+        checkMetadataFieldFromParse(record, metaMaps, collectionItem);
+      } catch (NotFoundException e) {
+        e.printStackTrace();
+      }
       cont++;
     }
     if (file.delete()) {
@@ -869,6 +887,32 @@ public class CollectionService {
       throw new RuntimeException(e);
     }
     return collectionList;
+  }
+
+  public void checkMetadataFieldFromParse(CSVRecord record, Map<String, String> metamap,
+      CollectionItem item)
+      throws NotFoundException {
+    CollectionMetadata collectionMetadata = null;
+    String keys = "";
+    for (Entry<String, String> entry : metamap.entrySet()) {
+      keys = entry.getKey();
+      collectionMetadata = this.collectionMetadataRepository.findById(entry.getValue());
+      if (collectionMetadata != null) {
+        String finalKeys = keys;
+        CollectionMetadata finalCollectionMetadata = collectionMetadata;
+        record.toMap().forEach((k, v) -> {
+          if (k.contains(finalKeys)) {
+            CollectionItemsMetadata collectionItemsMetadata = CollectionItemsMetadata.builder()
+                .metadata(finalCollectionMetadata)
+                .item(item)
+                .value(v)
+                .build();
+            this.collectionItemsMetadataRepository.save(collectionItemsMetadata);
+          }
+        });
+        break;
+      }
+    }
   }
 
   public CollectionSeriesList checkSerie(String name,
@@ -964,7 +1008,7 @@ public class CollectionService {
     for (CollectionItemMetadataRequest c : request.getMetadata()) {
       //CollectionMetadata collectionMetadata = this.collectionMetadataRepository.findById(c.getId());
       CollectionItemsMetadata collectionItemsMetadata = this.collectionItemsMetadataRepository.
-          findById(Long.parseLong(c.getId())).map(item -> {
+          findById(c.getId()).map(item -> {
             item.setValue(c.getValue());
             return this.collectionItemsMetadataRepository.save(item);
           }).orElseThrow(NotFoundException::new);
