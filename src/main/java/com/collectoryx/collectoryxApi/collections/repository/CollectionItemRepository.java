@@ -25,7 +25,7 @@ public interface CollectionItemRepository extends JpaRepository<CollectionItem, 
   @Query(value = "SELECT * FROM collection c "
       + "JOIN collection_list l ON c.collection=l.id "
       + "JOIN  users u ON l.user_id=u.id "
-      + "WHERE (c.adquiring_date BETWEEN :startDate AND :endDate) AND u.id=:userId",
+      + "WHERE (c.acquiring_date BETWEEN :startDate AND :endDate) AND u.id=:userId",
       nativeQuery = true)
   List<CollectionItem> getItemsPerYear(@Param("userId") Long id,
       @Param("startDate") LocalDate start,
@@ -43,7 +43,7 @@ public interface CollectionItemRepository extends JpaRepository<CollectionItem, 
   Page<CollectionItem> findByCollection_IdAndNameContaining(Long valueOf, String search,
       Pageable pageable);
 
-  Page<CollectionItem> findAllByCollection_UserId_IdOrderByAdquiringDateDesc(Long valueOf,
+  Page<CollectionItem> findAllByCollection_UserId_IdOrderByAcquiringDateDesc(Long valueOf,
       Pageable pageable);
 
   List<CollectionItem> findByImage_Id(Long id);

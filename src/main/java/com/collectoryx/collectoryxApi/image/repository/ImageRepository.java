@@ -18,4 +18,6 @@ public interface ImageRepository extends JpaRepository<Image, Long> {
 
   Page<Image> findByNameContainingAndPathNotContaining(String search, String http,
       Pageable pageable);
+
+  boolean existsByPath(String image);
 }

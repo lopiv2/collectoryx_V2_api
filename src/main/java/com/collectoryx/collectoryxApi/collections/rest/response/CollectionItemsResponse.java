@@ -34,7 +34,7 @@ public class CollectionItemsResponse {
 
   protected String notes;
 
-  private Date adquiringDate;
+  private Date acquiringDate;
 
   private List<CollectionItemMetadataResponse> metadata;
 

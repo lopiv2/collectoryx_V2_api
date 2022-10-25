@@ -158,7 +158,7 @@ public class CollectionController {
       @RequestHeader(value = "Authorization") String token) {
     CollectionItemsResponse collectionItemsResponse = null;
     try {
-      if (collectionCreateItemRequest.getAdquiringDate() != null) {
+      if (collectionCreateItemRequest.getAcquiringDate() != null) {
         collectionItemsResponse = this.collectionService.createItem(collectionCreateItemRequest);
       }
     } catch (NotFoundException e) {
@@ -354,7 +354,7 @@ public class CollectionController {
       @RequestHeader(value = "Authorization") String token) {
     CollectionItemsResponse collectionItemsResponse = null;
     try {
-      if (collectionCreateItemRequest.getAdquiringDate() != null) {
+      if (collectionCreateItemRequest.getAcquiringDate() != null) {
         collectionItemsResponse = this.collectionService.updateItem(collectionCreateItemRequest);
       }
     } catch (NotFoundException e) {

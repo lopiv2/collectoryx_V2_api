@@ -65,5 +65,5 @@ public class CollectionItem {
   @Column
   @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
   @Temporal(TemporalType.TIMESTAMP)
-  private Date adquiringDate;
+  private Date acquiringDate;
 }

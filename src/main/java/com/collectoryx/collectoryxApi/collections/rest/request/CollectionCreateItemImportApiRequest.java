@@ -40,7 +40,7 @@ public class CollectionCreateItemImportApiRequest {
   protected String notes;
 
 
-  private Date adquiringDate;
+  private Date acquiringDate;
 
   private List<CollectionMetadataResponse> metadata;
 

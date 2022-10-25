@@ -39,7 +39,7 @@ public class CollectionCreateItemRequest {
   protected String notes;
 
 
-  private Date adquiringDate;
+  private Date acquiringDate;
 
   private List<CollectionItemMetadataRequest> metadata;
 

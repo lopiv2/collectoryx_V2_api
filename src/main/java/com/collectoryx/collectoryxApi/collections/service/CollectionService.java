@@ -44,6 +44,7 @@ import java.time.LocalDateTime;
 import java.time.Year;
 import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -142,6 +143,26 @@ public class CollectionService {
 
   public CollectionResponse createCollection(CollectionRequest request) throws NotFoundException {
     Image image = null;
+    if (request.getFile() != null) {
+      boolean existsImage;
+      existsImage = this.imageRepository.existsByPath(request.getFile());
+      //If we try to find the image if exists, and not found, we create it
+      if (existsImage == false) {
+        if (request.getFile().contains("http")) {
+          Image imageUrl = Image.builder()
+              .name(request.getName())
+              .path(request.getFile())
+              .created((new Date()))
+              .build();
+          this.imageRepository.save(imageUrl);
+          image = imageUrl;
+        }
+      } else {
+        image = this.imageRepository.findImageByPath(request.getFile())
+            .orElseThrow(NotFoundException::new);
+      }
+      //imageResponse = toImageResponse(image);
+    }
     CollectionList collectionList = null;
     User user = this.userRepository.findById(request.getUserId())
         .orElseThrow(NotFoundException::new);
@@ -192,6 +213,26 @@ public class CollectionService {
   public CollectionResponse createCollectionNew(CollectionRequest request)
       throws NotFoundException {
     Image image = null;
+    if (request.getFile() != null) {
+      boolean existsImage;
+      existsImage = this.imageRepository.existsByPath(request.getFile());
+      //If we try to find the image if exists, and not found, we create it
+      if (existsImage == false) {
+        if (request.getFile().contains("http")) {
+          Image imageUrl = Image.builder()
+              .name(request.getName())
+              .path(request.getFile())
+              .created((new Date()))
+              .build();
+          this.imageRepository.save(imageUrl);
+          image = imageUrl;
+        }
+      } else {
+        image = this.imageRepository.findImageByPath(request.getFile())
+            .orElseThrow(NotFoundException::new);
+      }
+      //imageResponse = toImageResponse(image);
+    }
     CollectionList collectionList = null;
     User user = this.userRepository.findById(request.getUserId())
         .orElseThrow(NotFoundException::new);
@@ -260,8 +301,23 @@ public class CollectionService {
     Image image = null;
     ImageResponse imageResponse = null;
     if (request.getImage() != null) {
-      image = this.imageRepository.findImageByPath(request.getImage()).orElseThrow(
-          NotFoundException::new);
+      boolean existsImage;
+      existsImage = this.imageRepository.existsByPath(request.getImage());
+      //If we try to find the image if exists, and not found, we create it
+      if (existsImage == false) {
+        if (request.getImage().contains("http")) {
+          Image imageUrl = Image.builder()
+              .name(request.getName())
+              .path(request.getImage())
+              .created((new Date()))
+              .build();
+          this.imageRepository.save(imageUrl);
+          image = imageUrl;
+        }
+      } else {
+        image = this.imageRepository.findImageByPath(request.getImage())
+            .orElseThrow(NotFoundException::new);
+      }
       imageResponse = toImageResponse(image);
     }
     CollectionList collectionList = null;
@@ -276,13 +332,19 @@ public class CollectionService {
     collectionSeriesListResponse = toCollectionSerieListResponse(collectionSeriesList);
     CollectionItem collectionItem = null;
     CollectionItemsResponse collectionItemsResponse = null;
+    Date acquiringDateMod;
+    if (!request.isOwn()) {
+      acquiringDateMod = null;
+    } else {
+      acquiringDateMod = request.getAcquiringDate();
+    }
     if (imageResponse != null) {
       collectionItem = CollectionItem.builder()
           .name(request.getName())
           .serie(collectionSeriesList)
           .price(request.getPrice())
           .year(request.getYear())
-          .adquiringDate(request.getAdquiringDate())
+          .acquiringDate(acquiringDateMod)
           .own(request.isOwn())
           .notes(request.getNotes())
           .image(image)
@@ -312,7 +374,7 @@ public class CollectionService {
           .serie(collectionSeriesListResponse)
           .price(request.getPrice())
           .year(request.getYear())
-          .adquiringDate(request.getAdquiringDate())
+          .acquiringDate(request.getAcquiringDate())
           .own(request.isOwn())
           .notes(request.getNotes())
           .image(imageResponse)
@@ -326,7 +388,7 @@ public class CollectionService {
           .serie(collectionSeriesList)
           .price(request.getPrice())
           .year(request.getYear())
-          .adquiringDate(request.getAdquiringDate())
+          .acquiringDate(request.getAcquiringDate())
           .own(request.isOwn())
           .notes(request.getNotes())
           .collection(collectionList)
@@ -350,7 +412,7 @@ public class CollectionService {
           .serie(collectionSeriesListResponse)
           .price(request.getPrice())
           .year(request.getYear())
-          .adquiringDate(request.getAdquiringDate())
+          .acquiringDate(request.getAcquiringDate())
           .own(request.isOwn())
           .notes(request.getNotes())
           .metadata(collectionItemMetadataResponseList)
@@ -390,7 +452,7 @@ public class CollectionService {
         .serie(collectionSeriesList)
         .price(request.getPrice())
         .year(request.getYear())
-        .adquiringDate(request.getAdquiringDate())
+        .acquiringDate(request.getAcquiringDate())
         .own(request.isOwn())
         .notes(request.getNotes())
         .image(image)
@@ -404,8 +466,23 @@ public class CollectionService {
     Image image = null;
     ImageResponse imageResponse = null;
     if (request.getPath() != null) {
-      image = this.imageRepository.findImageByPath(request.getPath()).orElseThrow(
-          NotFoundException::new);
+      boolean existsImage;
+      existsImage = this.imageRepository.existsByPath(request.getPath());
+      //If we try to find the image if exists, and not found, we create it
+      if (existsImage == false) {
+        if (request.getPath().contains("http")) {
+          Image imageUrl = Image.builder()
+              .name(request.getName())
+              .path(request.getPath())
+              .created((new Date()))
+              .build();
+          this.imageRepository.save(imageUrl);
+          image = imageUrl;
+        }
+      } else {
+        image = this.imageRepository.findImageByPath(request.getPath())
+            .orElseThrow(NotFoundException::new);
+      }
       imageResponse = toImageResponse(image);
     }
     CollectionList collectionList = this.collectionListRepository.findById(
@@ -614,7 +691,7 @@ public class CollectionService {
         Sort.by(request.getOrderDirection().contains("up") ? Order.asc(request.getOrderField())
             : Order.desc(request.getOrderField())));
     Page<CollectionItem> collections = this.collectionItemRepository
-        .findAllByCollection_UserId_IdOrderByAdquiringDateDesc(Long.valueOf(request.getId()),
+        .findAllByCollection_UserId_IdOrderByAcquiringDateDesc(Long.valueOf(request.getId()),
             pageRequest);
     return getCollectionItemResponsePagingResponse(collections);
   }
@@ -661,9 +738,9 @@ public class CollectionService {
     collection.setOwn(!item.getOwn());
     LocalDateTime today = LocalDateTime.now();
     if (item.getOwn()) {
-      collection.setAdquiringDate(null);
+      collection.setAcquiringDate(null);
     } else {
-      collection.setAdquiringDate(java.sql.Timestamp.valueOf(today));
+      collection.setAcquiringDate(java.sql.Timestamp.valueOf(today));
     }
     this.collectionItemRepository.save(collection);
     CollectionItemsResponse collectionItemsResponse = toCollectionItemResponse(collection);
@@ -937,8 +1014,23 @@ public class CollectionService {
     Image image = null;
     ImageResponse imageResponse = null;
     if (request.getPath() != null) {
-      image = this.imageRepository.findImageByPath(request.getPath()).orElseThrow(
-          NotFoundException::new);
+      boolean existsImage;
+      existsImage = this.imageRepository.existsByPath(request.getPath());
+      //If we try to find the image if exists, and not found, we create it
+      if (existsImage == false) {
+        if (request.getPath().contains("http")) {
+          Image imageUrl = Image.builder()
+              .name(request.getName())
+              .path(request.getPath())
+              .created((new Date()))
+              .build();
+          this.imageRepository.save(imageUrl);
+          image = imageUrl;
+        }
+      } else {
+        image = this.imageRepository.findImageByPath(request.getPath())
+            .orElseThrow(NotFoundException::new);
+      }
       imageResponse = toImageResponse(image);
     }
     final Image imageRight = image;
@@ -957,8 +1049,23 @@ public class CollectionService {
     Image image = null;
     ImageResponse imageResponse = null;
     if (request.getImage() != null) {
-      image = this.imageRepository.findImageByPath(request.getImage()).orElseThrow(
-          NotFoundException::new);
+      boolean existsImage;
+      existsImage = this.imageRepository.existsByPath(request.getImage());
+      //If we try to find the image if exists, and not found, we create it
+      if (existsImage == false) {
+        if (request.getImage().contains("http")) {
+          Image imageUrl = Image.builder()
+              .name(request.getName())
+              .path(request.getImage())
+              .created((new Date()))
+              .build();
+          this.imageRepository.save(imageUrl);
+          image = imageUrl;
+        }
+      } else {
+        image = this.imageRepository.findImageByPath(request.getImage())
+            .orElseThrow(NotFoundException::new);
+      }
       imageResponse = toImageResponse(image);
     }
     final Image imageRight = image;
@@ -997,7 +1104,7 @@ public class CollectionService {
     collectionItem.setSerie(collectionSeriesList);
     collectionItem.setPrice(request.getPrice());
     collectionItem.setYear(request.getYear());
-    collectionItem.setAdquiringDate(request.getAdquiringDate());
+    collectionItem.setAcquiringDate(request.getAcquiringDate());
     collectionItem.setOwn(request.isOwn());
     collectionItem.setNotes(request.getNotes());
     collectionItem.setImage(imageRight);
@@ -1021,7 +1128,7 @@ public class CollectionService {
         .serie(collectionSeriesListResponse)
         .price(request.getPrice())
         .year(request.getYear())
-        .adquiringDate(request.getAdquiringDate())
+        .acquiringDate(request.getAcquiringDate())
         .own(request.isOwn())
         .notes(request.getNotes())
         .image(imageResponse)
@@ -1036,8 +1143,23 @@ public class CollectionService {
     Image image = null;
     ImageResponse imageResponse = null;
     if (request.getPath() != null) {
-      image = this.imageRepository.findImageByPath(request.getPath()).orElseThrow(
-          NotFoundException::new);
+      boolean existsImage;
+      existsImage = this.imageRepository.existsByPath(request.getPath());
+      //If we try to find the image if exists, and not found, we create it
+      if (existsImage == false) {
+        if (request.getPath().contains("http")) {
+          Image imageUrl = Image.builder()
+              .name(request.getName())
+              .path(request.getPath())
+              .created((new Date()))
+              .build();
+          this.imageRepository.save(imageUrl);
+          image = imageUrl;
+        }
+      } else {
+        image = this.imageRepository.findImageByPath(request.getPath())
+            .orElseThrow(NotFoundException::new);
+      }
       imageResponse = toImageResponse(image);
     }
     final Image imageRight = image;
@@ -1120,7 +1242,7 @@ public class CollectionService {
           .own(collection.isOwn())
           .wanted(collection.isWanted())
           .notes(collection.getNotes())
-          .adquiringDate(collection.getAdquiringDate())
+          .acquiringDate(collection.getAcquiringDate())
           .metadata(collectionItemMetadataResponseList)
           .build();
     }
@@ -1199,7 +1321,7 @@ public class CollectionService {
           .id(collection.getId())
           .name(collection.getName())
           .image(image)
-          .adquiringDate(collection.getAdquiringDate())
+          .acquiringDate(collection.getAcquiringDate())
           .collection(collectionListResponse)
           .notes(collection.getNotes())
           .price(collection.getPrice())
@@ -1212,7 +1334,7 @@ public class CollectionService {
       return CollectionItemsResponse.builder()
           .id(collection.getId())
           .name(collection.getName())
-          .adquiringDate(collection.getAdquiringDate())
+          .acquiringDate(collection.getAcquiringDate())
           .collection(collectionListResponse)
           .notes(collection.getNotes())
           .price(collection.getPrice())
