@@ -1031,7 +1031,7 @@ public class CollectionService {
         image = this.imageRepository.findImageByPath(request.getPath())
             .orElseThrow(NotFoundException::new);
       }
-      imageResponse = toImageResponse(image);
+      //imageResponse = toImageResponse(image);
     }
     final Image imageRight = image;
     CollectionList collectionList = null;
