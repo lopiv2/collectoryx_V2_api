@@ -253,6 +253,7 @@ public class ConfigService {
         .name(request.getName())
         .header(request.getHeader())
         .logo(request.getLogo())
+        .locked(request.isLocked())
         .apiLink(request.getApiLink())
         .keyCode(request.getKeyCode())
         .build();

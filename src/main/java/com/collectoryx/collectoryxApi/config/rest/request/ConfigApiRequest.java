@@ -33,4 +33,7 @@ public class ConfigApiRequest {
 
   private String logo;
 
+  @NotEmpty
+  private boolean locked; //Is a default API and can´t be deleted
+
 }

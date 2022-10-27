@@ -12,12 +12,19 @@ public class ScrapperApiService {
   public Mono<String> ApiScrapper(ScrapperApiRequest scrapperApiRequest) {
     Mono<String> response = null;
     if (scrapperApiRequest.getUrl().contains("fandom")) {
-      response = FandomApiReader(scrapperApiRequest);
+      return FandomApiReader(scrapperApiRequest);
     }
     if (scrapperApiRequest.getUrl().contains("pokemontcg")) {
-      response = PokemonApiReader(scrapperApiRequest);
+      return PokemonApiReader(scrapperApiRequest);
     }
-    return response;
+    if (scrapperApiRequest.getUrl().contains("rebrickable")) {
+      if (scrapperApiRequest.getMetadata().contains("sets")) {
+        return RebrickableApiReader(scrapperApiRequest);
+      } else {
+        return RebrickableMinifigsApiReader(scrapperApiRequest);
+      }
+    }
+    return null;
   }
 
   public Mono<String> FandomApiReader(ScrapperApiRequest scrapperApiRequest) {
@@ -36,8 +43,37 @@ public class ScrapperApiService {
     String searchUriApi = "/cards?q=name:";
     return client
         .get()
-        .uri(searchUriApi + scrapperApiRequest.getSearchQuery())
+        .uri(searchUriApi + scrapperApiRequest.getSearchQuery() + "&page="
+            + scrapperApiRequest.getPage() + "&pageSize=" + scrapperApiRequest.getRowsPerPage())
         .header(scrapperApiRequest.getHeader(), scrapperApiRequest.getKeyCode())
+        .accept(MediaType.APPLICATION_JSON)
+        .retrieve()
+        .bodyToMono(String.class);
+  }
+
+  public Mono<String> RebrickableApiReader(ScrapperApiRequest scrapperApiRequest) {
+    WebClient client = WebClient.create(scrapperApiRequest.getUrl());
+    String searchUriApi = "/sets/";
+    return client
+        .get()
+        .uri(searchUriApi + "?page=" + scrapperApiRequest.getPage() + "&page_size="
+            + scrapperApiRequest.getRowsPerPage()
+            + "&search=" + scrapperApiRequest.getSearchQuery())
+        .header(scrapperApiRequest.getHeader(), "key " + scrapperApiRequest.getKeyCode())
+        .accept(MediaType.APPLICATION_JSON)
+        .retrieve()
+        .bodyToMono(String.class);
+  }
+
+  public Mono<String> RebrickableMinifigsApiReader(ScrapperApiRequest scrapperApiRequest) {
+    WebClient client = WebClient.create(scrapperApiRequest.getUrl());
+    String searchUriApi = "/minifigs/";
+    return client
+        .get()
+        .uri(searchUriApi + "?page=" + scrapperApiRequest.getPage() + "&page_size="
+            + scrapperApiRequest.getRowsPerPage()
+            + "&search=" + scrapperApiRequest.getSearchQuery())
+        .header(scrapperApiRequest.getHeader(), "key " + scrapperApiRequest.getKeyCode())
         .accept(MediaType.APPLICATION_JSON)
         .retrieve()
         .bodyToMono(String.class);

@@ -36,6 +36,8 @@ public class ConfigApiKeys {
 
   private String logo;
 
+  private boolean locked=false; //Is a default API and can´t be deleted
+
   @OneToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "user_id")
   protected User user;

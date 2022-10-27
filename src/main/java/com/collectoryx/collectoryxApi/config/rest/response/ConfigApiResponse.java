@@ -17,5 +17,6 @@ public class ConfigApiResponse {
   private String header;
   private String apiLink;
   private String logo;
+  private boolean locked;
 
 }

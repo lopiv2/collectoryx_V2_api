@@ -4,48 +4,63 @@
   "keyCode": "",
   "apiLink": "https://api.pokemontcg.io/v2",
   "logo": "https://pokemontcg.io/images/favicon.ico",
+  "locked": "true",
   "header": "X-Api-Key"
+  },
+  {
+  "name": "Rebrickable",
+  "keyCode": "",
+  "apiLink": "https://rebrickable.com/api/v3/lego",
+  "logo": "https://rebrickable.com/static/img/favicon.png",
+  "locked": "true",
+  "header": "Authorization"
   },
   {
   "name": "MOTU",
   "keyCode": "",
   "apiLink": "",
   "logo": "",
-   "header": ""
+  "locked": "true",
+  "header": ""
   },
   {
   "name": "Marvel Legends",
   "keyCode": "",
   "apiLink": "",
   "logo": "",
-   "header": ""
+  "locked": "true",
+  "header": ""
   },
   {
   "name": "DC Multiverse",
   "keyCode": "",
   "apiLink": "",
   "logo": "",
-   "header": ""
+  "locked": "true",
+  "header": ""
   },
   {
   "name": "Musicbrainz",
   "keyCode": "",
   "apiLink": "",
   "logo": "",
-   "header": ""
+  "locked": "true",
+  "header": ""
   },
   {
   "name": "Discogs",
   "keyCode": "",
   "apiLink": "",
   "logo": "",
-   "header": ""
+  "locked": "true",
+  "header": ""
   },
   {
   "name": "Marvel Comics",
   "keyCode": "",
   "apiLink": "http(s)://gateway.marvel.com/",
   "logo": "",
-   "header": ""
+  "locked": "true",
+  "header": ""
   },
 ]

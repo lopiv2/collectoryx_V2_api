@@ -12,6 +12,12 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class ScrapperApiRequest {
 
+  protected int page;
+
+  protected int rowsPerPage;
+
+  protected String metadata;
+
   @NotEmpty
   protected String searchQuery;
 
