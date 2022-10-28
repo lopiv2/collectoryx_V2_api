@@ -20,8 +20,12 @@ public class ScrapperApiService {
     if (scrapperApiRequest.getUrl().contains("rebrickable")) {
       if (scrapperApiRequest.getMetadata().contains("sets")) {
         return RebrickableApiReader(scrapperApiRequest);
-      } else {
+      }
+      if (scrapperApiRequest.getMetadata().contains("minifigs")) {
         return RebrickableMinifigsApiReader(scrapperApiRequest);
+      }
+      if (scrapperApiRequest.getMetadata().contains("series")) {
+        return RebrickableSeriesApiReader(scrapperApiRequest);
       }
     }
     return null;
@@ -73,6 +77,18 @@ public class ScrapperApiService {
         .uri(searchUriApi + "?page=" + scrapperApiRequest.getPage() + "&page_size="
             + scrapperApiRequest.getRowsPerPage()
             + "&search=" + scrapperApiRequest.getSearchQuery())
+        .header(scrapperApiRequest.getHeader(), "key " + scrapperApiRequest.getKeyCode())
+        .accept(MediaType.APPLICATION_JSON)
+        .retrieve()
+        .bodyToMono(String.class);
+  }
+
+  public Mono<String> RebrickableSeriesApiReader(ScrapperApiRequest scrapperApiRequest) {
+    WebClient client = WebClient.create(scrapperApiRequest.getUrl());
+    String searchUriApi = "/themes/";
+    return client
+        .get()
+        .uri(searchUriApi + Integer.parseInt(scrapperApiRequest.getSearchQuery()) + "/")
         .header(scrapperApiRequest.getHeader(), "key " + scrapperApiRequest.getKeyCode())
         .accept(MediaType.APPLICATION_JSON)
         .retrieve()

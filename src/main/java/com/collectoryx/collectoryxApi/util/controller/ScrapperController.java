@@ -30,4 +30,10 @@ public class ScrapperController {
     //return Mono.just(collectionResponses);
   }
 
+  @PostMapping(value = "/get-serie-name-rebrickable")
+  public Mono<String> getSerieFromRebrickable(@RequestBody ScrapperApiRequest scrapperApiRequest,
+      @RequestHeader(value = "Authorization") String token) {
+    Mono<String> response=this.scrapperApiService.RebrickableSeriesApiReader(scrapperApiRequest);
+    return response;
+  }
 }

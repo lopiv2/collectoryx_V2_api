@@ -6,14 +6,8 @@
   <component name="ChangeListManager">
     <list default="true" id="e7725e87-06c9-4363-a7e7-9ec3adee6157" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/file.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/collectoryx/collectoryxApi/config/model/ConfigApiKeys.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/collectoryx/collectoryxApi/config/model/ConfigApiKeys.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/collectoryx/collectoryxApi/config/rest/request/ConfigApiRequest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/collectoryx/collectoryxApi/config/rest/request/ConfigApiRequest.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/collectoryx/collectoryxApi/config/rest/response/ConfigApiResponse.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/collectoryx/collectoryxApi/config/rest/response/ConfigApiResponse.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/collectoryx/collectoryxApi/config/service/ConfigService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/collectoryx/collectoryxApi/config/service/ConfigService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/collectoryx/collectoryxApi/util/rest/request/ScrapperApiRequest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/collectoryx/collectoryxApi/util/rest/request/ScrapperApiRequest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/collectoryx/collectoryxApi/util/controller/ScrapperController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/collectoryx/collectoryxApi/util/controller/ScrapperController.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/collectoryx/collectoryxApi/util/service/ScrapperApiService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/collectoryx/collectoryxApi/util/service/ScrapperApiService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/initialApis.json" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/initialApis.json" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
