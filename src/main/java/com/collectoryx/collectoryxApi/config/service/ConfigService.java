@@ -164,8 +164,8 @@ public class ConfigService {
   }
 
   public List<ConfigApiResponse> getAllApisByUser(Long id) {
-    //List<ConfigApiKeys> configApiKeysList = this.configApiKeysRepository.findAllByUserId(id);
-    List<ConfigApiKeys> configApiKeysList = this.configApiKeysRepository.findAll();
+    List<ConfigApiKeys> configApiKeysList = this.configApiKeysRepository.findAllByUserId(id);
+    //List<ConfigApiKeys> configApiKeysList = this.configApiKeysRepository.findAll();
     return StreamSupport.stream(configApiKeysList.spliterator(), false)
         .map(this::toConfigApiResponse)
         .collect(Collectors.toList());

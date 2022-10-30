@@ -88,7 +88,7 @@ public class ScrapperApiService {
     String searchUriApi = "/themes/";
     return client
         .get()
-        .uri(searchUriApi + Integer.parseInt(scrapperApiRequest.getSearchQuery()) + "/")
+        .uri(searchUriApi + scrapperApiRequest.getSearchQuery() + "/")
         .header(scrapperApiRequest.getHeader(), "key " + scrapperApiRequest.getKeyCode())
         .accept(MediaType.APPLICATION_JSON)
         .retrieve()
