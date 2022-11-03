@@ -6,10 +6,8 @@
   <component name="ChangeListManager">
     <list default="true" id="e7725e87-06c9-4363-a7e7-9ec3adee6157" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/collectoryx/collectoryxApi/config/service/ConfigService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/collectoryx/collectoryxApi/config/service/ConfigService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/collectoryx/collectoryxApi/util/service/ScrapperApiService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/collectoryx/collectoryxApi/util/service/ScrapperApiService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/collectoryx/collectoryxApi/config/service/ConfigService.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/collectoryx/collectoryxApi/config/service/ConfigService.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/collectoryx/collectoryxApi/util/service/ScrapperApiService.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/collectoryx/collectoryxApi/util/service/ScrapperApiService.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/collectoryx/collectoryxApi/collections/repository/CollectionItemsMetadataRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/collectoryx/collectoryxApi/collections/repository/CollectionItemsMetadataRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/collectoryx/collectoryxApi/collections/service/CollectionService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/collectoryx/collectoryxApi/collections/service/CollectionService.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
