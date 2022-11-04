@@ -11,5 +11,5 @@ public interface CollectionItemsMetadataRepository extends JpaRepository<Collect
 
   List<CollectionItemsMetadata> findByItem_Id(Long id);
 
-  Optional<CollectionItemsMetadata> findById(String id);
+  Optional<CollectionItemsMetadata> findById(Long id);
 }
