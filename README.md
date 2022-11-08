@@ -8,7 +8,7 @@ This image provides various versions that are available via tags. Please read th
 
 | Tag | Available | Description |
 | :----: | :----: |--- |
-| latest | ✅ | Stable releases from Collectoryx (currently v1) |
+| latest | ✅ | Stable releases from Collectoryx (currently 1.0.1) |
 
 ## Application Setup
 
@@ -31,7 +31,7 @@ version: "3.9"
 services:
   api:
     #build: .
-    image: collectoryx-api
+    image: lopiv2/collectoryx-api:1.0.1
     ports:
       - "8080:8080"
     depends_on:
@@ -43,7 +43,7 @@ services:
 
   front:
     #build: .
-    image: collectoryx-front
+    image: lopiv2/collectoryx-front:1.0.1
     ports:
       - "8082:8082"
     depends_on:
