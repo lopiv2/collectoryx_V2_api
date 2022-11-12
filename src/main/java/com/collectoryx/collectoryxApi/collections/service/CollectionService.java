@@ -1115,12 +1115,13 @@ public class CollectionService {
     for (CollectionItemMetadataRequest c : request.getMetadata()) {
       //CollectionMetadata collectionMetadata = this.collectionMetadataRepository.findById(c.getId());
       CollectionItemsMetadata collectionItemsMetadata = this.collectionItemsMetadataRepository.
-          findById(Long.valueOf(c.getId())).map(item -> {
-            item.setValue(c.getValue());
-            return this.collectionItemsMetadataRepository.save(item);
-          }).orElseThrow(NotFoundException::new);
-      collectionItemMetadataResponseList.add(
-          toCollectionItemMetadataResponse(collectionItemsMetadata));
+          findById(Long.valueOf(c.getId())).orElseThrow(NotFoundException::new);
+      if (collectionItemsMetadata != null) {
+        collectionItemsMetadata.setValue(c.getValue());
+        this.collectionItemsMetadataRepository.save(collectionItemsMetadata);
+        collectionItemMetadataResponseList.add(
+            toCollectionItemMetadataResponse(collectionItemsMetadata));
+      }
     }
     CollectionItemsResponse collectionItemsResponse = null;
     collectionItemsResponse = CollectionItemsResponse.builder()
