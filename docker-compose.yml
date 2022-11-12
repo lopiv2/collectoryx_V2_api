@@ -22,7 +22,7 @@ services:
     build:
       context: ../collectoryx_v2_front
       args:
-        - REACT_APP_API_URL=http://127.0.0.1:8080
+        - REACT_APP_API_URL=http://api.collectoryx:8080
     ports:
       - "8082:80"
     depends_on:
