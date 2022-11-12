@@ -21,8 +21,6 @@ services:
     image: lopiv2/collectoryx-front:latest
     build:
       context: ../collectoryx_v2_front
-      args:
-        - REACT_APP_API_URL=http://api.collectoryx:8080
     ports:
       - "8082:80"
     depends_on:
