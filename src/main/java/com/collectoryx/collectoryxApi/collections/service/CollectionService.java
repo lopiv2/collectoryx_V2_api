@@ -526,6 +526,11 @@ public class CollectionService {
     if (col.isWanted()) {
       collectionList.setWanted(collectionList.getWanted() - 1);
     }
+    List<CollectionItemsMetadata> collectionItemsMetadata = this.collectionItemsMetadataRepository
+        .findByItem_Id(id);
+    if (collectionItemsMetadata.size() > 0) {
+      this.collectionItemsMetadataRepository.deleteAll(collectionItemsMetadata);
+    }
     this.collectionItemRepository.deleteById(col.getId());
     return true;
   }
@@ -656,7 +661,7 @@ public class CollectionService {
 
   public List<CollectionSeriesListResponse> listAllSeriesCollections(Long id) {
     List<CollectionSeriesList> collections = this.collectionSeriesListRepository
-        .findAllByCollection_UserId(id);
+        .findAllByCollection_UserIdOrderByName(id);
     return StreamSupport.stream(collections.spliterator(), false)
         .map(this::toCollectionSerieListResponse)
         .collect(Collectors.toList());
@@ -707,7 +712,7 @@ public class CollectionService {
   public List<CollectionSeriesListResponse> listSeriesByCollection(Long id) {
     final List<CollectionSeriesListResponse> collectionSerieListResponseList = new LinkedList<>();
     List<CollectionSeriesList> collections = this.collectionSeriesListRepository
-        .findAllByCollection_Id(id);
+        .findAllByCollection_IdOrderByName(id);
     return StreamSupport.stream(collections.spliterator(), false)
         .map(this::toCollectionSerieListResponse)
         .collect(Collectors.toList());
@@ -987,7 +992,7 @@ public class CollectionService {
             this.collectionItemsMetadataRepository.save(collectionItemsMetadata);
           }
         });
-        break;
+        //break;
       }
     }
   }
