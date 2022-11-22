@@ -22,6 +22,10 @@ public interface CollectionListRepository extends JpaRepository<CollectionList, 
       nativeQuery = true)
   Long sumItemsByCollectionUser(@Param("userId") Long id);
 
+  @Query(value = "SELECT SUM(total_price) from collection_list cl where user_id =:userId ",
+      nativeQuery = true)
+  Long sumMoneyByCollectionUser(@Param("userId") Long id);
+
   long countByWantedAndUserId_Id(int i, Long id);
 
   Page<CollectionList> findByNameContaining(String search, Pageable pageable);

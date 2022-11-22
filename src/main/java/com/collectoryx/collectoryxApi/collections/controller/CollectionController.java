@@ -103,12 +103,12 @@ public class CollectionController {
   }
 
   @GetMapping(value = "/count-collections-money/{id}")
-  public Mono<List<CollectionItemsResponse>> getCollectionsTotalMoneyById(
+  public Mono<Long> getCollectionsTotalMoneyById(
       @PathVariable("id") Long id,
       @RequestHeader(value = "Authorization") String token) {
-    List<CollectionItemsResponse> collectionResponses = this.collectionService
+    Long count = this.collectionService
         .getMoneyFromAllItems(id);
-    return Mono.just(collectionResponses);
+    return Mono.just(count);
   }
 
   @GetMapping(value = "/count-collections-wishlist/{id}")

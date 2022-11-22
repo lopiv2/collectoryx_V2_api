@@ -651,12 +651,9 @@ public class CollectionService {
         .collect(Collectors.toList());
   }
 
-  public List<CollectionItemsResponse> getMoneyFromAllItems(Long id) {
-    List<CollectionItem> collections = this.collectionItemRepository
-        .findByCollection_UserId_Id(id);
-    return StreamSupport.stream(collections.spliterator(), false)
-        .map(this::toCollectionItemsResponse)
-        .collect(Collectors.toList());
+  public long getMoneyFromAllItems(Long id) {
+    long count = this.collectionListRepository.sumMoneyByCollectionUser(id);
+    return count;
   }
 
   public List<CollectionSeriesListResponse> listAllSeriesCollections(Long id) {
