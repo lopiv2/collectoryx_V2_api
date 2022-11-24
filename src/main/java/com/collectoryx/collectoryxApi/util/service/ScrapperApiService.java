@@ -1,6 +1,9 @@
 package com.collectoryx.collectoryxApi.util.service;
 
+import com.collectoryx.collectoryxApi.collections.rest.response.CollectionItemsPaginatedResponse;
 import com.collectoryx.collectoryxApi.collections.rest.response.CollectionItemsResponse;
+import com.collectoryx.collectoryxApi.collections.rest.response.CollectionSeriesListResponse;
+import com.collectoryx.collectoryxApi.image.rest.response.ImageResponse;
 import com.collectoryx.collectoryxApi.util.rest.request.ScrapperApiRequest;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -37,31 +40,27 @@ public class ScrapperApiService {
     return null;
   }
 
-  public List<CollectionItemsResponse> MarvelScrapper(String query, String metadata) {
-    if (metadata.contains("baf")) {
-      return MarvelReaderBaf(query);
-    }
-    if (metadata.contains("sets")) {
-      //return "sets";
-      //return MarvelReaderBaf(scrapperApiRequest);
-    }
-      /*if (scrapperApiRequest.getMetadata().contains("sets")) {
-        return MarvelReaderSets(scrapperApiRequest);
-      }
-      if (scrapperApiRequest.getMetadata().contains("exclusives")) {
-        return MarvelReaderExclusives(scrapperApiRequest);
-      }*/
-    return null;
+  public CollectionItemsPaginatedResponse MarvelScrapper(int page, int rowsPerPage, String query,
+      String metadata) {
+    return MarvelReader(page, rowsPerPage, query, metadata);
   }
 
-  public List<CollectionItemsResponse> MarvelReaderBaf(String query) {
+  public CollectionItemsPaginatedResponse MarvelReader(int page, int rowsPerPage, String query,
+      String metadata) {
     Document doc = null;
     //List of results
+    CollectionItemsPaginatedResponse collectionItemsPaginatedResponse =
+        CollectionItemsPaginatedResponse.builder()
+            .items(null)
+            .pages(0)
+            .totalCount(0)
+            .build();
     List<CollectionItemsResponse> collectionItemsResponseList = new ArrayList<>();
     try {
-      //String url = "https://www.actionfigure411.com/marvel/build-a-figure-list.php";
       String url = "https://www.actionfigure411.com/marvel/marvel-legends-everything.php";
       doc = Jsoup.connect(url).get();
+      int contElements = 0;
+      //All elements from main page
       Elements gridItems = doc.getElementsByClass("grid-item");
       for (int x = 0; x < gridItems.size(); x++) {
         Elements e = gridItems.get(x)
@@ -70,136 +69,100 @@ public class ScrapperApiService {
         if (e.text().toLowerCase(Locale.ROOT).contains(query)) {
           CollectionItemsResponse collectionItemsResponse = null;
           Document p = Jsoup.connect(e.attr("href")).get();
+          //Image
+          Element im = p.getElementsByClass("overlay-a").first();
+          String linkImg = im.attr("href");
+          //Name
           Element listGroup = p.getElementsByClass("list-group").first();
           Element name = listGroup.select("b").first();
           Element yearParsed = listGroup.getElementsByClass("list-group-item").get(1);
+          //Year
           Integer year = Integer.valueOf(yearParsed.toString()
               .substring(yearParsed.toString().indexOf("Year</b>: ") + 10,
                   yearParsed.toString().indexOf("Year</b>: ") + 14));
           Element priceParsed = listGroup.getElementsByClass("list-group-item").get(1);
           int priceString = priceParsed.toString().indexOf("Retail</b>: ");
+          //Price
           float price = 0;
           if (priceString != -1) {
-            price = Float.parseFloat(priceParsed.toString()
+            String pri = priceParsed.toString()
                 .substring(priceString + 13,
-                    priceString + 18));
+                    priceString + 18);
+            String str = pri.replaceAll("[^\\d.]", "");
+            price = Float.parseFloat(str);
           }
+          ImageResponse imageResponse = ImageResponse.builder()
+              .name(name.text())
+              .path("https://www.actionfigure411.com" + linkImg)
+              .build();
+          CollectionSeriesListResponse collectionSeriesListResponse = null;
+          //Serie
           for (int v = 0; v < p.getElementsByClass("list-group").size(); v++) {
             Element el = p.getElementsByClass("list-group").get(v);
-            if (el.getElementsByClass("list-group-item").select("b").text().contains("BAF")) {
+            //BAF
+            if (metadata.toLowerCase().contains("baf")) {
+              if (el.getElementsByClass("list-group-item").select("b").text().toLowerCase()
+                  .contains("baf")) {
+                Element zs = el.getElementsByClass("fancybox").first();
+                collectionSeriesListResponse = CollectionSeriesListResponse.builder()
+                    .name(zs.text())
+                    .build();
+                collectionItemsResponse = CollectionItemsResponse.builder()
+                    .name(name.text())
+                    .serie(collectionSeriesListResponse)
+                    .year(year)
+                    .image(imageResponse)
+                    .price(price)
+                    .build();
+                contElements++;
+                collectionItemsResponseList.add(collectionItemsResponse);
+                //Add an element for each found
+                collectionItemsPaginatedResponse.setTotalCount(contElements);
+                //break;
+
+                /*list.stream()
+                    .skip(page * size)
+                    .limit(size)
+                    .collect(Collectors.toCollection(ArrayList::new));*/
+
+                /*int sizePerPage=2;
+                int page=2;
+
+                int from = Math.max(0,page*sizePerPage);
+                int to = Math.min(list.size(),(page+1)*sizePerPage)
+
+                list.subList(from,to)*/
+
+              }
+            }
+            //Set
+            /*if (el.getElementsByClass("list-group-item").select("b").text().toLowerCase()
+                .contains("set") && metadata.toLowerCase().contains("set")) {
               Elements zs = el.getElementsByClass("fancybox");
-              System.out.println(zs.get(0).text());
+              collectionSeriesListResponse = CollectionSeriesListResponse.builder()
+                  .name(zs.get(0).text())
+                  .build();
+              break;
             }
-          }
-          /*Element serieParsed = listGroup.getElementsByClass("list-group-item").get(3);
-          if (serieParsed.text().contains("Figure Seek")) {
-            serieParsed = listGroup.getElementsByClass("list-group-item").get(4);
-          }*/
-          /*if (serieParsed.text().contains("Add to your Collection")) {
-            serieParsed = listGroup.getElementsByClass("list-group-item").get(3);
-          }*/
-          //System.out.println(serieParsed);
-          //String serie = serieParsed.select("a").first().text();
-          //System.out.println(serie);
-          collectionItemsResponse = CollectionItemsResponse.builder()
-              .name(name.text())
-              //.serie(collectionSeriesListResponse)
-              .year(year)
-              .price(price)
-              .build();
-
-        }
-        //System.out.println(e.attr("href"));
-      }
-
-      /*Elements items = doc.getElementsByAttributeValueContaining("href",
-          "baf");
-      CollectionItemsResponse collectionItemsResponse = null;
-      //List of all series and look for inside each one
-      for (int z = 0; z < items.size(); z++) {
-        Element it = items.get(z).select("a").first();
-        String linkHref = it.attr("href");
-        Document p = Jsoup.connect("https://www.actionfigure411.com/marvel/" + linkHref).get();
-        Element its = p.getElementsByAttributeValueContaining("href",
-            "checklist.php").first();
-        String linkCheck = its.attr("href");
-        Document checklistPage = Jsoup.connect("https://www.actionfigure411.com" + linkCheck)
-            .get();
-        Element serie = checklistPage.select("strong").get(0);
-        Integer serieGuide = serie.text().indexOf(" - ");
-        String movie = serie.text().substring(0, serieGuide);
-        String serieWithoutBaf = serie.text()
-            .substring(serieGuide + 2, serie.text().indexOf("BAF Checklist") - 1);
-
-        //Create the final serie name
-        String serieParsed = serieWithoutBaf + " - " + movie;
-
-        //Select the table to get the elements of the serie
-        Element table = checklistPage.select("table").get(0); //select the first table.
-        Elements rows = table.select("tr");
-        for (int i = 1; i < rows.size(); i++) { //Skip the first row
-          Element row = rows.get(i);
-          Elements cols = row.select("td");
-          if (cols.get(1).text().toLowerCase(Locale.ROOT).contains(query)) {
-            //System.out.println(cols.get(1).text());
-            float price = 0;
-            CollectionSeriesListResponse collectionSeriesListResponse = CollectionSeriesListResponse.builder()
-                .name(serieParsed)
-                .build();
-            if (cols.get(4).text() == "") {
-              price = 0;
-            } else {
-              String pr = cols.get(4).text().replace("$", "");
-              price = Float.parseFloat(pr);
-            }
-            collectionItemsResponse = CollectionItemsResponse.builder()
-                .name(cols.get(1).text())
-                .serie(collectionSeriesListResponse)
-                .year(Integer.parseInt(cols.get(3).text()))
-                .price(price)
-                .build();
-            collectionItemsResponseList.add(collectionItemsResponse);
-            //System.out.println(collectionItemsResponse);
+            //Exclusive
+            if (metadata.toLowerCase().contains("exclusive")) {
+              collectionSeriesListResponse = CollectionSeriesListResponse.builder()
+                  .name("Exclusive")
+                  .build();
+              break;
+            }*/
           }
         }
       }
-      System.out.println("fin");
-      return collectionItemsResponseList;*/
+      double pages = collectionItemsPaginatedResponse.getTotalCount() / rowsPerPage;
+      collectionItemsPaginatedResponse.setPages(Integer.valueOf((int) pages));
+      collectionItemsPaginatedResponse.setItems(collectionItemsResponseList);
+      return collectionItemsPaginatedResponse;
     } catch (IOException e) {
       e.printStackTrace();
     }
     return null;
   }
-
-  /*public String MarvelReader(String query) {
-    Document doc = null;
-    try {
-      String url = "https://legendsverse.com/checklist/characters";
-      doc = Jsoup.connect(url).get();
-      Element d = doc.select("p[class=\"text-sm text-gray-700 leading-5\"]").first();
-      //List<String> links = new ArrayList<>();
-      //Pages of elements in total
-      int pages = (int) Math.ceil(Double.parseDouble(d.child(2).text()) / 12);
-      query = query.replaceAll(" ", "-").toLowerCase(Locale.ROOT);
-      for (int z = 1; z <= pages; z++) {
-        Document p = Jsoup.connect(url + "?page=" + z).get();
-        Elements items = p.getElementsByAttributeValueContaining("href",
-            "/checklist/characters/" + query);
-        if (items.text() != null) {
-          //Element lnk = items.select("a[href]").first();
-          Element link = items.select("a").first();
-          String linkHref = link.attr("href");
-          //links.add(url + "?page=" + z);
-          System.out.println("https://legendsverse.com" + linkHref);
-          return getMarvelLegendsResults("https://legendsverse.com" + linkHref);
-        }
-      }
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
-    //Retornar empty si no encuentra nada
-    return doc.title();
-  }*/
 
   public String getMarvelLegendsResults(String itemUrl) {
     String result = "";

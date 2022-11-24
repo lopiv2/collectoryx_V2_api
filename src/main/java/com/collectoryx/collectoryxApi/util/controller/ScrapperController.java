@@ -1,9 +1,8 @@
 package com.collectoryx.collectoryxApi.util.controller;
 
-import com.collectoryx.collectoryxApi.collections.rest.response.CollectionItemsResponse;
+import com.collectoryx.collectoryxApi.collections.rest.response.CollectionItemsPaginatedResponse;
 import com.collectoryx.collectoryxApi.util.rest.request.ScrapperApiRequest;
 import com.collectoryx.collectoryxApi.util.service.ScrapperApiService;
-import java.util.List;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -39,12 +38,14 @@ public class ScrapperController {
   }
 
   @GetMapping(value = "/get-marvel-legends")
-  public List<CollectionItemsResponse> getMarvel(
+  public CollectionItemsPaginatedResponse getMarvel(
+      @RequestParam int page,
+      @RequestParam int rowsPerPage,
       @RequestParam String query,
       @RequestParam String metadata,
       @RequestHeader(value = "Authorization") String token) {
-    List<CollectionItemsResponse> collectionItemsResponseList = this.scrapperApiService.MarvelScrapper(
-        query, metadata);
+    CollectionItemsPaginatedResponse collectionItemsResponseList = this.scrapperApiService.MarvelScrapper(
+        page,rowsPerPage, query, metadata);
     return collectionItemsResponseList;
   }
 }
