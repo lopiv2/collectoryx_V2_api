@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class CollectionItemsPaginatedResponse {
 
-  protected int pages;
+  protected int page;
 
   protected int totalCount;
 

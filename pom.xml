@@ -46,6 +46,12 @@
       <version>2.5.2</version>
     </dependency>
     <dependency>
+      <groupId>us.codecraft</groupId>
+      <artifactId>xsoup</artifactId>
+      <version>0.3.6</version>
+    </dependency>
+
+    <dependency>
       <groupId>io.projectreactor</groupId>
       <artifactId>reactor-core</artifactId>
       <version>3.4.21</version>

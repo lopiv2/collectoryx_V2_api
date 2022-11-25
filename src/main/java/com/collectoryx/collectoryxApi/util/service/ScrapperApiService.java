@@ -52,7 +52,7 @@ public class ScrapperApiService {
     CollectionItemsPaginatedResponse collectionItemsPaginatedResponse =
         CollectionItemsPaginatedResponse.builder()
             .items(null)
-            .pages(0)
+            .page(0)
             .totalCount(0)
             .build();
     List<CollectionItemsResponse> collectionItemsResponseList = new ArrayList<>();
@@ -99,13 +99,11 @@ public class ScrapperApiService {
           //Serie
           for (int v = 0; v < p.getElementsByClass("list-group").size(); v++) {
             Element el = p.getElementsByClass("list-group").get(v);
-            //BAF
-            if (metadata.toLowerCase().contains("baf")) {
-              if (el.getElementsByClass("list-group-item").select("b").text().toLowerCase()
-                  .contains("baf")) {
-                Element zs = el.getElementsByClass("fancybox").first();
+            if (metadata.contains("baf")) {
+              Element b = el.select("b:matches((?i)BAF)").first();
+              if (b != null) {
                 collectionSeriesListResponse = CollectionSeriesListResponse.builder()
-                    .name(zs.text())
+                    .name(el.getElementsByClass("fancybox").first().text())
                     .build();
                 collectionItemsResponse = CollectionItemsResponse.builder()
                     .name(name.text())
@@ -116,57 +114,60 @@ public class ScrapperApiService {
                     .build();
                 contElements++;
                 collectionItemsResponseList.add(collectionItemsResponse);
-                //Add an element for each found
                 collectionItemsPaginatedResponse.setTotalCount(contElements);
-                //break;
-
-                /*list.stream()
-                    .skip(page * size)
-                    .limit(size)
-                    .collect(Collectors.toCollection(ArrayList::new));*/
-
-                /*int sizePerPage=2;
-                int page=2;
-
-                int from = Math.max(0,page*sizePerPage);
-                int to = Math.min(list.size(),(page+1)*sizePerPage)
-
-                list.subList(from,to)*/
-
               }
             }
-            //Set
-            /*if (el.getElementsByClass("list-group-item").select("b").text().toLowerCase()
-                .contains("set") && metadata.toLowerCase().contains("set")) {
-              Elements zs = el.getElementsByClass("fancybox");
-              collectionSeriesListResponse = CollectionSeriesListResponse.builder()
-                  .name(zs.get(0).text())
-                  .build();
-              break;
+            if (metadata.contains("set")) {
+              Element s = el.select("b:matches((?i)Set)").first();
+              Element b = el.select("b:matches((?i)BAF)").first();
+              if (s != null && b == null) {
+                collectionSeriesListResponse = CollectionSeriesListResponse.builder()
+                    .name(el.getElementsByClass("fancybox").first().text())
+                    .build();
+                collectionItemsResponse = CollectionItemsResponse.builder()
+                    .name(name.text())
+                    .serie(collectionSeriesListResponse)
+                    .year(year)
+                    .image(imageResponse)
+                    .price(price)
+                    .build();
+                contElements++;
+                collectionItemsResponseList.add(collectionItemsResponse);
+                collectionItemsPaginatedResponse.setTotalCount(contElements);
+              }
             }
-            //Exclusive
-            if (metadata.toLowerCase().contains("exclusive")) {
-              collectionSeriesListResponse = CollectionSeriesListResponse.builder()
-                  .name("Exclusive")
-                  .build();
-              break;
-            }*/
+            if (metadata.contains("exclusives")) {
+              Element s = el.select("b:matches((?i)Set)").first();
+              Element b = el.select("b:matches((?i)BAF)").first();
+              //If there is no set and baf, it´s exclusive
+              if (s == null && b == null) {
+                collectionSeriesListResponse = CollectionSeriesListResponse.builder()
+                    .name("Exclusives")
+                    .build();
+                collectionItemsResponse = CollectionItemsResponse.builder()
+                    .name(name.text())
+                    .serie(collectionSeriesListResponse)
+                    .year(year)
+                    .image(imageResponse)
+                    .price(price)
+                    .build();
+                contElements++;
+                collectionItemsResponseList.add(collectionItemsResponse);
+                collectionItemsPaginatedResponse.setTotalCount(contElements);
+              }
+            }
           }
         }
       }
-      double pages = collectionItemsPaginatedResponse.getTotalCount() / rowsPerPage;
-      collectionItemsPaginatedResponse.setPages(Integer.valueOf((int) pages));
-      collectionItemsPaginatedResponse.setItems(collectionItemsResponseList);
+      collectionItemsPaginatedResponse.setPage(page);
+      int from = (page * rowsPerPage) - rowsPerPage;
+      int to = Math.min(collectionItemsResponseList.size(), ((page * rowsPerPage)));
+      collectionItemsPaginatedResponse.setItems(collectionItemsResponseList.subList(from, to));
       return collectionItemsPaginatedResponse;
     } catch (IOException e) {
       e.printStackTrace();
     }
     return null;
-  }
-
-  public String getMarvelLegendsResults(String itemUrl) {
-    String result = "";
-    return result;
   }
 
   public Mono<String> PokemonApiReader(ScrapperApiRequest scrapperApiRequest) {
