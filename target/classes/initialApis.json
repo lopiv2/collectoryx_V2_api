@@ -16,6 +16,14 @@
   "header": "Authorization"
   },
   {
+  "name": "Hot Wheels",
+  "keyCode": "",
+  "apiLink": "",
+  "logo": "https://www.pngarts.com/files/11/Hot-Wheels-Logo-PNG-High-Quality-Image.png",
+  "locked": "true",
+  "header": ""
+  },
+  {
   "name": "MOTU",
   "keyCode": "",
   "apiLink": "",
@@ -27,7 +35,7 @@
   "name": "Marvel Legends",
   "keyCode": "",
   "apiLink": "",
-  "logo": "",
+  "logo": "https://www.actionfigure411.com/marvel/images/marvel-legends-series-logo.png",
   "locked": "true",
   "header": ""
   },

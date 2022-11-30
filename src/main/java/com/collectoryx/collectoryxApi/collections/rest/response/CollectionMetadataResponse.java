@@ -18,6 +18,9 @@ public class CollectionMetadataResponse {
   @Schema(description = "Metadata name", example = "Tag")
   private String name;
 
+  @Schema(description = "Metadata value", example = "1")
+  private String value;
+
   @Schema(description = "Metadata type", example = "INTEGER")
   private CollectionMetadataType type;
 

@@ -37,6 +37,18 @@ public class ScrapperController {
     return response;
   }
 
+  @GetMapping(value = "/get-hot-wheels")
+  public CollectionItemsPaginatedResponse getHotWheels(
+      @RequestParam int page,
+      @RequestParam int rowsPerPage,
+      @RequestParam String query,
+      @RequestParam String metadata,
+      @RequestHeader(value = "Authorization") String token) {
+    CollectionItemsPaginatedResponse collectionItemsResponseList = this.scrapperApiService
+        .HotWheelsScrapper(page, rowsPerPage, query, metadata);
+    return collectionItemsResponseList;
+  }
+
   @GetMapping(value = "/get-marvel-legends")
   public CollectionItemsPaginatedResponse getMarvel(
       @RequestParam int page,
@@ -44,8 +56,8 @@ public class ScrapperController {
       @RequestParam String query,
       @RequestParam String metadata,
       @RequestHeader(value = "Authorization") String token) {
-    CollectionItemsPaginatedResponse collectionItemsResponseList = this.scrapperApiService.MarvelScrapper(
-        page,rowsPerPage, query, metadata);
+    CollectionItemsPaginatedResponse collectionItemsResponseList = this.scrapperApiService
+        .MarvelScrapper(page, rowsPerPage, query, metadata);
     return collectionItemsResponseList;
   }
 }

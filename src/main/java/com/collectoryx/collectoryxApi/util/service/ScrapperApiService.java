@@ -1,5 +1,7 @@
 package com.collectoryx.collectoryxApi.util.service;
 
+import com.collectoryx.collectoryxApi.collections.model.CollectionMetadataType;
+import com.collectoryx.collectoryxApi.collections.rest.response.CollectionItemMetadataResponse;
 import com.collectoryx.collectoryxApi.collections.rest.response.CollectionItemsPaginatedResponse;
 import com.collectoryx.collectoryxApi.collections.rest.response.CollectionItemsResponse;
 import com.collectoryx.collectoryxApi.collections.rest.response.CollectionSeriesListResponse;
@@ -40,7 +42,134 @@ public class ScrapperApiService {
     return null;
   }
 
-  public CollectionItemsPaginatedResponse MarvelScrapper(int page, int rowsPerPage, String query,
+  public CollectionItemsPaginatedResponse HotWheelsScrapper(int page, int rowsPerPage, String query,
+      String metadata) {
+    return HotWheelsReader(page, rowsPerPage, query, metadata);
+  }
+
+  public CollectionItemsPaginatedResponse HotWheelsReader(int page, int rowsPerPage, String query,
+      String metadata) {
+    Document doc = null;
+    //List of results
+    CollectionItemsPaginatedResponse collectionItemsPaginatedResponse =
+        CollectionItemsPaginatedResponse.builder()
+            .items(null)
+            .page(0)
+            .totalCount(0)
+            .build();
+    List<CollectionItemsResponse> collectionItemsResponseList = new ArrayList<>();
+    try {
+      String url = "https://collecthw.com/";
+      Element j = Jsoup.connect(url + "/hw/search/" + query).get();
+      Element res = j.getElementsByClass("container-fluid google-auto-placed").first()
+          .getElementsByClass("searchtitle").first();
+      CollectionItemsResponse collectionItemsResponse = null;
+      CollectionSeriesListResponse collectionSeriesListResponse = null;
+      int contElements = 0;
+      if (res != null) { //Multiple elements
+        Elements body = j.getElementsByClass("container-fluid google-auto-placed").first()
+            .select("tbody").select("tr");
+        for (int r = 0; r < body.size(); r++) {
+          Element name = body.get(r).select("td").get(3);
+          Element serie = body.get(r).select("td").get(5);
+          Element price = body.get(r).select("td").get(13);
+          Element year = body.get(r).select("td").get(4);
+          String image = body.get(r).select("td").get(0).select("a").attr("src");
+          List<CollectionItemMetadataResponse> collectionItemMetadataResponseList = new ArrayList<>();
+          CollectionItemMetadataResponse collectionItemMetadataColResponse = CollectionItemMetadataResponse.builder()
+              .name("Collection Number")
+              .value(body.get(r).select("td").get(1).text().replace("col:", ""))
+              .type(CollectionMetadataType.STRING)
+              .build();
+          collectionItemMetadataResponseList.add(collectionItemMetadataColResponse);
+          CollectionItemMetadataResponse collectionItemMetadataColorResponse = CollectionItemMetadataResponse.builder()
+              .name("Color")
+              .type(CollectionMetadataType.STRING)
+              .value(body.get(r).select("td").get(6).text().replace("color:", ""))
+              .build();
+          collectionItemMetadataResponseList.add(collectionItemMetadataColorResponse);
+          ImageResponse imageResponse = ImageResponse.builder()
+              .name(name.text().replace("model:", ""))
+              .path(image)
+              .build();
+          collectionSeriesListResponse = CollectionSeriesListResponse.builder()
+              .name(serie.text().replace("series:", ""))
+              .build();
+          collectionItemsResponse = CollectionItemsResponse.builder()
+              .name(name.text().replace("model:", ""))
+              .serie(collectionSeriesListResponse)
+              .year(Integer.valueOf(year.text().replace("year:", "")))
+              .image(imageResponse)
+              .metadata(collectionItemMetadataResponseList)
+              .price(Float.valueOf(
+                  price.text().replace("$", "")))
+              .build();
+          //System.out.println(collectionItemsResponse);
+          contElements++;
+          collectionItemsResponseList.add(collectionItemsResponse);
+          collectionItemsPaginatedResponse.setTotalCount(contElements);
+        }
+      } else //Single Element result
+      {
+        Element result = j.getElementsByClass("container-fluid google-auto-placed").first()
+            .getElementsByClass("row searchcontent").first();
+        List<CollectionItemMetadataResponse> collectionItemMetadataResponseList = new ArrayList<>();
+        Document col = Jsoup.connect(url + result.select("a").first().attr("href")).get();
+        CollectionItemMetadataResponse collectionItemMetadataColResponse = CollectionItemMetadataResponse.builder()
+            .name("Collection Number")
+            .value(col.select("tbody").first().select("td").get(1).text().replace("col:", ""))
+            .type(CollectionMetadataType.STRING)
+            .build();
+        collectionItemMetadataResponseList.add(collectionItemMetadataColResponse);
+        CollectionItemMetadataResponse collectionItemMetadataColorResponse = CollectionItemMetadataResponse.builder()
+            .name("Color")
+            .type(CollectionMetadataType.STRING)
+            .value(result.select("dd").get(3).text().replace("color:", ""))
+            .build();
+        collectionItemMetadataResponseList.add(collectionItemMetadataColorResponse);
+        //Name
+        Element name = result.select("a").first();
+        //Price
+        Document p = Jsoup.connect(url + name.attr("href")).get();
+        //Image
+        ImageResponse imageResponse = ImageResponse.builder()
+            .name(name.text())
+            .path(result.select("img").first().attr("src"))
+            .build();
+        //Year
+        Element year = result.select("a").get(1);
+        //Serie
+        Element serie = result.select("a").get(2);
+        collectionSeriesListResponse = CollectionSeriesListResponse.builder()
+            .name(serie.text())
+            .build();
+        collectionItemsResponse = CollectionItemsResponse.builder()
+            .name(name.text())
+            .serie(collectionSeriesListResponse)
+            .year(Integer.valueOf(year.text()))
+            .image(imageResponse)
+            .metadata(collectionItemMetadataResponseList)
+            .price(Float.valueOf(
+                p.select("tbody").first().select("td").last().text()
+                    .replace("$", "")))
+            .build();
+        contElements++;
+        collectionItemsResponseList.add(collectionItemsResponse);
+        collectionItemsPaginatedResponse.setTotalCount(contElements);
+      }
+      collectionItemsPaginatedResponse.setPage(page);
+      int from = (page * rowsPerPage) - rowsPerPage;
+      int to = Math.min(collectionItemsResponseList.size(), ((page * rowsPerPage)));
+      collectionItemsPaginatedResponse.setItems(collectionItemsResponseList.subList(from, to));
+      return collectionItemsPaginatedResponse;
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+    return null;
+  }
+
+  public CollectionItemsPaginatedResponse MarvelScrapper(int page, int rowsPerPage, String
+      query,
       String metadata) {
     return MarvelReader(page, rowsPerPage, query, metadata);
   }

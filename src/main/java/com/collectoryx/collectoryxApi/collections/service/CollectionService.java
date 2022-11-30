@@ -447,6 +447,7 @@ public class CollectionService {
     this.collectionListRepository.save(collectionList);
     this.collectionSeriesListRepository.save(collectionSeriesList);
     CollectionItem collectionItem = null;
+    List<CollectionItemMetadataResponse> collectionItemMetadataResponseList = new ArrayList<>();
     collectionItem = CollectionItem.builder()
         .name(request.getName())
         .serie(collectionSeriesList)
@@ -459,6 +460,17 @@ public class CollectionService {
         .collection(collectionList)
         .build();
     this.collectionItemRepository.save(collectionItem);
+    CollectionItem collectionItem1 = this.collectionItemRepository.findById(collectionItem.getId())
+        .orElseThrow(NotFoundException::new);
+    for (CollectionItemMetadataRequest c : request.getMetadata()) {
+      CollectionMetadata collectionMetadata = this.collectionMetadataRepository.findById(c.getId());
+      CollectionItemsMetadata collectionItemsMetadata = CollectionItemsMetadata.builder()
+          .value(c.getValue())
+          .item(collectionItem1)
+          .metadata(collectionMetadata)
+          .build();
+      this.collectionItemsMetadataRepository.save(collectionItemsMetadata);
+    }
   }
 
   public CollectionSeriesListResponse createSerie(CollectionSerieListRequest request)
@@ -519,9 +531,9 @@ public class CollectionService {
     CollectionList collectionList = this.collectionListRepository.findById(
         col.getCollection().getId()).orElseThrow(NotFoundException::new);
     collectionList.setTotalItems(collectionList.getTotalItems() - 1);
-    collectionList.setTotalPrice(collectionList.getTotalPrice() - col.getPrice());
     if (col.isOwn()) {
       collectionList.setOwned(collectionList.getOwned() - 1);
+      collectionList.setTotalPrice(collectionList.getTotalPrice() - col.getPrice());
     }
     if (col.isWanted()) {
       collectionList.setWanted(collectionList.getWanted() - 1);
