@@ -444,6 +444,10 @@ public class CollectionService {
     }
     this.imageRepository.save((image));
     collectionList.setTotalItems(collectionList.getTotalItems() + 1);
+    if (request.isOwn()) {
+      collectionList.setOwned(collectionList.getOwned() + 1);
+      collectionList.setTotalPrice(collectionList.getTotalPrice() + request.getPrice());
+    }
     this.collectionListRepository.save(collectionList);
     this.collectionSeriesListRepository.save(collectionSeriesList);
     CollectionItem collectionItem = null;
