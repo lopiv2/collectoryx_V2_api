@@ -268,12 +268,7 @@
       <breakpoints>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/main/java/com/collectoryx/collectoryxApi/collections/service/CollectionService.java</url>
-          <line>1136</line>
-          <option name="timeStamp" value="12" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/main/java/com/collectoryx/collectoryxApi/collections/service/CollectionService.java</url>
-          <line>747</line>
+          <line>748</line>
           <option name="timeStamp" value="13" />
         </line-breakpoint>
       </breakpoints>

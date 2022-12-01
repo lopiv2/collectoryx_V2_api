@@ -39,6 +39,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.Year;
@@ -48,6 +51,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
@@ -816,7 +820,7 @@ public class CollectionService {
       throw new RuntimeException(e);
     }
 
-    String[] HEADERS = {"Image", "Name", "Collection", "Serie", "Year", "Price", "Own", "Notes"};
+    String[] HEADERS = {"Image", "Name", "Collection", "Serie", "AcquiringDate", "Year", "Price", "Own", "Notes"};
 
     Iterable<CSVRecord> records = null;
     CSVParser csvParser = null;
@@ -869,6 +873,7 @@ public class CollectionService {
     String name = "";
     String serie = "";
     long collection = 0;
+    String acquiringDate="";
     String own = "";
     String wanted = "";
     String price = "";
@@ -880,6 +885,9 @@ public class CollectionService {
     for (int v = 0; v < jsonArr.length(); v++) {
       JSONObject jsonObj = jsonArr.getJSONObject(v);
       switch (jsonObj.getString("original")) {
+        case "acquiringDate":
+          acquiringDate = jsonObj.getString("new");
+          break;
         case "name":
           name = jsonObj.getString("new");
           break;
@@ -940,16 +948,30 @@ public class CollectionService {
       } else {
         want = false;
       }
-      CollectionItem collectionItem = CollectionItem.builder()
-          .name(record.get(name))
-          .own(ow)
-          .price(pric)
-          .notes(record.get(notes))
-          .year(ye)
-          .wanted(want)
-          .serie(collectionSeriesList)
-          .collection(collectionList)
-          .build();
+      DateFormat formatter = null;
+      if (record.get(acquiringDate).contains("GMT")) {
+        formatter = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss z",
+            Locale.US);
+      } else {
+        formatter = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss Z",
+            Locale.US);
+      }
+      CollectionItem collectionItem = null;
+      try {
+        collectionItem = CollectionItem.builder()
+            .name(record.get(name))
+            .own(ow)
+            .acquiringDate(formatter.parse(record.get(acquiringDate)))
+            .price(pric)
+            .notes(record.get(notes))
+            .year(ye)
+            .wanted(want)
+            .serie(collectionSeriesList)
+            .collection(collectionList)
+            .build();
+      } catch (ParseException e) {
+        e.printStackTrace();
+      }
 
       collectionList.setTotalItems(collectionList.getTotalItems() + 1);
       if (ow == true) {
