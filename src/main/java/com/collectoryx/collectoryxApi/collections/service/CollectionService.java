@@ -446,9 +446,9 @@ public class CollectionService {
     }
     this.imageRepository.save((image));
     collectionList.setTotalItems(collectionList.getTotalItems() + 1);
-    Date acDate=request.getAcquiringDate();
+    Date acDate = request.getAcquiringDate();
     if (request.isOwn()) {
-      acDate=new Date();
+      acDate = new Date();
       collectionList.setOwned(collectionList.getOwned() + 1);
       collectionList.setTotalPrice(collectionList.getTotalPrice() + request.getPrice());
     }
@@ -951,7 +951,8 @@ public class CollectionService {
         ye = 2022;
       }
       Date d = null;
-      if (record.get(own).contains("1")) {
+      if (record.get(own).contains("1") && record.get(acquiringDate) != null
+          && record.get(acquiringDate) != "") {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-d", Locale.ENGLISH);
         LocalDate date = LocalDate.parse(record.get(acquiringDate), formatter);
         ZoneId defaultZoneId = ZoneId.systemDefault();
