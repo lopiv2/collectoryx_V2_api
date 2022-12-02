@@ -42,6 +42,109 @@ public class ScrapperApiService {
     return null;
   }
 
+  public CollectionItemsPaginatedResponse DCScrapper(int page, int rowsPerPage, String
+      query,
+      String metadata) {
+    return DCReader(page, rowsPerPage, query, metadata);
+  }
+
+  public CollectionItemsPaginatedResponse DCReader(int page, int rowsPerPage, String query,
+      String metadata) {
+    Document doc = null;
+    //List of results
+    CollectionItemsPaginatedResponse collectionItemsPaginatedResponse =
+        CollectionItemsPaginatedResponse.builder()
+            .items(null)
+            .page(0)
+            .totalCount(0)
+            .build();
+    List<CollectionItemsResponse> collectionItemsResponseList = new ArrayList<>();
+    try {
+      String url = "https://www.actionfigure411.com/dc/multiverse-price-guide.php";
+      doc = Jsoup.connect(url).get();
+      int contElements = 0;
+      //All elements from main page
+      Elements gridItems = doc.getElementsByClass("container-fluid").get(2)
+          .getElementsByClass("table-responsive");
+      for (int x = 0; x < gridItems.size(); x++) {
+        Elements e = gridItems.get(x)
+            .select("table").select("tbody").select("tr");
+        String serieNew = "";
+        String name = "";
+        String image = "";
+        Integer year = 0;
+        float price = 0;
+        Element ser=gridItems.get(x)
+            .select("table").select("tbody").select("tr[id]").first();
+        //Serie
+        if (ser != null) {
+          if (ser.select("font").text() != "") {
+            serieNew = ser.select("font").text();
+          }
+        }
+        for (int v = 0; v < e.size(); v++) {
+          Elements it = e.get(v).select("tr");
+          //System.out.println(it);
+          Elements nam = it.select("td").select("a[rel]");
+          //if ocurrency is found
+          if (nam.text() != "" && nam.text().toLowerCase(Locale.ROOT).contains(query)) {
+            CollectionItemsResponse collectionItemsResponse = null;
+            //Name
+            name = nam.text();
+            //Image
+            Document link = null;
+            try {
+              link = Jsoup.connect("https://www.actionfigure411.com/" + nam.attr("href"))
+                  .get();
+            } catch (IOException ex) {
+              ex.printStackTrace();
+            }
+            Element im = link.getElementsByClass("overlay-a").first();
+            String linkImg = im.attr("href");
+            ImageResponse imageResponse = ImageResponse.builder()
+                .name(name)
+                .path("https://www.actionfigure411.com" + linkImg)
+                .build();
+            CollectionSeriesListResponse collectionSeriesListResponse = null;
+            //Year
+            Element y = it.select("td").get(5);
+            if (y != null) {
+              year = Integer.valueOf(y.text());
+            }
+            //Price
+            Element p = it.select("td").get(7);
+            if (p != null && p.text() != "") {
+              String pa = p.text().replace("$", "");
+              price = Float.parseFloat(pa);
+            }
+            collectionSeriesListResponse = CollectionSeriesListResponse.builder()
+                .name(serieNew)
+                .build();
+            collectionItemsResponse = CollectionItemsResponse.builder()
+                .name(name)
+                .serie(collectionSeriesListResponse)
+                .year(year)
+                .image(imageResponse)
+                .price(price)
+                .build();
+            contElements++;
+            collectionItemsResponseList.add(collectionItemsResponse);
+            collectionItemsPaginatedResponse.setTotalCount(contElements);
+          }
+        }
+        collectionItemsPaginatedResponse.setPage(page);
+        int from = (page * rowsPerPage) - rowsPerPage;
+        int to = Math.min(collectionItemsResponseList.size(), ((page * rowsPerPage)));
+        collectionItemsPaginatedResponse.setItems(collectionItemsResponseList.subList(from, to));
+        return collectionItemsPaginatedResponse;
+      }
+      return null;
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+    return null;
+  }
+
   public CollectionItemsPaginatedResponse HotWheelsScrapper(int page, int rowsPerPage, String query,
       String metadata) {
     return HotWheelsReader(page, rowsPerPage, query, metadata);

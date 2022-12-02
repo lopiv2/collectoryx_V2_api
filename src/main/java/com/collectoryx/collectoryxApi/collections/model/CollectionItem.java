@@ -63,7 +63,7 @@ public class CollectionItem {
   protected String notes;
 
   @Column
-  @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
-  @Temporal(TemporalType.TIMESTAMP)
+  @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-d", locale = "en_GB")
+  @Temporal(TemporalType.DATE)
   private Date acquiringDate;
 }

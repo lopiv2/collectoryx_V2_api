@@ -39,13 +39,11 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.Year;
 import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -448,7 +446,9 @@ public class CollectionService {
     }
     this.imageRepository.save((image));
     collectionList.setTotalItems(collectionList.getTotalItems() + 1);
+    Date acDate=request.getAcquiringDate();
     if (request.isOwn()) {
+      acDate=new Date();
       collectionList.setOwned(collectionList.getOwned() + 1);
       collectionList.setTotalPrice(collectionList.getTotalPrice() + request.getPrice());
     }
@@ -461,7 +461,7 @@ public class CollectionService {
         .serie(collectionSeriesList)
         .price(request.getPrice())
         .year(request.getYear())
-        .acquiringDate(request.getAcquiringDate())
+        .acquiringDate(acDate)
         .own(request.isOwn())
         .notes(request.getNotes())
         .image(image)
@@ -536,6 +536,7 @@ public class CollectionService {
   public boolean deleteCollectionItem(Long id) throws NotFoundException {
     CollectionItem col = this.collectionItemRepository.findById(id)
         .orElseThrow(NotFoundException::new);
+    Long serieId = col.getSerie().getId();
     CollectionList collectionList = this.collectionListRepository.findById(
         col.getCollection().getId()).orElseThrow(NotFoundException::new);
     collectionList.setTotalItems(collectionList.getTotalItems() - 1);
@@ -552,6 +553,10 @@ public class CollectionService {
       this.collectionItemsMetadataRepository.deleteAll(collectionItemsMetadata);
     }
     this.collectionItemRepository.deleteById(col.getId());
+    Long itemsWithSerie = this.collectionItemRepository.countBySerie_Id(serieId);
+    if (itemsWithSerie == 0) {
+      this.collectionSeriesListRepository.deleteById(serieId);
+    }
     return true;
   }
 
@@ -577,6 +582,12 @@ public class CollectionService {
         .findAllBySerie_Id(id);
     CollectionSeriesList collectionSeriesList = this.collectionSeriesListRepository.findByName(
         "default");
+    if (collectionSeriesList == null) {
+      collectionSeriesList = CollectionSeriesList.builder()
+          .name("default")
+          .build();
+      this.collectionSeriesListRepository.save(collectionSeriesList);
+    }
     for (CollectionItem item : collectionItemList) {
       item.setSerie(collectionSeriesList);
       this.collectionItemRepository.save(item);
@@ -820,7 +831,8 @@ public class CollectionService {
       throw new RuntimeException(e);
     }
 
-    String[] HEADERS = {"Image", "Name", "Collection", "Serie", "AcquiringDate", "Year", "Price", "Own", "Notes"};
+    String[] HEADERS = {"Image", "Name", "Collection", "Serie", "AcquiringDate", "Year", "Price",
+        "Own", "Notes"};
 
     Iterable<CSVRecord> records = null;
     CSVParser csvParser = null;
@@ -873,7 +885,7 @@ public class CollectionService {
     String name = "";
     String serie = "";
     long collection = 0;
-    String acquiringDate="";
+    String acquiringDate = "";
     String own = "";
     String wanted = "";
     String price = "";
@@ -938,7 +950,12 @@ public class CollectionService {
       } catch (NumberFormatException e) {
         ye = 2022;
       }
+      Date d = null;
       if (record.get(own).contains("1")) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-d", Locale.ENGLISH);
+        LocalDate date = LocalDate.parse(record.get(acquiringDate), formatter);
+        ZoneId defaultZoneId = ZoneId.systemDefault();
+        d = Date.from(date.atStartOfDay(defaultZoneId).toInstant());
         ow = true;
       } else {
         ow = false;
@@ -948,30 +965,19 @@ public class CollectionService {
       } else {
         want = false;
       }
-      DateFormat formatter = null;
-      if (record.get(acquiringDate).contains("GMT")) {
-        formatter = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss z",
-            Locale.US);
-      } else {
-        formatter = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss Z",
-            Locale.US);
-      }
+
       CollectionItem collectionItem = null;
-      try {
-        collectionItem = CollectionItem.builder()
-            .name(record.get(name))
-            .own(ow)
-            .acquiringDate(formatter.parse(record.get(acquiringDate)))
-            .price(pric)
-            .notes(record.get(notes))
-            .year(ye)
-            .wanted(want)
-            .serie(collectionSeriesList)
-            .collection(collectionList)
-            .build();
-      } catch (ParseException e) {
-        e.printStackTrace();
-      }
+      collectionItem = CollectionItem.builder()
+          .name(record.get(name))
+          .own(ow)
+          .acquiringDate(d)
+          .price(pric)
+          .notes(record.get(notes))
+          .year(ye)
+          .wanted(want)
+          .serie(collectionSeriesList)
+          .collection(collectionList)
+          .build();
 
       collectionList.setTotalItems(collectionList.getTotalItems() + 1);
       if (ow == true) {

@@ -60,4 +60,16 @@ public class ScrapperController {
         .MarvelScrapper(page, rowsPerPage, query, metadata);
     return collectionItemsResponseList;
   }
+
+  @GetMapping(value = "/get-dc-multiverse")
+  public CollectionItemsPaginatedResponse getDC(
+      @RequestParam int page,
+      @RequestParam int rowsPerPage,
+      @RequestParam String query,
+      @RequestParam String metadata,
+      @RequestHeader(value = "Authorization") String token) {
+    CollectionItemsPaginatedResponse collectionItemsResponseList = this.scrapperApiService
+        .DCScrapper(page, rowsPerPage, query, metadata);
+    return collectionItemsResponseList;
+  }
 }

@@ -47,4 +47,6 @@ public interface CollectionItemRepository extends JpaRepository<CollectionItem, 
       Pageable pageable);
 
   List<CollectionItem> findByImage_Id(Long id);
+
+  Long countBySerie_Id(Long serieId);
 }

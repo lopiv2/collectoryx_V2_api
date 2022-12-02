@@ -14,6 +14,7 @@ public class ConfigResponse {
 
   private Integer id;
   private ThemeResponse theme;
+  private String latestVersion;
   private boolean expensivePanel;
   private boolean wishlistPanel;
   private boolean recentPurchasePanel;

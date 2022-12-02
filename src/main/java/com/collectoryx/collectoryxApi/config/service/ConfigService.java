@@ -27,6 +27,8 @@ import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 import javax.transaction.Transactional;
 import org.json.JSONArray;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Element;
 import org.springframework.data.crossstore.ChangeSetPersister.NotFoundException;
 import org.springframework.stereotype.Service;
 
@@ -178,9 +180,25 @@ public class ConfigService {
         .collect(Collectors.toList());
   }
 
+  public String getLatestVersion() {
+    String url = "https://github.com/lopiv2/collectoryx_v2_front";
+    Element j = null;
+    try {
+      j = Jsoup.connect(url).get();
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+    Element version = j.select("table").first().select("tbody")
+        .first().select("tr").first().select("td").get(2);
+    int vPos = version.text().indexOf("currently");
+    String latestVersion = version.text().substring(vPos + 10).replace(")", "");
+    return latestVersion;
+  }
+
   public ConfigResponse getUserConfig(Long id) {
     Config config = this.configRepository.findByUser_Id(id);
-    return toConfigResponse(config);
+    String v = getLatestVersion();
+    return toConfigResponse(config, v);
   }
 
   public ConfigResponse saveConfig(ConfigRequest item) throws NotFoundException {
@@ -236,9 +254,22 @@ public class ConfigService {
         .build();
   }
 
+
   private ConfigResponse toConfigResponse(Config request) {
     return ConfigResponse.builder()
         .id(request.getId())
+        .wishlistPanel(request.isWishlistPanel())
+        .expensivePanel(request.isExpensiveItemPanel())
+        .completedCollectionsPanel(request.isCompletedCollectionsPanel())
+        .recentPurchasePanel(request.isRecentPurchasePanel())
+        .darkTheme(request.isDarkTheme())
+        .build();
+  }
+
+  private ConfigResponse toConfigResponse(Config request, String version) {
+    return ConfigResponse.builder()
+        .id(request.getId())
+        .latestVersion(version)
         .wishlistPanel(request.isWishlistPanel())
         .expensivePanel(request.isExpensiveItemPanel())
         .completedCollectionsPanel(request.isCompletedCollectionsPanel())
