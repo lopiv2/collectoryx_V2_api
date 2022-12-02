@@ -470,14 +470,16 @@ public class CollectionService {
     this.collectionItemRepository.save(collectionItem);
     CollectionItem collectionItem1 = this.collectionItemRepository.findById(collectionItem.getId())
         .orElseThrow(NotFoundException::new);
-    for (CollectionItemMetadataRequest c : request.getMetadata()) {
-      CollectionMetadata collectionMetadata = this.collectionMetadataRepository.findById(c.getId());
-      CollectionItemsMetadata collectionItemsMetadata = CollectionItemsMetadata.builder()
-          .value(c.getValue())
-          .item(collectionItem1)
-          .metadata(collectionMetadata)
-          .build();
-      this.collectionItemsMetadataRepository.save(collectionItemsMetadata);
+    if(request.getMetadata()!=null){
+      for (CollectionItemMetadataRequest c : request.getMetadata()) {
+        CollectionMetadata collectionMetadata = this.collectionMetadataRepository.findById(c.getId());
+        CollectionItemsMetadata collectionItemsMetadata = CollectionItemsMetadata.builder()
+            .value(c.getValue())
+            .item(collectionItem1)
+            .metadata(collectionMetadata)
+            .build();
+        this.collectionItemsMetadataRepository.save(collectionItemsMetadata);
+      }
     }
   }
 
