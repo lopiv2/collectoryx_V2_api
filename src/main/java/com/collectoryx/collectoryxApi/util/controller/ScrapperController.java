@@ -3,6 +3,7 @@ package com.collectoryx.collectoryxApi.util.controller;
 import com.collectoryx.collectoryxApi.collections.rest.response.CollectionItemsPaginatedResponse;
 import com.collectoryx.collectoryxApi.util.rest.request.ScrapperApiRequest;
 import com.collectoryx.collectoryxApi.util.service.ScrapperApiService;
+import java.io.IOException;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -58,6 +59,18 @@ public class ScrapperController {
       @RequestHeader(value = "Authorization") String token) {
     CollectionItemsPaginatedResponse collectionItemsResponseList = this.scrapperApiService
         .MarvelScrapper(page, rowsPerPage, query, metadata);
+    return collectionItemsResponseList;
+  }
+
+  @GetMapping(value = "/get-motu")
+  public CollectionItemsPaginatedResponse getMotu(
+      @RequestParam int page,
+      @RequestParam int rowsPerPage,
+      @RequestParam String query,
+      @RequestParam String metadata,
+      @RequestHeader(value = "Authorization") String token) throws IOException {
+    CollectionItemsPaginatedResponse collectionItemsResponseList = this.scrapperApiService
+        .MotuScrapper(page, rowsPerPage, query, metadata);
     return collectionItemsResponseList;
   }
 

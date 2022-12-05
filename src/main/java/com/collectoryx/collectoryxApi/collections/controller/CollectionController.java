@@ -70,6 +70,20 @@ public class CollectionController {
     return Mono.just(collectionResponses);
   }
 
+  @PostMapping(value = "/collections/get-item-data")
+  public Mono<CollectionItemsResponse> getCollectionItemByData(
+      @RequestBody CollectionItemRequest collectionItemRequest,
+      @RequestHeader(value = "Authorization") String token) throws NotFoundException {
+    PagingResponse<CollectionItemsResponse> collectionResponses = null;
+    CollectionItemsResponse collectionItemsResponse = this.collectionService.getCollectionItemByData(
+        collectionItemRequest);
+    if (collectionItemsResponse != null) {
+      return Mono.just(collectionItemsResponse);
+    } else {
+      return null;
+    }
+  }
+
   @PostMapping(value = "/collections/recent")
   public Mono<PagingResponse<CollectionItemsResponse>> getRecentCollectionItemsById(
       @RequestBody PageFrontRequest pageFrontRequest,
@@ -79,14 +93,6 @@ public class CollectionController {
         getAllCollectionItemsByUserId(pageFrontRequest);
     return Mono.just(collectionResponses);
   }
-
-  /*@GetMapping(value = "/collections/{id}")
-  public Mono<List<CollectionItemsResponse>> getCollectionItemsById(@PathVariable("id") Long id,
-      @RequestHeader(value = "Authorization") String token) {
-    List<CollectionItemsResponse> collectionResponses = this.collectionService.
-        getCollectionItemsById(id);
-    return Mono.just(collectionResponses);
-  }*/
 
   @GetMapping(value = "/count-collections/{id}")
   public Mono<Long> getCountCollectionsById(@PathVariable("id") Long id,

@@ -470,9 +470,10 @@ public class CollectionService {
     this.collectionItemRepository.save(collectionItem);
     CollectionItem collectionItem1 = this.collectionItemRepository.findById(collectionItem.getId())
         .orElseThrow(NotFoundException::new);
-    if(request.getMetadata()!=null){
+    if (request.getMetadata() != null) {
       for (CollectionItemMetadataRequest c : request.getMetadata()) {
-        CollectionMetadata collectionMetadata = this.collectionMetadataRepository.findById(c.getId());
+        CollectionMetadata collectionMetadata = this.collectionMetadataRepository.findById(
+            c.getId());
         CollectionItemsMetadata collectionItemsMetadata = CollectionItemsMetadata.builder()
             .value(c.getValue())
             .item(collectionItem1)
@@ -616,6 +617,18 @@ public class CollectionService {
     CollectionItem col = this.collectionItemRepository.findById(id)
         .orElseThrow(NotFoundException::new);
     CollectionItemsResponse collectionItemsResponse = toCollectionItemResponse(col);
+    return collectionItemsResponse;
+  }
+
+  public CollectionItemsResponse getCollectionItemByData(CollectionItemRequest request)
+      throws NotFoundException {
+    CollectionItem col = this.collectionItemRepository.findByNameAndYearAndSerie_Name(
+            request.getName(), request.getYear(), request.getSerie())
+        .orElse(null);
+    CollectionItemsResponse collectionItemsResponse = null;
+    if (col != null) {
+      collectionItemsResponse = toCollectionItemResponse(col);
+    }
     return collectionItemsResponse;
   }
 

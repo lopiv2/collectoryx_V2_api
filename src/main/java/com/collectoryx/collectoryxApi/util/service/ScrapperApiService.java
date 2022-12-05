@@ -74,7 +74,7 @@ public class ScrapperApiService {
         String image = "";
         Integer year = 0;
         float price = 0;
-        Element ser=gridItems.get(x)
+        Element ser = gridItems.get(x)
             .select("table").select("tbody").select("tr[id]").first();
         //Serie
         if (ser != null) {
@@ -400,6 +400,108 @@ public class ScrapperApiService {
       e.printStackTrace();
     }
     return null;
+  }
+
+  public CollectionItemsPaginatedResponse MotuScrapper(int page, int rowsPerPage, String
+      query,
+      String metadata) throws IOException {
+    return MotuReader(page, rowsPerPage, query, metadata);
+  }
+
+  public CollectionItemsPaginatedResponse MotuReader(int page, int rowsPerPage, String query,
+      String metadata) throws IOException {
+    Document doc = null;
+    //List of results
+    CollectionItemsPaginatedResponse collectionItemsPaginatedResponse =
+        CollectionItemsPaginatedResponse.builder()
+            .items(null)
+            .page(0)
+            .totalCount(0)
+            .build();
+    List<CollectionItemsResponse> collectionItemsResponseList = new ArrayList<>();
+    int contElements = 0;
+    String url = "";
+    CollectionSeriesListResponse collectionSeriesListResponse = null;
+    String name = "";
+    String serie = "";
+    switch (metadata) {
+      case "origins":
+        url = "https://www.actionfigure411.com/masters-of-the-universe/origins-checklist.php";
+        serie = "Origins";
+        break;
+      case "original":
+        url = "https://www.actionfigure411.com/masters-of-the-universe/original-checklist.php";
+        serie = "Original";
+        break;
+      case "classics":
+        url = "https://www.actionfigure411.com/masters-of-the-universe/mattel-classics-checklist.php";
+        serie = "Classics";
+        break;
+      case "masterverse":
+        url = "https://www.actionfigure411.com/masters-of-the-universe/masterverse-checklist.php";
+        serie = "Masterverse";
+        break;
+      case "super7":
+        url = "https://www.actionfigure411.com/masters-of-the-universe/super7-checklist.php";
+        serie = "Super7";
+        break;
+      default:
+        return null;
+    }
+    collectionSeriesListResponse = CollectionSeriesListResponse.builder()
+        .name(serie)
+        .build();
+    doc = Jsoup.connect(url).get();
+    Elements e = doc
+        .getElementsByAttributeValueContaining("href", "actionfigure411");
+
+    for (int v = 0; v < e.size(); v++) {
+      if (e.get(v).text().toLowerCase(Locale.ROOT).contains((query))) {
+        name = e.get(v).text();
+        CollectionItemsResponse collectionItemsResponse = null;
+        Document p = Jsoup.connect(e.get(v).attr("href")).get();
+        //Image
+        Element im = p.getElementsByClass("overlay-a").first();
+        String linkImg = im.attr("href");
+        //Year
+        Element listGroup = p.getElementsByClass("list-group").first();
+        Element yearParsed = listGroup.getElementsByClass("list-group-item").get(1);
+        Integer year = Integer.valueOf(yearParsed.toString()
+            .substring(yearParsed.toString().indexOf("Year</b>: ") + 10,
+                yearParsed.toString().indexOf("Year</b>: ") + 14));
+        Element priceParsed = listGroup.getElementsByClass("list-group-item").get(1);
+        int priceString = priceParsed.toString().indexOf("Retail</b>: ");
+        //Price
+        float price = 0;
+        if (priceString != -1) {
+          String pri = priceParsed.toString()
+              .substring(priceString + 13,
+                  priceString + 18);
+          String str = pri.replaceAll("[^\\d.]", "");
+          price = Float.parseFloat(str);
+        }
+        ImageResponse imageResponse = ImageResponse.builder()
+            .name(name)
+            .path("https://www.actionfigure411.com" + linkImg)
+            .build();
+        collectionItemsResponse = CollectionItemsResponse.builder()
+            .name(name)
+            .serie(collectionSeriesListResponse)
+            .year(year)
+            .image(imageResponse)
+            .price(price)
+            .build();
+        contElements++;
+        collectionItemsResponseList.add(collectionItemsResponse);
+        collectionItemsPaginatedResponse.setTotalCount(contElements);
+      }
+    }
+
+    collectionItemsPaginatedResponse.setPage(page);
+    int from = (page * rowsPerPage) - rowsPerPage;
+    int to = Math.min(collectionItemsResponseList.size(), ((page * rowsPerPage)));
+    collectionItemsPaginatedResponse.setItems(collectionItemsResponseList.subList(from, to));
+    return collectionItemsPaginatedResponse;
   }
 
   public Mono<String> PokemonApiReader(ScrapperApiRequest scrapperApiRequest) {

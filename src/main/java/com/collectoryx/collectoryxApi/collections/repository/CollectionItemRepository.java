@@ -3,6 +3,7 @@ package com.collectoryx.collectoryxApi.collections.repository;
 import com.collectoryx.collectoryxApi.collections.model.CollectionItem;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -49,4 +50,6 @@ public interface CollectionItemRepository extends JpaRepository<CollectionItem, 
   List<CollectionItem> findByImage_Id(Long id);
 
   Long countBySerie_Id(Long serieId);
+
+  Optional<CollectionItem> findByNameAndYearAndSerie_Name(String name, Integer year, String serie);
 }

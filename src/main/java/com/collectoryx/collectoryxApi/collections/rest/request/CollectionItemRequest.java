@@ -15,6 +15,12 @@ public class CollectionItemRequest {
   @NotEmpty
   protected Long id;
 
+  protected String name;
+
+  protected Integer year;
+
+  protected String serie;
+
   @NotEmpty
   protected Boolean own;
 
