@@ -145,6 +145,119 @@ public class ScrapperApiService {
     return null;
   }
 
+  public CollectionItemsPaginatedResponse GijoeScrapper(int page, int rowsPerPage, String query,
+      String metadata) throws IOException {
+    return GijoeReader(page, rowsPerPage, query, metadata);
+  }
+
+  public CollectionItemsPaginatedResponse GijoeReader(int page, int rowsPerPage, String query,
+      String metadata) throws IOException {
+    Document doc = null;
+    //List of results
+    CollectionItemsPaginatedResponse collectionItemsPaginatedResponse =
+        CollectionItemsPaginatedResponse.builder()
+            .items(null)
+            .page(0)
+            .totalCount(0)
+            .build();
+    List<CollectionItemsResponse> collectionItemsResponseList = new ArrayList<>();
+    int contElements = 0;
+    String url = "";
+    CollectionSeriesListResponse collectionSeriesListResponse = null;
+    String name = "";
+    String serie = "";
+    switch (metadata) {
+      case "classified":
+        url = "https://www.actionfigure411.com/gijoe/classified-checklist.php";
+        serie = "Classified";
+        break;
+      case "retro":
+        url = "https://www.actionfigure411.com/gijoe/retro-checklist.php";
+        serie = "Retro";
+        break;
+      case "classic":
+        url = "https://www.actionfigure411.com/gijoe/classic-checklist.php";
+        serie = "Classic";
+        break;
+      case "ultimates":
+        url = "https://www.actionfigure411.com/gijoe/super7-checklist.php";
+        serie = "Ultimates";
+        break;
+      case "reaction":
+        url = "https://www.actionfigure411.com/gijoe/super7-reaction-checklist.php";
+        serie = "ReAction";
+        break;
+      case "25":
+        url = "https://www.actionfigure411.com/gijoe/25th-anniversary-checklist.php";
+        serie = "25 Anniversary";
+        break;
+      default:
+        return null;
+    }
+    collectionSeriesListResponse = CollectionSeriesListResponse.builder()
+        .name(serie)
+        .build();
+    doc = Jsoup.connect(url).get();
+    Elements e = doc
+        .getElementsByAttributeValueContaining("href", "actionfigure411");
+
+    for (int v = 0; v < e.size(); v++) {
+      if (e.get(v).text().toLowerCase(Locale.ROOT).contains((query))) {
+        List<CollectionItemMetadataResponse> collectionItemMetadataResponseList = new ArrayList<>();
+        CollectionItemMetadataResponse collectionItemMetadataWaveResponse = CollectionItemMetadataResponse.builder()
+            .name("Wave")
+            .value(e.get(v).parent().nextElementSibling().text())
+            .type(CollectionMetadataType.STRING)
+            .build();
+        collectionItemMetadataResponseList.add(collectionItemMetadataWaveResponse);
+        name = e.get(v).text();
+        CollectionItemsResponse collectionItemsResponse = null;
+        Document p = Jsoup.connect(e.get(v).attr("href")).get();
+        //Image
+        Element im = p.getElementsByClass("overlay-a").first();
+        String linkImg = im.attr("href");
+        //Year
+        Element listGroup = p.getElementsByClass("list-group").first();
+        Element yearParsed = listGroup.getElementsByClass("list-group-item").get(1);
+        Integer year = Integer.valueOf(yearParsed.toString()
+            .substring(yearParsed.toString().indexOf("Year</b>: ") + 10,
+                yearParsed.toString().indexOf("Year</b>: ") + 14));
+        Element priceParsed = listGroup.getElementsByClass("list-group-item").get(1);
+        int priceString = priceParsed.toString().indexOf("Retail</b>: ");
+        //Price
+        float price = 0;
+        if (priceString != -1) {
+          String pri = priceParsed.toString()
+              .substring(priceString + 13,
+                  priceString + 18);
+          String str = pri.replaceAll("[^\\d.]", "");
+          price = Float.parseFloat(str);
+        }
+        ImageResponse imageResponse = ImageResponse.builder()
+            .name(name)
+            .path("https://www.actionfigure411.com" + linkImg)
+            .build();
+        collectionItemsResponse = CollectionItemsResponse.builder()
+            .name(name)
+            .serie(collectionSeriesListResponse)
+            .year(year)
+            .metadata(collectionItemMetadataResponseList)
+            .image(imageResponse)
+            .price(price)
+            .build();
+        contElements++;
+        collectionItemsResponseList.add(collectionItemsResponse);
+        collectionItemsPaginatedResponse.setTotalCount(contElements);
+      }
+    }
+
+    collectionItemsPaginatedResponse.setPage(page);
+    int from = (page * rowsPerPage) - rowsPerPage;
+    int to = Math.min(collectionItemsResponseList.size(), ((page * rowsPerPage)));
+    collectionItemsPaginatedResponse.setItems(collectionItemsResponseList.subList(from, to));
+    return collectionItemsPaginatedResponse;
+  }
+
   public CollectionItemsPaginatedResponse HotWheelsScrapper(int page, int rowsPerPage, String query,
       String metadata) {
     return HotWheelsReader(page, rowsPerPage, query, metadata);
@@ -504,6 +617,206 @@ public class ScrapperApiService {
     return collectionItemsPaginatedResponse;
   }
 
+  public CollectionItemsPaginatedResponse StarWarsScrapper(int page, int rowsPerPage, String
+      query,
+      String metadata) throws IOException {
+    return StarWarsReader(page, rowsPerPage, query, metadata);
+  }
+
+  public CollectionItemsPaginatedResponse StarWarsReader(int page, int rowsPerPage, String query,
+      String metadata) throws IOException {
+    Document doc = null;
+    //List of results
+    CollectionItemsPaginatedResponse collectionItemsPaginatedResponse =
+        CollectionItemsPaginatedResponse.builder()
+            .items(null)
+            .page(0)
+            .totalCount(0)
+            .build();
+    List<CollectionItemsResponse> collectionItemsResponseList = new ArrayList<>();
+    int contElements = 0;
+    String url = "";
+    CollectionSeriesListResponse collectionSeriesListResponse = null;
+    String name = "";
+    String serie = "";
+    switch (metadata) {
+      case "vintage":
+        url = "https://www.actionfigure411.com/star-wars/vintage-collection-checklist.php";
+        serie = "Vintage Collection";
+        break;
+      case "black":
+        url = "https://www.actionfigure411.com/star-wars/black-series-checklist.php";
+        serie = "Black Series";
+        break;
+      default:
+        return null;
+    }
+    collectionSeriesListResponse = CollectionSeriesListResponse.builder()
+        .name(serie)
+        .build();
+    doc = Jsoup.connect(url).get();
+    Elements e = doc
+        .getElementsByAttributeValueContaining("href", "actionfigure411");
+
+    for (int v = 0; v < e.size(); v++) {
+      if (e.get(v).text().toLowerCase(Locale.ROOT).contains((query))) {
+        List<CollectionItemMetadataResponse> collectionItemMetadataResponseList = new ArrayList<>();
+        CollectionItemMetadataResponse collectionItemMetadataWaveResponse = CollectionItemMetadataResponse.builder()
+            .name("Wave")
+            .value(e.get(v).parent().nextElementSibling().text())
+            .type(CollectionMetadataType.STRING)
+            .build();
+        collectionItemMetadataResponseList.add(collectionItemMetadataWaveResponse);
+        name = e.get(v).text();
+        CollectionItemsResponse collectionItemsResponse = null;
+        Document p = Jsoup.connect(e.get(v).attr("href")).get();
+        //Image
+        Element im = p.getElementsByClass("overlay-a").first();
+        String linkImg = im.attr("href");
+        //Year
+        Element listGroup = p.getElementsByClass("list-group").first();
+        Element yearParsed = listGroup.getElementsByClass("list-group-item").get(1);
+        Integer year = Integer.valueOf(yearParsed.toString()
+            .substring(yearParsed.toString().indexOf("Year</b>: ") + 10,
+                yearParsed.toString().indexOf("Year</b>: ") + 14));
+        Element priceParsed = listGroup.getElementsByClass("list-group-item").get(1);
+        int priceString = priceParsed.toString().indexOf("Retail</b>: ");
+        //Price
+        float price = 0;
+        if (priceString != -1) {
+          String pri = priceParsed.toString()
+              .substring(priceString + 13,
+                  priceString + 18);
+          String str = pri.replaceAll("[^\\d.]", "");
+          price = Float.parseFloat(str);
+        }
+        ImageResponse imageResponse = ImageResponse.builder()
+            .name(name)
+            .path("https://www.actionfigure411.com" + linkImg)
+            .build();
+        collectionItemsResponse = CollectionItemsResponse.builder()
+            .name(name)
+            .serie(collectionSeriesListResponse)
+            .year(year)
+            .metadata(collectionItemMetadataResponseList)
+            .image(imageResponse)
+            .price(price)
+            .build();
+        contElements++;
+        collectionItemsResponseList.add(collectionItemsResponse);
+        collectionItemsPaginatedResponse.setTotalCount(contElements);
+      }
+    }
+
+    collectionItemsPaginatedResponse.setPage(page);
+    int from = (page * rowsPerPage) - rowsPerPage;
+    int to = Math.min(collectionItemsResponseList.size(), ((page * rowsPerPage)));
+    collectionItemsPaginatedResponse.setItems(collectionItemsResponseList.subList(from, to));
+    return collectionItemsPaginatedResponse;
+  }
+
+  public CollectionItemsPaginatedResponse TMNTScrapper(int page, int rowsPerPage, String query,
+      String metadata)
+      throws IOException {
+    return TMNTReader(page, rowsPerPage, query, metadata);
+  }
+
+  private CollectionItemsPaginatedResponse TMNTReader(int page, int rowsPerPage, String query,
+      String metadata)
+      throws IOException {
+    Document doc = null;
+    //List of results
+    CollectionItemsPaginatedResponse collectionItemsPaginatedResponse =
+        CollectionItemsPaginatedResponse.builder()
+            .items(null)
+            .page(0)
+            .totalCount(0)
+            .build();
+    List<CollectionItemsResponse> collectionItemsResponseList = new ArrayList<>();
+    int contElements = 0;
+    String url = "";
+    CollectionSeriesListResponse collectionSeriesListResponse = null;
+    String name = "";
+    String serie = "";
+    switch (metadata) {
+      case "neca":
+        url = "https://www.actionfigure411.com/teenage-mutant-ninja-turtles/neca-checklist.php";
+        serie = "NECA";
+        break;
+      case "super7":
+        url = "https://www.actionfigure411.com/teenage-mutant-ninja-turtles/super7-checklist.php";
+        serie = "Super7";
+        break;
+      case "playmates":
+        url = "https://www.actionfigure411.com/teenage-mutant-ninja-turtles/playmates-checklist.php";
+        serie = "Playmates";
+        break;
+      default:
+        return null;
+    }
+    collectionSeriesListResponse = CollectionSeriesListResponse.builder()
+        .name(serie)
+        .build();
+    doc = Jsoup.connect(url).get();
+    Elements e = doc
+        .getElementsByAttributeValueContaining("href", "actionfigure411");
+
+    for (int v = 0; v < e.size(); v++) {
+      if (e.get(v).text().toLowerCase(Locale.ROOT).contains((query))) {
+        List<CollectionItemMetadataResponse> collectionItemMetadataResponseList = new ArrayList<>();
+        CollectionItemMetadataResponse collectionItemMetadataWaveResponse = CollectionItemMetadataResponse.builder()
+            .name("Wave")
+            .value(e.get(v).parent().nextElementSibling().text())
+            .type(CollectionMetadataType.STRING)
+            .build();
+        collectionItemMetadataResponseList.add(collectionItemMetadataWaveResponse);
+        name = e.get(v).text();
+        CollectionItemsResponse collectionItemsResponse = null;
+        Document p = Jsoup.connect(e.get(v).attr("href")).get();
+        //Image
+        Element im = p.getElementsByClass("overlay-a").first();
+        String linkImg = im.attr("href");
+        //Year
+        Element listGroup = p.getElementsByClass("list-group").first();
+        Element yearParsed = listGroup.getElementsByClass("list-group-item").get(1);
+        Integer year = Integer.valueOf(yearParsed.toString()
+            .substring(yearParsed.toString().indexOf("Year</b>: ") + 10,
+                yearParsed.toString().indexOf("Year</b>: ") + 14));
+        Element priceParsed = listGroup.getElementsByClass("list-group-item").get(1);
+        int priceString = priceParsed.toString().indexOf("Retail</b>: ");
+        //Price
+        float price = 0;
+        if (priceString != -1) {
+          String pri = priceParsed.toString()
+              .substring(priceString + 13,
+                  priceString + 18);
+          String str = pri.replaceAll("[^\\d.]", "");
+          price = Float.parseFloat(str);
+        }
+        ImageResponse imageResponse = ImageResponse.builder()
+            .name(name)
+            .path("https://www.actionfigure411.com" + linkImg)
+            .build();
+        collectionItemsResponse = CollectionItemsResponse.builder()
+            .name(name)
+            .serie(collectionSeriesListResponse)
+            .year(year)
+            .metadata(collectionItemMetadataResponseList)
+            .image(imageResponse)
+            .price(price)
+            .build();
+        contElements++;
+        collectionItemsResponseList.add(collectionItemsResponse);
+        collectionItemsPaginatedResponse.setTotalCount(contElements);
+      }
+    }
+    collectionItemsPaginatedResponse.setPage(page);
+    int from = (page * rowsPerPage) - rowsPerPage;
+    int to = Math.min(collectionItemsResponseList.size(), ((page * rowsPerPage)));
+    collectionItemsPaginatedResponse.setItems(collectionItemsResponseList.subList(from, to));
+    return collectionItemsPaginatedResponse;
+  }
+
   public Mono<String> PokemonApiReader(ScrapperApiRequest scrapperApiRequest) {
     WebClient client = WebClient.create(scrapperApiRequest.getUrl());
     String searchUriApi = "/cards?q=name:";
@@ -556,6 +869,5 @@ public class ScrapperApiService {
         .retrieve()
         .bodyToMono(String.class);
   }
-
 
 }

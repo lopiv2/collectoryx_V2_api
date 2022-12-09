@@ -1,5 +1,37 @@
 [
- {
+  {
+  "name": "DC Multiverse",
+  "keyCode": "",
+  "apiLink": "",
+  "logo": "https://www.actionfigure411.com/dc/images/dc-logo.png",
+  "locked": "true",
+  "header": ""
+  },
+  {
+  "name": "Hot Wheels",
+  "keyCode": "",
+  "apiLink": "",
+  "logo": "https://www.pngarts.com/files/11/Hot-Wheels-Logo-PNG-High-Quality-Image.png",
+  "locked": "true",
+  "header": ""
+  },
+  {
+  "name": "Marvel Legends",
+  "keyCode": "",
+  "apiLink": "",
+  "logo": "https://www.actionfigure411.com/marvel/images/marvel-legends-series-logo.png",
+  "locked": "true",
+  "header": ""
+  },
+  {
+  "name": "MOTU",
+  "keyCode": "",
+  "apiLink": "",
+  "logo": "https://www.actionfigure411.com/masters-of-the-universe/images/masters-of-the-universe-logo.png",
+  "locked": "true",
+  "header": ""
+  },
+  {
   "name": "Pokemon TCG",
   "keyCode": "",
   "apiLink": "https://api.pokemontcg.io/v2",
@@ -16,34 +48,10 @@
   "header": "Authorization"
   },
   {
-  "name": "Hot Wheels",
+  "name": "Star Wars",
   "keyCode": "",
   "apiLink": "",
-  "logo": "https://www.pngarts.com/files/11/Hot-Wheels-Logo-PNG-High-Quality-Image.png",
-  "locked": "true",
-  "header": ""
-  },
-  {
-  "name": "MOTU",
-  "keyCode": "",
-  "apiLink": "",
-  "logo": "https://www.actionfigure411.com/masters-of-the-universe/images/masters-of-the-universe-logo.png",
-  "locked": "true",
-  "header": ""
-  },
-  {
-  "name": "Marvel Legends",
-  "keyCode": "",
-  "apiLink": "",
-  "logo": "https://www.actionfigure411.com/marvel/images/marvel-legends-series-logo.png",
-  "locked": "true",
-  "header": ""
-  },
-  {
-  "name": "DC Multiverse",
-  "keyCode": "",
-  "apiLink": "",
-  "logo": "https://www.actionfigure411.com/dc/images/dc-logo.png",
+  "logo": "https://www.actionfigure411.com/star-wars/images/star-wars-logo.png",
   "locked": "true",
   "header": ""
   },

@@ -85,4 +85,40 @@ public class ScrapperController {
         .DCScrapper(page, rowsPerPage, query, metadata);
     return collectionItemsResponseList;
   }
+
+  @GetMapping(value = "/get-gijoe")
+  public CollectionItemsPaginatedResponse getGijoe(
+      @RequestParam int page,
+      @RequestParam int rowsPerPage,
+      @RequestParam String query,
+      @RequestParam String metadata,
+      @RequestHeader(value = "Authorization") String token) throws IOException {
+    CollectionItemsPaginatedResponse collectionItemsResponseList = this.scrapperApiService
+        .GijoeScrapper(page, rowsPerPage, query, metadata);
+    return collectionItemsResponseList;
+  }
+
+  @GetMapping(value = "/get-star-wars")
+  public CollectionItemsPaginatedResponse getStarWars(
+      @RequestParam int page,
+      @RequestParam int rowsPerPage,
+      @RequestParam String query,
+      @RequestParam String metadata,
+      @RequestHeader(value = "Authorization") String token) throws IOException {
+    CollectionItemsPaginatedResponse collectionItemsResponseList = this.scrapperApiService
+        .StarWarsScrapper(page, rowsPerPage, query, metadata);
+    return collectionItemsResponseList;
+  }
+
+  @GetMapping(value = "/get-tmnt")
+  public CollectionItemsPaginatedResponse getTMNT(
+      @RequestParam int page,
+      @RequestParam int rowsPerPage,
+      @RequestParam String query,
+      @RequestParam String metadata,
+      @RequestHeader(value = "Authorization") String token) throws IOException {
+    CollectionItemsPaginatedResponse collectionItemsResponseList = this.scrapperApiService
+        .TMNTScrapper(page, rowsPerPage, query, metadata);
+    return collectionItemsResponseList;
+  }
 }
