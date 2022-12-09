@@ -8,6 +8,14 @@
   "header": ""
   },
   {
+    "name": "Gijoe",
+    "keyCode": "",
+    "apiLink": "",
+    "logo": "https://www.actionfigure411.com/gijoe/images/gijoe-logo.png",
+    "locked": "true",
+    "header": ""
+  },
+  {
   "name": "Hot Wheels",
   "keyCode": "",
   "apiLink": "",
@@ -52,6 +60,14 @@
   "keyCode": "",
   "apiLink": "",
   "logo": "https://www.actionfigure411.com/star-wars/images/star-wars-logo.png",
+  "locked": "true",
+  "header": ""
+  },
+  {
+  "name": "TMNT",
+  "keyCode": "",
+  "apiLink": "",
+  "logo": "https://www.actionfigure411.com/teenage-mutant-ninja-turtles/images/tmnt-main-logo.png",
   "locked": "true",
   "header": ""
   },

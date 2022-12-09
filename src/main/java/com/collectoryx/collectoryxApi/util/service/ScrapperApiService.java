@@ -11,6 +11,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import org.jsoup.Connection.Method;
+import org.jsoup.Connection.Response;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -639,7 +641,37 @@ public class ScrapperApiService {
     CollectionSeriesListResponse collectionSeriesListResponse = null;
     String name = "";
     String serie = "";
-    switch (metadata) {
+    Response response =
+        Jsoup.connect(
+                "https://www.jeditemplearchives.com/content/modules.php?name=JReviews&rop=search&query=")
+            .userAgent("Mozilla/5.0")
+            .timeout(10 * 1000)
+            .method(Method.POST)
+            .data("query", query)
+            .data("search", "")
+            .followRedirects(true)
+            .execute();
+
+    //parse the document from response
+    Document document = Jsoup.parse(response.body());
+    Element searchBox = document.getElementsByClass("rdr-index").first();
+    Elements results = searchBox.select("strong");
+    //Number of elements per collection
+    for (int x = 0; x < results.size(); x++) {
+      name = results.get(x).getElementsByAttributeValueContaining("href", "JReviews").first()
+          .text();
+      System.out.println(name);
+      /*List<CollectionItemMetadataResponse> collectionItemMetadataResponseList = new ArrayList<>();
+      CollectionItemMetadataResponse collectionItemMetadataBrandResponse = CollectionItemMetadataResponse.builder()
+          .name("Brand")
+          .value(results.get(x).nextElementSibling().text())
+          .type(CollectionMetadataType.STRING)
+          .build();
+      collectionItemMetadataResponseList.add(collectionItemMetadataBrandResponse);
+      serie = results.get(x).text();*/
+    }
+    return null;
+    /*switch (metadata) {
       case "vintage":
         url = "https://www.actionfigure411.com/star-wars/vintage-collection-checklist.php";
         serie = "Vintage Collection";
@@ -712,7 +744,7 @@ public class ScrapperApiService {
     int from = (page * rowsPerPage) - rowsPerPage;
     int to = Math.min(collectionItemsResponseList.size(), ((page * rowsPerPage)));
     collectionItemsPaginatedResponse.setItems(collectionItemsResponseList.subList(from, to));
-    return collectionItemsPaginatedResponse;
+    return collectionItemsPaginatedResponse;*/
   }
 
   public CollectionItemsPaginatedResponse TMNTScrapper(int page, int rowsPerPage, String query,
