@@ -637,13 +637,16 @@ public class ScrapperApiService {
             .build();
     List<CollectionItemsResponse> collectionItemsResponseList = new ArrayList<>();
     int contElements = 0;
-    String url = "";
+    String url = "https://www.jeditemplearchives.com/content/";
     CollectionSeriesListResponse collectionSeriesListResponse = null;
+    CollectionItemsResponse collectionItemsResponse = null;
     String name = "";
     String serie = "";
+    float price = 0;
+    Integer year = 0;
     Response response =
         Jsoup.connect(
-                "https://www.jeditemplearchives.com/content/modules.php?name=JReviews&rop=search&query=")
+                url + "modules.php?name=JReviews&rop=search&query=")
             .userAgent("Mozilla/5.0")
             .timeout(10 * 1000)
             .method(Method.POST)
@@ -658,73 +661,47 @@ public class ScrapperApiService {
     Elements results = searchBox.select("strong");
     //Number of elements per collection
     for (int x = 0; x < results.size(); x++) {
-      name = results.get(x).getElementsByAttributeValueContaining("href", "JReviews").first()
-          .text();
-      System.out.println(name);
-      /*List<CollectionItemMetadataResponse> collectionItemMetadataResponseList = new ArrayList<>();
-      CollectionItemMetadataResponse collectionItemMetadataBrandResponse = CollectionItemMetadataResponse.builder()
-          .name("Brand")
-          .value(results.get(x).nextElementSibling().text())
-          .type(CollectionMetadataType.STRING)
-          .build();
-      collectionItemMetadataResponseList.add(collectionItemMetadataBrandResponse);
-      serie = results.get(x).text();*/
-    }
-    return null;
-    /*switch (metadata) {
-      case "vintage":
-        url = "https://www.actionfigure411.com/star-wars/vintage-collection-checklist.php";
-        serie = "Vintage Collection";
-        break;
-      case "black":
-        url = "https://www.actionfigure411.com/star-wars/black-series-checklist.php";
-        serie = "Black Series";
-        break;
-      default:
-        return null;
-    }
-    collectionSeriesListResponse = CollectionSeriesListResponse.builder()
-        .name(serie)
-        .build();
-    doc = Jsoup.connect(url).get();
-    Elements e = doc
-        .getElementsByAttributeValueContaining("href", "actionfigure411");
-
-    for (int v = 0; v < e.size(); v++) {
-      if (e.get(v).text().toLowerCase(Locale.ROOT).contains((query))) {
-        List<CollectionItemMetadataResponse> collectionItemMetadataResponseList = new ArrayList<>();
-        CollectionItemMetadataResponse collectionItemMetadataWaveResponse = CollectionItemMetadataResponse.builder()
-            .name("Wave")
-            .value(e.get(v).parent().nextElementSibling().text())
-            .type(CollectionMetadataType.STRING)
-            .build();
-        collectionItemMetadataResponseList.add(collectionItemMetadataWaveResponse);
-        name = e.get(v).text();
-        CollectionItemsResponse collectionItemsResponse = null;
-        Document p = Jsoup.connect(e.get(v).attr("href")).get();
-        //Image
-        Element im = p.getElementsByClass("overlay-a").first();
-        String linkImg = im.attr("href");
-        //Year
-        Element listGroup = p.getElementsByClass("list-group").first();
-        Element yearParsed = listGroup.getElementsByClass("list-group-item").get(1);
-        Integer year = Integer.valueOf(yearParsed.toString()
-            .substring(yearParsed.toString().indexOf("Year</b>: ") + 10,
-                yearParsed.toString().indexOf("Year</b>: ") + 14));
-        Element priceParsed = listGroup.getElementsByClass("list-group-item").get(1);
-        int priceString = priceParsed.toString().indexOf("Retail</b>: ");
-        //Price
-        float price = 0;
-        if (priceString != -1) {
-          String pri = priceParsed.toString()
-              .substring(priceString + 13,
-                  priceString + 18);
-          String str = pri.replaceAll("[^\\d.]", "");
-          price = Float.parseFloat(str);
+      Element item = results.get(x).getElementsByAttributeValueContaining("href", "modules.php")
+          .first();
+      Document p = Jsoup.connect(url + item.attr("href"))
+          .get();
+      Element it = p.getElementsByClass("RDRBody").first();
+      if (it.text().indexOf("Collection:") != -1 && it.text().indexOf("Number:") != -1
+          && it.text().indexOf("Availability:") != -1 && it.text().indexOf("License:") != -1) {
+        name = it.text().substring(it.text().indexOf("Name:") + 6, it.text().indexOf("Collection"));
+        serie = it.text()
+            .substring(it.text().indexOf("Collection:") + 12, it.text().indexOf("Number:"));
+        String y = it.text()
+            .substring(it.text().indexOf("Availability:") + 14, it.text().indexOf("License:"));
+        if (y.length() < 6) {
+          year = Integer.valueOf(y.substring(0, 3));
+        } else {
+          year = Integer.valueOf(y.substring(y.indexOf(" ") + 1).replace(" ", ""));
         }
+        Element pr = it.select("p:contains(Retail)").first();
+        if (pr.text().indexOf("Retail:") != -1) {
+          price = Float.parseFloat(
+              pr.text().substring(pr.text().indexOf("Retail:") + 9, pr.text().indexOf(" USD")));
+        } else {
+          price = 0;
+        }
+        Element imageBox = p.getElementsByClass("imagebox").first();
+        String linkImg = imageBox.select("td").last().select("a").attr("href");
+        Document im = Jsoup.connect("https://www.jeditemplearchives.com" + linkImg).get();
+        Element imgLink = im.getElementsByAttributeValueContaining("src", ".jpg").first();
         ImageResponse imageResponse = ImageResponse.builder()
             .name(name)
-            .path("https://www.actionfigure411.com" + linkImg)
+            .path(imgLink.attr("abs:src").replace("..", ""))
+            .build();
+        List<CollectionItemMetadataResponse> collectionItemMetadataResponseList = new ArrayList<>();
+        CollectionItemMetadataResponse collectionItemMetadataBrandResponse = CollectionItemMetadataResponse.builder()
+            .name("Brand")
+            .value("Hasbro")
+            .type(CollectionMetadataType.STRING)
+            .build();
+        collectionItemMetadataResponseList.add(collectionItemMetadataBrandResponse);
+        collectionSeriesListResponse = CollectionSeriesListResponse.builder()
+            .name(serie)
             .build();
         collectionItemsResponse = CollectionItemsResponse.builder()
             .name(name)
@@ -739,12 +716,11 @@ public class ScrapperApiService {
         collectionItemsPaginatedResponse.setTotalCount(contElements);
       }
     }
-
     collectionItemsPaginatedResponse.setPage(page);
     int from = (page * rowsPerPage) - rowsPerPage;
     int to = Math.min(collectionItemsResponseList.size(), ((page * rowsPerPage)));
     collectionItemsPaginatedResponse.setItems(collectionItemsResponseList.subList(from, to));
-    return collectionItemsPaginatedResponse;*/
+    return collectionItemsPaginatedResponse;
   }
 
   public CollectionItemsPaginatedResponse TMNTScrapper(int page, int rowsPerPage, String query,
