@@ -17,6 +17,7 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -24,6 +25,9 @@ import reactor.core.publisher.Mono;
 
 @Service
 public class ScrapperApiService {
+
+  @Autowired
+  private WebClient webClient;
 
   public Mono<String> ApiScrapper(ScrapperApiRequest scrapperApiRequest) {
     Mono<String> response = null;
@@ -829,15 +833,15 @@ public class ScrapperApiService {
   }
 
   public Mono<String> PokemonApiReader(ScrapperApiRequest scrapperApiRequest) {
-    WebClient client = WebClient.create(scrapperApiRequest.getUrl());
+    //WebClient client = WebClient.create(scrapperApiRequest.getUrl());
     String query = scrapperApiRequest.getSearchQuery();
     if (scrapperApiRequest.getSearchQuery().contains(" ")) {
       query = "\"" + query + "\"";
     }
     String searchUriApi = "/cards?q=name:";
-    return client
+    return webClient
         .get()
-        .uri(searchUriApi + query + "&page="
+        .uri(scrapperApiRequest.getUrl() + searchUriApi + query + "&page="
             + scrapperApiRequest.getPage() + "&pageSize=" + scrapperApiRequest.getRowsPerPage())
         .header(scrapperApiRequest.getHeader(), scrapperApiRequest.getKeyCode())
         .accept(MediaType.APPLICATION_JSON)
@@ -846,15 +850,16 @@ public class ScrapperApiService {
   }
 
   public Mono<String> GiantBombApiReader(ScrapperApiRequest scrapperApiRequest) {
-    WebClient client = WebClient.create(scrapperApiRequest.getUrl());
+    //WebClient client = WebClient.create(scrapperApiRequest.getUrl());
     String query = scrapperApiRequest.getSearchQuery();
     if (scrapperApiRequest.getSearchQuery().contains(" ")) {
       query = "\"" + query + "\"";
     }
     String searchUriApi = "/search/";
-    return client
+    return webClient
         .get()
-        .uri(searchUriApi + "?query=" + query + "&resources=game" + "&page="
+        .uri(scrapperApiRequest.getUrl() + searchUriApi + "?query=" + query + "&resources=game"
+            + "&page="
             + scrapperApiRequest.getPage() + "&limit=" + scrapperApiRequest.getRowsPerPage()
             + "&api_key=" + scrapperApiRequest.getKeyCode() + "&format=json")
         .accept(MediaType.APPLICATION_JSON)
@@ -863,11 +868,12 @@ public class ScrapperApiService {
   }
 
   public Mono<String> RebrickableApiReader(ScrapperApiRequest scrapperApiRequest) {
-    WebClient client = WebClient.create(scrapperApiRequest.getUrl());
+    //WebClient client = WebClient.create(scrapperApiRequest.getUrl());
     String searchUriApi = "/sets/";
-    return client
+    return webClient
         .get()
-        .uri(searchUriApi + "?page=" + scrapperApiRequest.getPage() + "&page_size="
+        .uri(scrapperApiRequest.getUrl() + searchUriApi + "?page=" + scrapperApiRequest.getPage()
+            + "&page_size="
             + scrapperApiRequest.getRowsPerPage()
             + "&search=" + scrapperApiRequest.getSearchQuery())
         .header(scrapperApiRequest.getHeader(), "key " + scrapperApiRequest.getKeyCode())
@@ -877,11 +883,12 @@ public class ScrapperApiService {
   }
 
   public Mono<String> RebrickableMinifigsApiReader(ScrapperApiRequest scrapperApiRequest) {
-    WebClient client = WebClient.create(scrapperApiRequest.getUrl());
+    //WebClient client = WebClient.create(scrapperApiRequest.getUrl());
     String searchUriApi = "/minifigs/";
-    return client
+    return webClient
         .get()
-        .uri(searchUriApi + "?page=" + scrapperApiRequest.getPage() + "&page_size="
+        .uri(scrapperApiRequest.getUrl() + searchUriApi + "?page=" + scrapperApiRequest.getPage()
+            + "&page_size="
             + scrapperApiRequest.getRowsPerPage()
             + "&search=" + scrapperApiRequest.getSearchQuery())
         .header(scrapperApiRequest.getHeader(), "key " + scrapperApiRequest.getKeyCode())
@@ -891,11 +898,11 @@ public class ScrapperApiService {
   }
 
   public Mono<String> RebrickableSeriesApiReader(ScrapperApiRequest scrapperApiRequest) {
-    WebClient client = WebClient.create(scrapperApiRequest.getUrl());
+    //WebClient client = WebClient.create(scrapperApiRequest.getUrl());
     String searchUriApi = "/themes/";
-    return client
+    return webClient
         .get()
-        .uri(searchUriApi + scrapperApiRequest.getSearchQuery() + "/")
+        .uri(scrapperApiRequest.getUrl() + searchUriApi + scrapperApiRequest.getSearchQuery() + "/")
         .header(scrapperApiRequest.getHeader(), "key " + scrapperApiRequest.getKeyCode())
         .accept(MediaType.APPLICATION_JSON)
         .retrieve()

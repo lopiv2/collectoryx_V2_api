@@ -110,6 +110,7 @@ public class AuthenticationController {
         responseMap.put("token", token);
         responseMap.put("role", role);
         responseMap.put("email", email);
+        this.configService.checkUpdatedApis(id);
         return ResponseEntity.ok(responseMap);
       } else {
         responseMap.put("error", true);

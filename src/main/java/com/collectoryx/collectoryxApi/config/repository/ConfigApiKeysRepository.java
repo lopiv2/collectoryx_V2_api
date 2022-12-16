@@ -9,4 +9,6 @@ import org.springframework.stereotype.Repository;
 public interface ConfigApiKeysRepository extends JpaRepository<ConfigApiKeys, Long> {
 
   List<ConfigApiKeys> findAllByUserId(Long id);
+
+  ConfigApiKeys findByNameAndUser_Id(String name, Long userId);
 }

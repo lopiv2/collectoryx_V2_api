@@ -17,14 +17,9 @@ public class WebClientConfiguration {
         .codecs(codecs -> codecs.defaultCodecs().maxInMemorySize(size))
         .build();
 
-    WebClient webClient = WebClient
-        .builder()
-        .baseUrl("https://countriesnow.space/api/v0.1/countriespopulation/cities")
-        .defaultCookie("cookieKey", "cookieValue")
+    return WebClient.builder()
         .exchangeStrategies(strategies)
-        .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
         .build();
-    return webClient;
   }
 
 }

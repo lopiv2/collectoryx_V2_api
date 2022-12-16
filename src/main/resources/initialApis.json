@@ -75,7 +75,7 @@
   "name": "GiantBomb",
   "keyCode": "",
   "apiLink": "https://www.giantbomb.com/api",
-  "logo": "https://www.giantbomb.com/a/bundles/giantbombsite/images/favicon.ico"",
+  "logo": "https://www.giantbomb.com/a/bundles/giantbombsite/images/favicon.ico",
   "locked": "true",
   "header": ""
   },
@@ -94,5 +94,5 @@
   "logo": "",
   "locked": "true",
   "header": ""
-  },
+  }
 ]

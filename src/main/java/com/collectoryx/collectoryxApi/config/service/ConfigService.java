@@ -122,6 +122,57 @@ public class ConfigService {
     this.configRepository.save(config);
   }
 
+  public void checkUpdatedApis(Long userId) throws NotFoundException {
+    ObjectMapper mapper = new ObjectMapper();
+    mapper.configure(DeserializationFeature.USE_JAVA_ARRAY_FOR_JSON_ARRAY, true);
+    InputStream input = getClass().getClassLoader().getResourceAsStream("initialApis.json");
+    StringBuilder sb = new StringBuilder();
+    User user1 = this.userRepository.findById(userId).orElseThrow(NotFoundException::new);
+    try (InputStreamReader streamReader =
+        new InputStreamReader(input, StandardCharsets.UTF_8);
+        BufferedReader reader = new BufferedReader(streamReader)) {
+      String line;
+      while ((line = reader.readLine()) != null) {
+        sb.append(line);
+      }
+      JSONArray jsonArray = new JSONArray(sb.toString());
+      //System.out.println(jsonArray);
+      try {
+        ConfigApiKeys[] configApiKeysList = mapper.readValue(jsonArray.toString(),
+            ConfigApiKeys[].class);
+        for (ConfigApiKeys conf : configApiKeysList) {
+          ConfigApiKeys configApiKeys = this.configApiKeysRepository.findByNameAndUser_Id(
+              conf.getName(), userId);
+          //If not config api found, create from zero
+          if(configApiKeys==null){
+            ConfigApiKeys configApiKeys1 = ConfigApiKeys.builder()
+                .user(user1)
+                .name(conf.getName())
+                .header(conf.getHeader())
+                .keyCode(conf.getKeyCode())
+                .apiLink(conf.getApiLink())
+                .logo(conf.getLogo())
+                .locked(conf.isLocked())
+                .build();
+            this.configApiKeysRepository.save(configApiKeys1);
+          }
+          //If found, updates it
+          else{
+            configApiKeys.setApiLink(conf.getApiLink());
+            configApiKeys.setLogo(conf.getLogo());
+            configApiKeys.setHeader(conf.getHeader());
+            configApiKeys.setLocked(conf.isLocked());
+            this.configApiKeysRepository.save(configApiKeys);
+          }
+        }
+      } catch (Exception e) {
+        e.printStackTrace();
+      }
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+  }
+
   public void createInitialApiList(User user) {
     ObjectMapper mapper = new ObjectMapper();
     mapper.configure(DeserializationFeature.USE_JAVA_ARRAY_FOR_JSON_ARRAY, true);
