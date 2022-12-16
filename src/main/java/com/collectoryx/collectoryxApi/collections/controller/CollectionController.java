@@ -154,6 +154,13 @@ public class CollectionController {
           throw new RuntimeException(e);
         }
         break;
+      //Any template with metadata available
+      default:
+        try {
+          collectionResponse = this.collectionService.createCollectionNew(collectionRequest);
+        } catch (NotFoundException e) {
+          throw new RuntimeException(e);
+        }
     }
     return Mono.just(collectionResponse);
   }

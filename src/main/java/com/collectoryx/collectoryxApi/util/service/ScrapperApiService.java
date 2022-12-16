@@ -27,6 +27,9 @@ public class ScrapperApiService {
 
   public Mono<String> ApiScrapper(ScrapperApiRequest scrapperApiRequest) {
     Mono<String> response = null;
+    if (scrapperApiRequest.getUrl().contains("giantbomb")) {
+      return GiantBombApiReader(scrapperApiRequest);
+    }
     if (scrapperApiRequest.getUrl().contains("pokemontcg")) {
       return PokemonApiReader(scrapperApiRequest);
     }
@@ -47,7 +50,7 @@ public class ScrapperApiService {
   public CollectionItemsPaginatedResponse DCScrapper(int page, int rowsPerPage, String
       query,
       String metadata) {
-    return DCReader(page, rowsPerPage, query, metadata);
+    return DCReader(page, rowsPerPage, query.toLowerCase(Locale.ROOT), metadata);
   }
 
   public CollectionItemsPaginatedResponse DCReader(int page, int rowsPerPage, String query,
@@ -149,7 +152,7 @@ public class ScrapperApiService {
 
   public CollectionItemsPaginatedResponse GijoeScrapper(int page, int rowsPerPage, String query,
       String metadata) throws IOException {
-    return GijoeReader(page, rowsPerPage, query, metadata);
+    return GijoeReader(page, rowsPerPage, query.toLowerCase(Locale.ROOT), metadata);
   }
 
   public CollectionItemsPaginatedResponse GijoeReader(int page, int rowsPerPage, String query,
@@ -262,7 +265,7 @@ public class ScrapperApiService {
 
   public CollectionItemsPaginatedResponse HotWheelsScrapper(int page, int rowsPerPage, String query,
       String metadata) {
-    return HotWheelsReader(page, rowsPerPage, query, metadata);
+    return HotWheelsReader(page, rowsPerPage, query.toLowerCase(Locale.ROOT), metadata);
   }
 
   public CollectionItemsPaginatedResponse HotWheelsReader(int page, int rowsPerPage, String query,
@@ -389,7 +392,7 @@ public class ScrapperApiService {
   public CollectionItemsPaginatedResponse MarvelScrapper(int page, int rowsPerPage, String
       query,
       String metadata) {
-    return MarvelReader(page, rowsPerPage, query, metadata);
+    return MarvelReader(page, rowsPerPage, query.toLowerCase(Locale.ROOT), metadata);
   }
 
   public CollectionItemsPaginatedResponse MarvelReader(int page, int rowsPerPage, String query,
@@ -520,7 +523,7 @@ public class ScrapperApiService {
   public CollectionItemsPaginatedResponse MotuScrapper(int page, int rowsPerPage, String
       query,
       String metadata) throws IOException {
-    return MotuReader(page, rowsPerPage, query, metadata);
+    return MotuReader(page, rowsPerPage, query.toLowerCase(Locale.ROOT), metadata);
   }
 
   public CollectionItemsPaginatedResponse MotuReader(int page, int rowsPerPage, String query,
@@ -622,7 +625,7 @@ public class ScrapperApiService {
   public CollectionItemsPaginatedResponse StarWarsScrapper(int page, int rowsPerPage, String
       query,
       String metadata) throws IOException {
-    return StarWarsReader(page, rowsPerPage, query, metadata);
+    return StarWarsReader(page, rowsPerPage, query.toLowerCase(Locale.ROOT), metadata);
   }
 
   public CollectionItemsPaginatedResponse StarWarsReader(int page, int rowsPerPage, String query,
@@ -726,7 +729,7 @@ public class ScrapperApiService {
   public CollectionItemsPaginatedResponse TMNTScrapper(int page, int rowsPerPage, String query,
       String metadata)
       throws IOException {
-    return TMNTReader(page, rowsPerPage, query, metadata);
+    return TMNTReader(page, rowsPerPage, query.toLowerCase(Locale.ROOT), metadata);
   }
 
   private CollectionItemsPaginatedResponse TMNTReader(int page, int rowsPerPage, String query,
@@ -827,12 +830,33 @@ public class ScrapperApiService {
 
   public Mono<String> PokemonApiReader(ScrapperApiRequest scrapperApiRequest) {
     WebClient client = WebClient.create(scrapperApiRequest.getUrl());
+    String query = scrapperApiRequest.getSearchQuery();
+    if (scrapperApiRequest.getSearchQuery().contains(" ")) {
+      query = "\"" + query + "\"";
+    }
     String searchUriApi = "/cards?q=name:";
     return client
         .get()
-        .uri(searchUriApi + scrapperApiRequest.getSearchQuery() + "&page="
+        .uri(searchUriApi + query + "&page="
             + scrapperApiRequest.getPage() + "&pageSize=" + scrapperApiRequest.getRowsPerPage())
         .header(scrapperApiRequest.getHeader(), scrapperApiRequest.getKeyCode())
+        .accept(MediaType.APPLICATION_JSON)
+        .retrieve()
+        .bodyToMono(String.class);
+  }
+
+  public Mono<String> GiantBombApiReader(ScrapperApiRequest scrapperApiRequest) {
+    WebClient client = WebClient.create(scrapperApiRequest.getUrl());
+    String query = scrapperApiRequest.getSearchQuery();
+    if (scrapperApiRequest.getSearchQuery().contains(" ")) {
+      query = "\"" + query + "\"";
+    }
+    String searchUriApi = "/search/";
+    return client
+        .get()
+        .uri(searchUriApi + "?query=" + query + "&resources=game" + "&page="
+            + scrapperApiRequest.getPage() + "&limit=" + scrapperApiRequest.getRowsPerPage()
+            + "&api_key=" + scrapperApiRequest.getKeyCode() + "&format=json")
         .accept(MediaType.APPLICATION_JSON)
         .retrieve()
         .bodyToMono(String.class);

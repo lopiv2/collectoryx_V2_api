@@ -13,8 +13,10 @@ import com.sun.syndication.feed.synd.SyndEntry;
 import com.sun.syndication.feed.synd.SyndFeed;
 import com.sun.syndication.io.SyndFeedInput;
 import com.sun.syndication.io.XmlReader;
+import java.io.IOException;
 import java.net.URL;
 import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -23,19 +25,16 @@ import java.util.Locale;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 import javax.transaction.Transactional;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 import org.json.JSONObject;
 import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 import org.springframework.data.crossstore.ChangeSetPersister.NotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 import reactor.core.publisher.Mono;
 
 @Service
@@ -82,70 +81,93 @@ public class UserFeedsService {
     List<UserFeedsContentResponse> userFeedsContentResponseList = new ArrayList<>();
     boolean ok = false;
     if (args.size() == 1) {
+      org.jsoup.nodes.Document docs = null;
       try {
-        URL feedUrl = new URL(args.get(0));
-        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-        DocumentBuilder builder = factory.newDocumentBuilder();
-        Document doc = builder.parse(feedUrl.toString());
-
-        doc.getDocumentElement().normalize();
-
-        NodeList list = doc.getElementsByTagName("item");
-
-        for (int temp = 0; temp < list.getLength(); temp++) {
-          Node node = list.item(temp);
-          if (node.getNodeType() == Node.ELEMENT_NODE) {
-            Element element = (Element) node;
-            String image = null;
-            String title = element.getElementsByTagName("title").item(0).getTextContent();
-            String description = element.getElementsByTagName("description").item(0)
-                .getTextContent();
-            String link = element.getElementsByTagName("link").item(0).getTextContent();
-            String date = element.getElementsByTagName("pubDate").item(0).getTextContent();
-            DateFormat formatter = null;
-            if (date.contains("GMT")) {
-              formatter = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss z",
-                  Locale.US);
-            } else {
-              formatter = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss Z",
-                  Locale.US);
-            }
-            Date pubDate = formatter.parse(date);
-            if (description.contains("img")) {
-              org.jsoup.nodes.Document docDesc = Jsoup.parse(description);
-              org.jsoup.nodes.Element img = docDesc.select("img").first();
-              if (img != null) {
-                image = img.attr("src");
-              }
-            } else {
-              if (element.getElementsByTagName("image").item(0) != null) {
-                image = element.getElementsByTagName("image").item(0).getTextContent();
+        docs = Jsoup.connect(args.get(0)).get();
+      } catch (IOException e) {
+        e.printStackTrace();
+      }
+      String feedUrls = docs.select("link").first().text();
+      //Select item feed
+      Elements e = docs.select("item");
+      for (int x = 0; x < e.size(); x++) {
+        String image = null;
+        String title = e.get(x).select("title").text();
+        String description = e.get(x).select("description").text();
+        String link = e.get(x).select("link").text();
+        String date = e.get(x).select("pubDate").text();
+        DateFormat formatter = null;
+        if (date.contains("GMT")) {
+          formatter = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss z",
+              Locale.US);
+        } else {
+          formatter = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss Z",
+              Locale.US);
+        }
+        Date pubDate = null;
+        try {
+          pubDate = formatter.parse(date);
+        } catch (ParseException ex) {
+          ex.printStackTrace();
+        }
+        //Check for image
+        org.jsoup.nodes.Element img = e.get(x).select("image").first();
+        if (img != null) {
+          image = img.text();
+        } else {
+          //Check for image inside media:content
+          org.jsoup.nodes.Element imgM = e.get(x).select("media|content").first();
+          if (imgM != null) {
+            image = imgM.attr("url");
+          } else {
+            //Find image inside content:encoded
+            org.jsoup.nodes.Element i = e.get(x).select("content|encoded").first();
+            if (i != null) {
+              org.jsoup.nodes.Document d = Jsoup.parseBodyFragment(i.text());
+              String linkImg = d.select("img").first().attr("src");
+              //Check if absolute or relative route for images
+              if (linkImg.contains("http")) {
+                image = linkImg;
               } else {
-                Element enclosure = (Element) element.getElementsByTagName("media:content")
-                    .item(0);
-                if (enclosure != null) {
-                  String url = enclosure.getAttribute("url");
-                  image = url;
-                } else {
-                  image = "";
-                }
+                image = feedUrls + linkImg;
               }
             }
-            UserFeedsContentResponse userFeedsContentResponse = UserFeedsContentResponse.builder()
-                .title(title)
-                .description(description)
-                .link(link)
-                .pubDate(pubDate)
-                .image(image)
-                .build();
-            userFeedsContentResponseList.add(userFeedsContentResponse);
+            //find image inside description
+            else {
+              Element desc = e.get(x).select("description").first();
+              //Parse because RSS is encrypted
+              if (desc != null) {
+                Document imd = Jsoup.parseBodyFragment(desc.text());
+                image = imd.select("img").attr("src");
+              }
+              /*if (image == null || image == "") {
+                //Check for image inside item link of feed
+                Document im = null;
+                try {
+                  im = Jsoup.connect(link).userAgent(
+                          "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/49.0.2623.87 Safari/537.36")
+                      .get();
+                } catch (IOException ex) {
+                  ex.printStackTrace();
+                }
+                Element imContainer = im.getElementsByClass("entry-content").first();
+                image = imContainer.select("img").first().attr("src")
+                    .replaceAll("\\bhttp\\b", "https");
+
+              }*/
+            }
           }
         }
-        return userFeedsContentResponseList;
-      } catch (Exception ex) {
-        ex.printStackTrace();
-        System.out.println("ERROR: " + ex.getMessage());
+        UserFeedsContentResponse userFeedsContentResponse = UserFeedsContentResponse.builder()
+            .title(title)
+            .description(description)
+            .link(link)
+            .pubDate(pubDate)
+            .image(image)
+            .build();
+        userFeedsContentResponseList.add(userFeedsContentResponse);
       }
+      return userFeedsContentResponseList;
     }
 
     if (!ok) {
