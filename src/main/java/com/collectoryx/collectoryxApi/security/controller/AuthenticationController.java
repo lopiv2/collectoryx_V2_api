@@ -111,6 +111,7 @@ public class AuthenticationController {
         responseMap.put("role", role);
         responseMap.put("email", email);
         this.configService.checkUpdatedApis(id);
+        this.configService.checkUpdatedConnections(id);
         return ResponseEntity.ok(responseMap);
       } else {
         responseMap.put("error", true);
@@ -163,6 +164,8 @@ public class AuthenticationController {
     userRepository.save(user);
     //Se genera el listado de Apis por defecto que lleva la aplicacion
     this.configService.createInitialApiList(user);
+    //Generates the initial connections configurations
+    this.configService.createInitialConnectionsList(user);
     this.configService.createInitialThemes();
     //Genera configuracion inicial del usuario
     this.configService.createInitialConfig(user);

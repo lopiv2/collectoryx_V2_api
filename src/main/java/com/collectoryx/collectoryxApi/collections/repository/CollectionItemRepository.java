@@ -52,4 +52,7 @@ public interface CollectionItemRepository extends JpaRepository<CollectionItem, 
   Long countBySerie_Id(Long serieId);
 
   Optional<CollectionItem> findByNameAndYearAndSerie_Name(String name, Integer year, String serie);
+
+  Optional<CollectionItem> findByNameAndYearAndSerie_NameAndCollection_Id(String name, Integer year,
+      String serie, long collection);
 }

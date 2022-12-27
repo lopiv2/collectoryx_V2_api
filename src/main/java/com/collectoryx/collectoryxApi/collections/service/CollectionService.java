@@ -428,10 +428,23 @@ public class CollectionService {
       throws NotFoundException {
     Image image = null;
     if (request.getImage() != null) {
-      image = Image.builder()
-          .path(request.getImage())
-          .name(request.getName())
-          .build();
+      boolean existsImage;
+      existsImage = this.imageRepository.existsByPath(request.getImage());
+      //If we try to find the image if exists, and not found, we create it
+      if (existsImage == false) {
+        if (request.getImage().contains("http")) {
+          Image imageUrl = Image.builder()
+              .name(request.getName())
+              .path(request.getImage())
+              .created((new Date()))
+              .build();
+          this.imageRepository.save(imageUrl);
+          image = imageUrl;
+        }
+      } else {
+        image = this.imageRepository.findImageByPath(request.getImage())
+            .orElseThrow(NotFoundException::new);
+      }
     }
     CollectionList collectionList = null;
     collectionList = this.collectionListRepository.findById(request.getCollection())
@@ -444,7 +457,6 @@ public class CollectionService {
           .collection(collectionList)
           .build();
     }
-    this.imageRepository.save((image));
     collectionList.setTotalItems(collectionList.getTotalItems() + 1);
     Date acDate = request.getAcquiringDate();
     if (request.isOwn()) {
@@ -622,8 +634,8 @@ public class CollectionService {
 
   public CollectionItemsResponse getCollectionItemByData(CollectionItemRequest request)
       throws NotFoundException {
-    CollectionItem col = this.collectionItemRepository.findByNameAndYearAndSerie_Name(
-            request.getName(), request.getYear(), request.getSerie())
+    CollectionItem col = this.collectionItemRepository.findByNameAndYearAndSerie_NameAndCollection_Id(
+            request.getName(), request.getYear(), request.getSerie(),request.getCollection())
         .orElse(null);
     CollectionItemsResponse collectionItemsResponse = null;
     if (col != null) {
@@ -1110,6 +1122,8 @@ public class CollectionService {
       throws NotFoundException {
     Image image = null;
     ImageResponse imageResponse = null;
+    CollectionItem collectionItem = this.collectionItemRepository.findById(request.getId())
+        .orElseThrow(NotFoundException::new);
     if (request.getImage() != null) {
       boolean existsImage;
       existsImage = this.imageRepository.existsByPath(request.getImage());
@@ -1140,8 +1154,6 @@ public class CollectionService {
             request.getSerie())
         .orElseThrow(NotFoundException::new);
     collectionSeriesListResponse = toCollectionSerieListResponse(collectionSeriesList);
-    CollectionItem collectionItem = this.collectionItemRepository.findById(request.getId())
-        .orElseThrow(NotFoundException::new);
     //Si no se tenia el item, y ahora si...
     if (request.isOwn() && !collectionItem.isOwn()) {
       collectionList.setOwned(collectionList.getOwned() + 1);

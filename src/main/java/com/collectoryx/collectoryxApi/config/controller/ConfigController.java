@@ -1,8 +1,12 @@
 package com.collectoryx.collectoryxApi.config.controller;
 
 import com.collectoryx.collectoryxApi.config.rest.request.ConfigApiRequest;
+import com.collectoryx.collectoryxApi.config.rest.request.ConfigConnectionRequest;
+import com.collectoryx.collectoryxApi.config.rest.request.ConfigConnectionTelegramRequest;
 import com.collectoryx.collectoryxApi.config.rest.request.ConfigRequest;
 import com.collectoryx.collectoryxApi.config.rest.response.ConfigApiResponse;
+import com.collectoryx.collectoryxApi.config.rest.response.ConfigConnectionResponse;
+import com.collectoryx.collectoryxApi.config.rest.response.ConfigConnectionTelegramResponse;
 import com.collectoryx.collectoryxApi.config.rest.response.ConfigResponse;
 import com.collectoryx.collectoryxApi.config.service.ConfigService;
 import com.collectoryx.collectoryxApi.user.rest.request.ThemeRequest;
@@ -31,6 +35,23 @@ public class ConfigController {
   public ConfigController(ConfigService configService) {
     this.configService = configService;
   }
+
+  @GetMapping(value = "/check-config-connection/{id}")
+  public Mono<List<ConfigConnectionResponse>> checkConfigConnection(@PathVariable("id") Long id,
+      @RequestHeader(value = "Authorization") String token) {
+    List<ConfigConnectionResponse> configConnectionResponses =
+        this.configService.getAllConnectionsByUser(id);
+    return Mono.just(configConnectionResponses);
+  }
+
+  @GetMapping(value = "/get-config-telegram/{id}")
+  public Mono<ConfigConnectionTelegramResponse> checkConfigTelegram(@PathVariable("id") Long id,
+      @RequestHeader(value = "Authorization") String token) {
+    ConfigConnectionTelegramResponse configConnectionTelegramResponse =
+        this.configService.getTelegramConfig(id);
+    return Mono.just(configConnectionTelegramResponse);
+  }
+
 
   @PostMapping(value = "/create-theme")
   public Mono<ThemeResponse> createTheme(
@@ -75,6 +96,34 @@ public class ConfigController {
       throw new RuntimeException(e);
     }
     return Mono.just(configApiResponse);
+  }
+
+  @PutMapping(value = "/update-connection")
+  public Mono<ConfigConnectionResponse> updateConnectionConfig(
+      @RequestBody ConfigConnectionRequest configConnectionRequest,
+      @RequestHeader(value = "Authorization") String token) {
+    ConfigConnectionResponse configConnectionResponse = null;
+    try {
+      configConnectionResponse = this.configService.updateConnection(
+          configConnectionRequest);
+    } catch (NotFoundException e) {
+      throw new RuntimeException(e);
+    }
+    return Mono.just(configConnectionResponse);
+  }
+
+  @PutMapping(value = "/update-telegram")
+  public Mono<ConfigConnectionTelegramResponse> updateTelegramConfig(
+      @RequestBody ConfigConnectionTelegramRequest configConnectionTelegramRequest,
+      @RequestHeader(value = "Authorization") String token) {
+    ConfigConnectionTelegramResponse configConnectionTelegramResponse = null;
+    try {
+      configConnectionTelegramResponse = this.configService.updateTelegramConnection(
+          configConnectionTelegramRequest);
+    } catch (NotFoundException e) {
+      throw new RuntimeException(e);
+    }
+    return Mono.just(configConnectionTelegramResponse);
   }
 
   @DeleteMapping(value = "/delete-api/{id}")

@@ -2,11 +2,19 @@ package com.collectoryx.collectoryxApi.config.service;
 
 import com.collectoryx.collectoryxApi.config.model.Config;
 import com.collectoryx.collectoryxApi.config.model.ConfigApiKeys;
+import com.collectoryx.collectoryxApi.config.model.Connections;
+import com.collectoryx.collectoryxApi.config.model.ConnectionsTelegram;
 import com.collectoryx.collectoryxApi.config.repository.ConfigApiKeysRepository;
+import com.collectoryx.collectoryxApi.config.repository.ConfigConnectionTelegramRepository;
+import com.collectoryx.collectoryxApi.config.repository.ConfigConnectionsRepository;
 import com.collectoryx.collectoryxApi.config.repository.ConfigRepository;
 import com.collectoryx.collectoryxApi.config.rest.request.ConfigApiRequest;
+import com.collectoryx.collectoryxApi.config.rest.request.ConfigConnectionRequest;
+import com.collectoryx.collectoryxApi.config.rest.request.ConfigConnectionTelegramRequest;
 import com.collectoryx.collectoryxApi.config.rest.request.ConfigRequest;
 import com.collectoryx.collectoryxApi.config.rest.response.ConfigApiResponse;
+import com.collectoryx.collectoryxApi.config.rest.response.ConfigConnectionResponse;
+import com.collectoryx.collectoryxApi.config.rest.response.ConfigConnectionTelegramResponse;
 import com.collectoryx.collectoryxApi.config.rest.response.ConfigResponse;
 import com.collectoryx.collectoryxApi.user.model.Themes;
 import com.collectoryx.collectoryxApi.user.model.User;
@@ -41,15 +49,21 @@ public class ConfigService {
   private final UserRepository userRepository;
   private final AdminService adminService;
   private final ConfigApiKeysRepository configApiKeysRepository;
+  private final ConfigConnectionsRepository configConnectionsRepository;
+  private final ConfigConnectionTelegramRepository configConnectionTelegramRepository;
 
   public ConfigService(UserThemesRepository userThemesRepository,
       ConfigRepository configRepository, UserRepository userRepository, AdminService adminService,
-      ConfigApiKeysRepository configApiKeysRepository) {
+      ConfigApiKeysRepository configApiKeysRepository,
+      ConfigConnectionsRepository configConnectionsRepository,
+      ConfigConnectionTelegramRepository configConnectionTelegramRepository) {
     this.userThemesRepository = userThemesRepository;
     this.configRepository = configRepository;
     this.userRepository = userRepository;
     this.adminService = adminService;
     this.configApiKeysRepository = configApiKeysRepository;
+    this.configConnectionsRepository = configConnectionsRepository;
+    this.configConnectionTelegramRepository = configConnectionTelegramRepository;
   }
 
   public ConfigApiResponse createApi(ConfigApiRequest request) {
@@ -84,6 +98,31 @@ public class ConfigService {
           return this.configApiKeysRepository.save(item);
         }).orElseThrow(NotFoundException::new);
     return toConfigApiResponse(configApiKeys);
+  }
+
+  public ConfigConnectionResponse updateConnection(ConfigConnectionRequest request)
+      throws NotFoundException {
+    Connections connections = this.configConnectionsRepository.findById(
+            request.getId())
+        .map(item -> {
+          item.setName(request.getName());
+          item.setConfigured(request.isConfigured());
+          return this.configConnectionsRepository.save(item);
+        }).orElseThrow(NotFoundException::new);
+    return toConfigConnectionResponse(connections);
+  }
+
+  public ConfigConnectionTelegramResponse updateTelegramConnection(
+      ConfigConnectionTelegramRequest request) throws NotFoundException {
+    ConnectionsTelegram connectionsTelegram = this.configConnectionTelegramRepository.findById(
+            request.getId())
+        .map(item -> {
+          item.setName(request.getName());
+          item.setBotToken(request.getBotToken());
+          item.setChatId(request.getChatId());
+          return this.configConnectionTelegramRepository.save(item);
+        }).orElseThrow(NotFoundException::new);
+    return toConfigConnectionTelegramResponse(connectionsTelegram);
   }
 
   public void createInitialThemes() throws NotFoundException {
@@ -144,7 +183,7 @@ public class ConfigService {
           ConfigApiKeys configApiKeys = this.configApiKeysRepository.findByNameAndUser_Id(
               conf.getName(), userId);
           //If not config api found, create from zero
-          if(configApiKeys==null){
+          if (configApiKeys == null) {
             ConfigApiKeys configApiKeys1 = ConfigApiKeys.builder()
                 .user(user1)
                 .name(conf.getName())
@@ -157,12 +196,59 @@ public class ConfigService {
             this.configApiKeysRepository.save(configApiKeys1);
           }
           //If found, updates it
-          else{
+          else {
             configApiKeys.setApiLink(conf.getApiLink());
             configApiKeys.setLogo(conf.getLogo());
             configApiKeys.setHeader(conf.getHeader());
             configApiKeys.setLocked(conf.isLocked());
             this.configApiKeysRepository.save(configApiKeys);
+          }
+        }
+      } catch (Exception e) {
+        e.printStackTrace();
+      }
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+  }
+
+  public void checkUpdatedConnections(Long userId) throws NotFoundException {
+    ObjectMapper mapper = new ObjectMapper();
+    mapper.configure(DeserializationFeature.USE_JAVA_ARRAY_FOR_JSON_ARRAY, true);
+    InputStream input = getClass().getClassLoader().getResourceAsStream("initialConnections.json");
+    StringBuilder sb = new StringBuilder();
+    User user1 = this.userRepository.findById(userId).orElseThrow(NotFoundException::new);
+    try (InputStreamReader streamReader =
+        new InputStreamReader(input, StandardCharsets.UTF_8);
+        BufferedReader reader = new BufferedReader(streamReader)) {
+      String line;
+      while ((line = reader.readLine()) != null) {
+        sb.append(line);
+      }
+      JSONArray jsonArray = new JSONArray(sb.toString());
+      //System.out.println(jsonArray);
+      try {
+        Connections[] connections = mapper.readValue(jsonArray.toString(),
+            Connections[].class);
+        for (Connections conf : connections) {
+          Connections con = this.configConnectionsRepository.findByNameAndUser_Id(
+              conf.getName(), userId);
+          //If not config connection found, create from zero
+          if (con == null) {
+            Connections c = Connections.builder()
+                .user(user1)
+                .name(conf.getName())
+                .configured(conf.isConfigured())
+                .build();
+            this.configConnectionsRepository.save(c);
+            if (conf.getName().contains("Telegram")) {
+              //Telegram
+              ConnectionsTelegram connectionsTelegram = ConnectionsTelegram.builder()
+                  .connection(c)
+                  .name(c.getName())
+                  .build();
+              this.configConnectionTelegramRepository.save(connectionsTelegram);
+            }
           }
         }
       } catch (Exception e) {
@@ -209,6 +295,47 @@ public class ConfigService {
     }
   }
 
+  public void createInitialConnectionsList(User user) {
+    ObjectMapper mapper = new ObjectMapper();
+    mapper.configure(DeserializationFeature.USE_JAVA_ARRAY_FOR_JSON_ARRAY, true);
+    InputStream input = getClass().getClassLoader().getResourceAsStream("initialConnections.json");
+    StringBuilder sb = new StringBuilder();
+    try (InputStreamReader streamReader =
+        new InputStreamReader(input, StandardCharsets.UTF_8);
+        BufferedReader reader = new BufferedReader(streamReader)) {
+      String line;
+      while ((line = reader.readLine()) != null) {
+        sb.append(line);
+      }
+      JSONArray jsonArray = new JSONArray(sb.toString());
+      //System.out.println(jsonArray);
+      try {
+        Connections[] connectionsList = mapper.readValue(jsonArray.toString(),
+            Connections[].class);
+        for (Connections conf : connectionsList) {
+          Connections c = Connections.builder()
+              .user(user)
+              .name(conf.getName())
+              .configured(conf.isConfigured())
+              .build();
+          this.configConnectionsRepository.save(c);
+          if (conf.getName().contains("Telegram")) {
+            //Telegram
+            ConnectionsTelegram connectionsTelegram = ConnectionsTelegram.builder()
+                .connection(c)
+                .name(c.getName())
+                .build();
+            this.configConnectionTelegramRepository.save(connectionsTelegram);
+          }
+        }
+      } catch (Exception e) {
+        e.printStackTrace();
+      }
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+  }
+
   public boolean deleteApi(Long id) throws NotFoundException {
     ConfigApiKeys col = this.configApiKeysRepository.findById(id)
         .orElseThrow(NotFoundException::new);
@@ -221,6 +348,13 @@ public class ConfigService {
     //List<ConfigApiKeys> configApiKeysList = this.configApiKeysRepository.findAll();
     return StreamSupport.stream(configApiKeysList.spliterator(), false)
         .map(this::toConfigApiResponse)
+        .collect(Collectors.toList());
+  }
+
+  public List<ConfigConnectionResponse> getAllConnectionsByUser(Long id) {
+    List<Connections> connectionsList = this.configConnectionsRepository.findAllByUserId(id);
+    return StreamSupport.stream(connectionsList.spliterator(), false)
+        .map(this::toConfigConnectionResponse)
         .collect(Collectors.toList());
   }
 
@@ -250,6 +384,12 @@ public class ConfigService {
     Config config = this.configRepository.findByUser_Id(id);
     String v = getLatestVersion();
     return toConfigResponse(config, v);
+  }
+
+  public ConfigConnectionTelegramResponse getTelegramConfig(Long id) {
+    ConnectionsTelegram connectionsTelegram = this.configConnectionTelegramRepository
+        .findByConnection_User_Id(id);
+    return toConfigConnectionTelegramResponse(connectionsTelegram);
   }
 
   public ConfigResponse saveConfig(ConfigRequest item) throws NotFoundException {
@@ -297,6 +437,17 @@ public class ConfigService {
     return toThemeResponse(theme);
   }
 
+  private ConfigConnectionTelegramResponse toConfigConnectionTelegramResponse(
+      ConnectionsTelegram request) {
+    return ConfigConnectionTelegramResponse.builder()
+        .botToken(request.getBotToken())
+        .id(request.getId())
+        .chatId(request.getChatId())
+        .name(request.getName())
+        .connectionId(request.getConnection().getId())
+        .build();
+  }
+
   private ConfigResponse toConfigResponse(Config request, Themes theme) {
     return ConfigResponse.builder()
         .id(request.getId())
@@ -341,6 +492,16 @@ public class ConfigService {
         .build();
   }
 
+  private ConfigConnectionResponse toConfigConnectionResponse(Connections request) {
+    UserResponse userResponse = this.adminService.toUserResponse(request.getUser());
+    return ConfigConnectionResponse.builder()
+        .id(request.getId())
+        .name(request.getName())
+        .configured(request.isConfigured())
+        .user(userResponse)
+        .build();
+  }
+
   private ThemeResponse toThemeResponse(Themes request) {
     UserResponse userResponse = this.adminService.toUserResponse(request.getUser());
     return ThemeResponse.builder()
@@ -357,5 +518,4 @@ public class ConfigService {
         .primaryTextColor(request.getPrimaryTextColor())
         .build();
   }
-
 }

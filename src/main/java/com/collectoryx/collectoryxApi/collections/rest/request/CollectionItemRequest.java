@@ -21,6 +21,8 @@ public class CollectionItemRequest {
 
   protected String serie;
 
+  protected long collection;
+
   @NotEmpty
   protected Boolean own;
 
