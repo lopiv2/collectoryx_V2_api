@@ -32,6 +32,8 @@ public class ConnectionsTelegram {
 
   private String chatId;
 
+  private boolean sentNotifications=false;
+
   @OneToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "connection_id")
   protected Connections connection;

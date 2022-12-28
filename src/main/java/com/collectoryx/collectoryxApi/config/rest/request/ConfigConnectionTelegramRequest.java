@@ -22,4 +22,6 @@ public class ConfigConnectionTelegramRequest {
 
   private String chatId;
 
+  private boolean sentNotifications;
+
 }

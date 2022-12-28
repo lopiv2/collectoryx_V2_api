@@ -16,6 +16,7 @@ public class ConfigConnectionTelegramResponse {
   private String name;
   private String botToken;
   private String chatId;
+  private boolean sentNotifications;
   private Long connectionId;
 
 }

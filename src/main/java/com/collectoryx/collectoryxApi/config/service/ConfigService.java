@@ -120,6 +120,7 @@ public class ConfigService {
           item.setName(request.getName());
           item.setBotToken(request.getBotToken());
           item.setChatId(request.getChatId());
+          item.setSentNotifications(request.isSentNotifications());
           return this.configConnectionTelegramRepository.save(item);
         }).orElseThrow(NotFoundException::new);
     return toConfigConnectionTelegramResponse(connectionsTelegram);
@@ -246,6 +247,7 @@ public class ConfigService {
               ConnectionsTelegram connectionsTelegram = ConnectionsTelegram.builder()
                   .connection(c)
                   .name(c.getName())
+                  .sentNotifications(false)
                   .build();
               this.configConnectionTelegramRepository.save(connectionsTelegram);
             }
@@ -324,6 +326,7 @@ public class ConfigService {
             ConnectionsTelegram connectionsTelegram = ConnectionsTelegram.builder()
                 .connection(c)
                 .name(c.getName())
+                .sentNotifications(false)
                 .build();
             this.configConnectionTelegramRepository.save(connectionsTelegram);
           }
@@ -445,6 +448,7 @@ public class ConfigService {
         .chatId(request.getChatId())
         .name(request.getName())
         .connectionId(request.getConnection().getId())
+        .sentNotifications(request.isSentNotifications())
         .build();
   }
 
