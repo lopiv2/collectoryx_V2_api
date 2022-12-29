@@ -8,6 +8,7 @@ import com.collectoryx.collectoryxApi.collections.rest.response.CollectionSeries
 import com.collectoryx.collectoryxApi.image.rest.response.ImageResponse;
 import com.collectoryx.collectoryxApi.util.rest.request.ScrapperApiRequest;
 import java.io.IOException;
+import java.time.Year;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -668,6 +669,8 @@ public class ScrapperApiService {
     Elements results = searchBox.select("strong");
     //Number of elements per collection
     for (int x = 0; x < results.size(); x++) {
+      Element n = results.get(x).select("strong").select("a").first();
+      name = n.text().substring(0, n.text().indexOf(" -"));
       Element item = results.get(x).getElementsByAttributeValueContaining("href", "modules.php")
           .first();
       Document p = Jsoup.connect(url + item.attr("href"))
@@ -675,16 +678,23 @@ public class ScrapperApiService {
       Element it = p.getElementsByClass("RDRBody").first();
       if (it.text().indexOf("Collection:") != -1 && it.text().indexOf("Number:") != -1
           && it.text().indexOf("Availability:") != -1 && it.text().indexOf("License:") != -1) {
-        name = it.text().substring(it.text().indexOf("Name:") + 6, it.text().indexOf("Collection"));
+        //name = it.text().substring(it.text().indexOf("Name:") + 6, it.text().indexOf("Collection"));
         serie = it.text()
             .substring(it.text().indexOf("Collection:") + 12, it.text().indexOf("Number:"));
         String y = it.text()
             .substring(it.text().indexOf("Availability:") + 14, it.text().indexOf("License:"));
-        if (y.length() < 6) {
+        if (y.contains("TBD")) {
+          y = String.valueOf(Year.now().getValue());
+        }
+        y = y.replace("*", "");
+        y = y.replaceAll("[^0-9]", "");
+        year= Integer.valueOf(y.substring(0,4));
+        /*if (y.length() < 6) {
           year = Integer.valueOf(y.substring(0, 3));
         } else {
-          year = Integer.valueOf(y.substring(y.indexOf(" ") + 1).replace(" ", ""));
-        }
+
+          //year = Integer.valueOf(y.substring(y.indexOf(" ") + 1).replace(" ", ""));
+        }*/
         Element pr = it.select("p:contains(Retail)").first();
         if (pr.text().indexOf("Retail:") != -1) {
           price = Float.parseFloat(
@@ -693,7 +703,10 @@ public class ScrapperApiService {
           price = 0;
         }
         Element imageBox = p.getElementsByClass("imagebox").first();
-        String linkImg = imageBox.select("td").last().select("a").attr("href");
+        String linkImg = "";
+        if (imageBox != null) {
+          linkImg = imageBox.select("td").last().select("a").attr("href");
+        }
         Document im = Jsoup.connect("https://www.jeditemplearchives.com" + linkImg).get();
         Element imgLink = im.getElementsByAttributeValueContaining("src", ".jpg").first();
         ImageResponse imageResponse = ImageResponse.builder()
