@@ -103,12 +103,16 @@ public class CollectionService {
     this.collectionItemsMetadataRepository = collectionItemsMetadataRepository;
   }
 
-  public long getCountOfCollections(Long id) {
-    long count = this.collectionListRepository.countByUserId_Id(id);
-    return count;
+  public Long getCountOfCollections(Long id) {
+    Long count = this.collectionListRepository.countByUserId_Id(id);
+    if (count == null) {
+      return Long.valueOf(0);
+    } else {
+      return count;
+    }
   }
 
-  public long getCountOfCollectionItems(Long id) {
+  public Long getCountOfCollectionItems(Long id) {
     Long count = this.collectionListRepository.sumItemsByCollectionUser(id);
     if (count == null) {
       count = Long.valueOf(0);
@@ -116,9 +120,13 @@ public class CollectionService {
     return count;
   }
 
-  public long getCountOfWishlist(Long id) {
-    long count = this.collectionListRepository.countByWantedAndUserId_Id(1, id);
-    return count;
+  public Long getCountOfWishlist(Long id) {
+    Long count = this.collectionListRepository.countByWantedAndUserId_Id(1, id);
+    if (count == null) {
+      return Long.valueOf(0);
+    } else {
+      return count;
+    }
   }
 
   public long getCountOfCompletedCollections(PageFrontRequest request) {
@@ -635,7 +643,7 @@ public class CollectionService {
   public CollectionItemsResponse getCollectionItemByData(CollectionItemRequest request)
       throws NotFoundException {
     CollectionItem col = this.collectionItemRepository.findByNameAndYearAndSerie_NameAndCollection_Id(
-            request.getName(), request.getYear(), request.getSerie(),request.getCollection())
+            request.getName(), request.getYear(), request.getSerie(), request.getCollection())
         .orElse(null);
     CollectionItemsResponse collectionItemsResponse = null;
     if (col != null) {
@@ -709,9 +717,13 @@ public class CollectionService {
         .collect(Collectors.toList());
   }
 
-  public long getMoneyFromAllItems(Long id) {
-    long count = this.collectionListRepository.sumMoneyByCollectionUser(id);
-    return count;
+  public Long getMoneyFromAllItems(Long id) {
+    Long count = this.collectionListRepository.sumMoneyByCollectionUser(id);
+    if (count == null) {
+      return Long.valueOf(0);
+    } else {
+      return count;
+    }
   }
 
   public List<CollectionSeriesListResponse> listAllSeriesCollections(Long id) {
