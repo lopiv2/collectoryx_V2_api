@@ -22,4 +22,6 @@ public interface CollectionSeriesListRepository extends JpaRepository<Collection
   List<CollectionSeriesList> findAllByCollection_IdOrderByName(Long id);
 
   List<CollectionSeriesList> findAllByCollection_UserIdOrderByName(Long id);
+
+  void deleteAllByCollection_Id(Long id);
 }

@@ -213,13 +213,6 @@ public class CollectionController {
     return Mono.just(isDeleted);
   }
 
-  @DeleteMapping(value = "/delete-collection/{id}")
-  public Mono<Boolean> deleteCollection(@PathVariable("id") Long id,
-      @RequestHeader(value = "Authorization") String token) throws NotFoundException {
-    boolean isDeleted = this.collectionService.deleteCollection(id);
-    return Mono.just(isDeleted);
-  }
-
   @DeleteMapping(value = "/delete-collection-cascade/{id}")
   public Mono<Boolean> deleteCollectionCascade(@PathVariable("id") Long id,
       @RequestHeader(value = "Authorization") String token) throws NotFoundException {

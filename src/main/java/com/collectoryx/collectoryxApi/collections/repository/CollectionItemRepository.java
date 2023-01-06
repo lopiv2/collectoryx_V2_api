@@ -55,4 +55,6 @@ public interface CollectionItemRepository extends JpaRepository<CollectionItem, 
 
   Optional<CollectionItem> findByNameAndYearAndSerie_NameAndCollection_Id(String name, Integer year,
       String serie, long collection);
+
+  void deleteByCollection_Id(Long id);
 }

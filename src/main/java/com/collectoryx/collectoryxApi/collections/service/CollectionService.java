@@ -583,19 +583,24 @@ public class CollectionService {
     return true;
   }
 
-  public boolean deleteCollection(Long id) throws NotFoundException {
-    CollectionList col = this.collectionListRepository.findById(id)
-        .orElseThrow(NotFoundException::new);
-    this.collectionListRepository.deleteById(col.getId());
-    return true;
-  }
-
   public boolean deleteCollectionCascade(Long id) throws NotFoundException {
     List<CollectionMetadata> collectionMetadata = this.collectionMetadataRepository
         .findByCollection_Id(id);
+    //Look for every metadata fields of this collection, and delete all metadatas
+    for(int z=0;z<collectionMetadata.size();z++){
+      List<CollectionItemsMetadata> collectionItemsMetadata = this.collectionItemsMetadataRepository
+          .findByMetadata_Id(collectionMetadata.get(z).getId());
+      this.collectionItemsMetadataRepository.deleteAll(collectionItemsMetadata);
+    }
+    //Delete all metadata fields from metadata Collection
     this.collectionMetadataRepository.deleteAll(collectionMetadata);
     CollectionList col = this.collectionListRepository.findById(id)
         .orElseThrow(NotFoundException::new);
+    //Delete all series from this collection
+    this.collectionSeriesListRepository.deleteAllByCollection_Id(col.getId());
+    //Delete all items from collection
+    this.collectionItemRepository.deleteByCollection_Id(col.getId());
+    //Delete collection at last
     this.collectionListRepository.deleteById(col.getId());
     return true;
   }
