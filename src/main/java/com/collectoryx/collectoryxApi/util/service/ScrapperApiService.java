@@ -298,7 +298,14 @@ public class ScrapperApiService {
         for (int r = 0; r < body.size(); r++) {
           Element name = body.get(r).select("td").get(3);
           Element serie = body.get(r).select("td").get(5);
-          Element price = body.get(r).select("td").get(13);
+          Element price = body.get(r).select("td").get(14);
+          float priceVal = 0;
+          if (price.text() == "" || price == null) {
+            priceVal = 0;
+          } else {
+            priceVal = Float.valueOf(
+                price.text().replace("$", ""));
+          }
           Element year = body.get(r).select("td").get(4);
           String image = body.get(r).select("td").get(0).select("a").attr("src");
           List<CollectionItemMetadataResponse> collectionItemMetadataResponseList = new ArrayList<>();
@@ -327,8 +334,7 @@ public class ScrapperApiService {
               .year(Integer.valueOf(year.text().replace("year:", "")))
               .image(imageResponse)
               .metadata(collectionItemMetadataResponseList)
-              .price(Float.valueOf(
-                  price.text().replace("$", "")))
+              .price(priceVal)
               .build();
           //System.out.println(collectionItemsResponse);
           contElements++;
@@ -688,7 +694,7 @@ public class ScrapperApiService {
         }
         y = y.replace("*", "");
         y = y.replaceAll("[^0-9]", "");
-        year= Integer.valueOf(y.substring(0,4));
+        year = Integer.valueOf(y.substring(0, 4));
         /*if (y.length() < 6) {
           year = Integer.valueOf(y.substring(0, 3));
         } else {
