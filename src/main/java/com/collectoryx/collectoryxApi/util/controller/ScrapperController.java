@@ -62,6 +62,18 @@ public class ScrapperController {
     return collectionItemsResponseList;
   }
 
+  @GetMapping(value = "/get-minerals")
+  public CollectionItemsPaginatedResponse getMinerals(
+      @RequestParam int page,
+      @RequestParam int rowsPerPage,
+      @RequestParam String query,
+      @RequestParam String metadata,
+      @RequestHeader(value = "Authorization") String token) throws IOException {
+    CollectionItemsPaginatedResponse collectionItemsResponseList = this.scrapperApiService
+        .MineralScrapper(page, rowsPerPage, query, metadata);
+    return collectionItemsResponseList;
+  }
+
   @GetMapping(value = "/get-motu")
   public CollectionItemsPaginatedResponse getMotu(
       @RequestParam int page,
@@ -107,7 +119,12 @@ public class ScrapperController {
       @RequestHeader(value = "Authorization") String token) throws IOException {
     CollectionItemsPaginatedResponse collectionItemsResponseList = this.scrapperApiService
         .StarWarsScrapper(page, rowsPerPage, query, metadata);
-    return collectionItemsResponseList;
+    if (collectionItemsResponseList != null) {
+      return collectionItemsResponseList;
+    }
+    else{
+      return null;
+    }
   }
 
   @GetMapping(value = "/get-tmnt")

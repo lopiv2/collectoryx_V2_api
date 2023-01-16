@@ -494,12 +494,14 @@ public class CollectionService {
       for (CollectionItemMetadataRequest c : request.getMetadata()) {
         CollectionMetadata collectionMetadata = this.collectionMetadataRepository.findById(
             c.getId());
-        CollectionItemsMetadata collectionItemsMetadata = CollectionItemsMetadata.builder()
-            .value(c.getValue())
-            .item(collectionItem1)
-            .metadata(collectionMetadata)
-            .build();
-        this.collectionItemsMetadataRepository.save(collectionItemsMetadata);
+        if (collectionMetadata != null) {
+          CollectionItemsMetadata collectionItemsMetadata = CollectionItemsMetadata.builder()
+              .value(c.getValue())
+              .item(collectionItem1)
+              .metadata(collectionMetadata)
+              .build();
+          this.collectionItemsMetadataRepository.save(collectionItemsMetadata);
+        }
       }
     }
   }
@@ -587,7 +589,7 @@ public class CollectionService {
     List<CollectionMetadata> collectionMetadata = this.collectionMetadataRepository
         .findByCollection_Id(id);
     //Look for every metadata fields of this collection, and delete all metadatas
-    for(int z=0;z<collectionMetadata.size();z++){
+    for (int z = 0; z < collectionMetadata.size(); z++) {
       List<CollectionItemsMetadata> collectionItemsMetadata = this.collectionItemsMetadataRepository
           .findByMetadata_Id(collectionMetadata.get(z).getId());
       this.collectionItemsMetadataRepository.deleteAll(collectionItemsMetadata);
@@ -1002,7 +1004,16 @@ public class CollectionService {
         ZoneId defaultZoneId = ZoneId.systemDefault();
         d = Date.from(date.atStartOfDay(defaultZoneId).toInstant());
         ow = true;
-      } else {
+      }
+      if (record.get(own).contains("1") && (record.get(acquiringDate) == null
+          || record.get(acquiringDate) == "")) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-d", Locale.ENGLISH);
+        LocalDate date = LocalDate.now();
+        ZoneId defaultZoneId = ZoneId.systemDefault();
+        d = Date.from(date.atStartOfDay(defaultZoneId).toInstant());
+        ow = true;
+      }
+      if (record.get(own).contains("0")) {
         ow = false;
       }
       if (record.get(wanted).contains("1")) {
