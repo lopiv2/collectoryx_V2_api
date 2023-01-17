@@ -559,7 +559,7 @@ public class ScrapperApiService {
     String name = "";
     String serie = "Standard";
     float price = 0;
-    Integer year = 0;
+    Integer year = Year.now().getValue();
     doc = Jsoup.connect(url).get();
     Element body = doc.getElementById("bodyContent");
     Element division = body.getElementsByClass("mw-parser-output").first();
