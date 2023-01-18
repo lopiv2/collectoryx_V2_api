@@ -12,6 +12,8 @@ import java.time.Year;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.stream.Collectors;
+import org.apache.commons.lang3.StringUtils;
 import org.jsoup.Connection.Method;
 import org.jsoup.Connection.Response;
 import org.jsoup.Jsoup;
@@ -563,87 +565,92 @@ public class ScrapperApiService {
     doc = Jsoup.connect(url).get();
     Element body = doc.getElementById("bodyContent");
     Element division = body.getElementsByClass("mw-parser-output").first();
-    Element mineral = division.getElementsByAttributeValueContaining("title", query).first();
-    if (mineral != null) {
-      name = mineral.text();
-      Document p = Jsoup.connect(mineral.attr("abs:href"))
-          .userAgent(
-              "Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:25.0) Gecko/20100101 Firefox/25.0")
-          .get();
-      Element infobox = p.getElementsByClass("infobox").first();
-      Element imageBox = infobox.getElementsByClass("infobox-image").first();
-      String linkImg = "";
-      if (imageBox != null) {
-        linkImg = imageBox.select("a").first().select("img").attr("abs:src");
-      }
-      ImageResponse imageResponse = ImageResponse.builder()
-          .name(name)
-          .path(linkImg)
-          .build();
-      List<CollectionItemMetadataResponse> collectionItemMetadataResponseList = new ArrayList<>();
-      String formula = "";
-      String ima = "";
-      String color = "";
-      Elements labels = infobox.select("tr");
-      for (int z = 0; z < labels.size(); z++) {
-        if (labels.get(z).select("a").text().contains("Formula")) {
-          Element f = labels.get(z).select("td").first();
-          formula = f.text();
-          int hasLink = formula.indexOf("[");
-          //If it has link after formula or IMA, remove it
-          if (hasLink != -1) {
-            formula = formula.substring(0, formula.indexOf("["));
+    Elements minerals = division.getElementsByAttributeValueContaining("title", query);
+    if (minerals != null) {
+      for (int x = 0; x < minerals.size(); x++) {
+        name = StringUtils.capitalize(minerals.get(x).text());
+        Document p = Jsoup.connect(minerals.get(x).attr("abs:href"))
+            .userAgent(
+                "Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:25.0) Gecko/20100101 Firefox/25.0")
+            .get();
+        Element infobox = p.getElementsByClass("infobox").first();
+        Element imageBox = infobox.getElementsByClass("infobox-image").first();
+        String linkImg = "";
+        if (imageBox != null) {
+          linkImg = imageBox.select("a").first().select("img").attr("abs:src");
+        }
+        ImageResponse imageResponse = ImageResponse.builder()
+            .name(name)
+            .path(linkImg)
+            .build();
+        List<CollectionItemMetadataResponse> collectionItemMetadataResponseList = new ArrayList<>();
+        String formula = "";
+        String ima = "";
+        String color = "";
+        Elements labels = infobox.select("tr");
+        for (int z = 0; z < labels.size(); z++) {
+          if (labels.get(z).select("a").text().contains("Formula")) {
+            Element f = labels.get(z).select("td").first();
+            formula = f.text();
+            int hasLink = formula.indexOf("[");
+            //If it has link after formula or IMA, remove it
+            if (hasLink != -1) {
+              formula = formula.substring(0, formula.indexOf("["));
+            }
+          }
+          if (labels.get(z).select("a").text().contains("IMA")) {
+            Element f = labels.get(z).select("td").first();
+            ima = f.text();
+            int hasLink = ima.indexOf("[");
+            if (hasLink != -1) {
+              ima = ima.substring(0, ima.indexOf("["));
+            }
+          }
+          if (labels.get(z).select("th").text().contains("Color")) {
+            Element f = labels.get(z).select("td").first();
+            color = f.text();
           }
         }
-        if (labels.get(z).select("a").text().contains("IMA")) {
-          Element f = labels.get(z).select("td").first();
-          ima = f.text();
-          int hasLink = ima.indexOf("[");
-          if (hasLink != -1) {
-            ima = ima.substring(0, ima.indexOf("["));
-          }
-        }
-        if (labels.get(z).select("th").text().contains("Color")) {
-          Element f = labels.get(z).select("td").first();
-          color = f.text();
-        }
+        CollectionItemMetadataResponse collectionItemMetadataFormulaResponse = CollectionItemMetadataResponse.builder()
+            .name("Formula")
+            .value(formula)
+            .type(CollectionMetadataType.STRING)
+            .build();
+        collectionItemMetadataResponseList.add(collectionItemMetadataFormulaResponse);
+        CollectionItemMetadataResponse collectionItemMetadataImaResponse = CollectionItemMetadataResponse.builder()
+            .name("IMA symbol")
+            .value(ima)
+            .type(CollectionMetadataType.STRING)
+            .build();
+        collectionItemMetadataResponseList.add(collectionItemMetadataImaResponse);
+        CollectionItemMetadataResponse collectionItemMetadataColorResponse = CollectionItemMetadataResponse.builder()
+            .name("Color")
+            .value(color)
+            .type(CollectionMetadataType.STRING)
+            .build();
+        collectionItemMetadataResponseList.add(collectionItemMetadataColorResponse);
+        collectionSeriesListResponse = CollectionSeriesListResponse.builder()
+            .name(serie)
+            .build();
+        collectionItemsResponse = CollectionItemsResponse.builder()
+            .name(name)
+            .serie(collectionSeriesListResponse)
+            .year(year)
+            .metadata(collectionItemMetadataResponseList)
+            .image(imageResponse)
+            .price(price)
+            .build();
+        contElements++;
+        collectionItemsResponseList.add(collectionItemsResponse);
+        collectionItemsPaginatedResponse.setTotalCount(contElements);
       }
-      CollectionItemMetadataResponse collectionItemMetadataFormulaResponse = CollectionItemMetadataResponse.builder()
-          .name("Formula")
-          .value(formula)
-          .type(CollectionMetadataType.STRING)
-          .build();
-      collectionItemMetadataResponseList.add(collectionItemMetadataFormulaResponse);
-      CollectionItemMetadataResponse collectionItemMetadataImaResponse = CollectionItemMetadataResponse.builder()
-          .name("IMA symbol")
-          .value(ima)
-          .type(CollectionMetadataType.STRING)
-          .build();
-      collectionItemMetadataResponseList.add(collectionItemMetadataImaResponse);
-      CollectionItemMetadataResponse collectionItemMetadataColorResponse = CollectionItemMetadataResponse.builder()
-          .name("Color")
-          .value(color)
-          .type(CollectionMetadataType.STRING)
-          .build();
-      collectionItemMetadataResponseList.add(collectionItemMetadataColorResponse);
-      collectionSeriesListResponse = CollectionSeriesListResponse.builder()
-          .name(serie)
-          .build();
-      collectionItemsResponse = CollectionItemsResponse.builder()
-          .name(name)
-          .serie(collectionSeriesListResponse)
-          .year(year)
-          .metadata(collectionItemMetadataResponseList)
-          .image(imageResponse)
-          .price(price)
-          .build();
-      contElements++;
-      collectionItemsResponseList.add(collectionItemsResponse);
-      collectionItemsPaginatedResponse.setTotalCount(contElements);
+      List<CollectionItemsResponse> deDupResponseList = collectionItemsResponseList.stream()
+          .distinct().collect(Collectors.toList());
+      collectionItemsPaginatedResponse.setTotalCount(deDupResponseList.size());
       collectionItemsPaginatedResponse.setPage(page);
       int from = (page * rowsPerPage) - rowsPerPage;
-      int to = Math.min(collectionItemsResponseList.size(), ((page * rowsPerPage)));
-      collectionItemsPaginatedResponse.setItems(collectionItemsResponseList.subList(from, to));
+      int to = Math.min(deDupResponseList.size(), ((page * rowsPerPage)));
+      collectionItemsPaginatedResponse.setItems(deDupResponseList.subList(from, to));
       return collectionItemsPaginatedResponse;
     } else {
       return null;
