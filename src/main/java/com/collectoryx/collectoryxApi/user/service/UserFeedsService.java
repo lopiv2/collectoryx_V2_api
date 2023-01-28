@@ -57,7 +57,7 @@ public class UserFeedsService {
     User user = this.userRepository.findById(request.getUserId())
         .orElseThrow(NotFoundException::new);
     String getLogo =
-        "https://t3.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://"
+        "https://t3.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url="
             + request.getCleanUrl() + "?&size=128";
     UserFeeds userFeeds = UserFeeds.builder()
         .user(user)
