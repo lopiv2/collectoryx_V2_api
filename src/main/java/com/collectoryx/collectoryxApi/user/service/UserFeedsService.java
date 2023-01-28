@@ -56,14 +56,14 @@ public class UserFeedsService {
       throws NotFoundException {
     User user = this.userRepository.findById(request.getUserId())
         .orElseThrow(NotFoundException::new);
-    String getLogo = getLogoFromUrlFeed(request.getCleanUrl()).block();
-    //System.out.println(getLogo);
-    JSONObject jsonObject = new JSONObject(getLogo);
+    String getLogo =
+        "https://t3.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url="
+            + request.getCleanUrl() + "?&size=128";
     UserFeeds userFeeds = UserFeeds.builder()
         .user(user)
         .name(request.getName())
         .rssUrl(request.getUrl())
-        .logo(jsonObject.getJSONArray("icons").getJSONObject(0).getString("src"))
+        .logo(getLogo)
         .build();
     this.userFeedsRepository.save(userFeeds);
     UserFeedsResponse userFeedsResponse = toUserFeedsResponse(userFeeds);
@@ -214,21 +214,6 @@ public class UserFeedsService {
     UserFeeds userFeed = this.userFeedsRepository
         .findByUserIdAndName(id, title);
     return toUserFeedsResponse(userFeed);
-  }
-
-  public Mono<String> getLogoFromUrlFeed(String url) {
-    WebClient client = WebClient.create("https://favicongrabber.com/api/grab/" + url);
-    //WebClient client = WebClient.create("https://dc.fandom.com/api.php");
-    return client
-        .get()
-        .uri("?action=imageserving&wisId=90286")
-        .accept(MediaType.APPLICATION_JSON)
-        .retrieve()
-        .onStatus(HttpStatus::is5xxServerError, response -> {
-          return Mono.error(new Exception("Api error"));
-        })
-        .bodyToMono(String.class);
-    //.publish(s -> Mono.just(s.toString()));
   }
 
   public List<UserFeedsResponse> listAllUserFeeds(Long id) {
