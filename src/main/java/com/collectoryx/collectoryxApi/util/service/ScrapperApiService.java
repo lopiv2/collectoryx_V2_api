@@ -574,43 +574,48 @@ public class ScrapperApiService {
                 "Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:25.0) Gecko/20100101 Firefox/25.0")
             .get();
         Element infobox = p.getElementsByClass("infobox").first();
-        Element imageBox = infobox.getElementsByClass("infobox-image").first();
         String linkImg = "";
-        if (imageBox != null) {
-          linkImg = imageBox.select("a").first().select("img").attr("abs:src");
-        }
-        ImageResponse imageResponse = ImageResponse.builder()
-            .name(name)
-            .path(linkImg)
-            .build();
-        List<CollectionItemMetadataResponse> collectionItemMetadataResponseList = new ArrayList<>();
         String formula = "";
         String ima = "";
         String color = "";
-        Elements labels = infobox.select("tr");
-        for (int z = 0; z < labels.size(); z++) {
-          if (labels.get(z).select("a").text().contains("Formula")) {
-            Element f = labels.get(z).select("td").first();
-            formula = f.text();
-            int hasLink = formula.indexOf("[");
-            //If it has link after formula or IMA, remove it
-            if (hasLink != -1) {
-              formula = formula.substring(0, formula.indexOf("["));
-            }
+        ImageResponse imageResponse = null;
+        List<CollectionItemMetadataResponse> collectionItemMetadataResponseList = new ArrayList<>();
+        if (infobox != null) {
+          Element imageBox = infobox.getElementsByClass("infobox-image").first();
+          if (imageBox != null) {
+            linkImg = imageBox.select("a").first().select("img").attr("abs:src");
+          } else {
+            linkImg = "";
           }
-          if (labels.get(z).select("a").text().contains("IMA")) {
-            Element f = labels.get(z).select("td").first();
-            ima = f.text();
-            int hasLink = ima.indexOf("[");
-            if (hasLink != -1) {
-              ima = ima.substring(0, ima.indexOf("["));
+          Elements labels = infobox.select("tr");
+          for (int z = 0; z < labels.size(); z++) {
+            if (labels.get(z).select("a").text().contains("Formula")) {
+              Element f = labels.get(z).select("td").first();
+              formula = f.text();
+              int hasLink = formula.indexOf("[");
+              //If it has link after formula or IMA, remove it
+              if (hasLink != -1) {
+                formula = formula.substring(0, formula.indexOf("["));
+              }
             }
-          }
-          if (labels.get(z).select("th").text().contains("Color")) {
-            Element f = labels.get(z).select("td").first();
-            color = f.text();
+            if (labels.get(z).select("a").text().contains("IMA")) {
+              Element f = labels.get(z).select("td").first();
+              ima = f.text();
+              int hasLink = ima.indexOf("[");
+              if (hasLink != -1) {
+                ima = ima.substring(0, ima.indexOf("["));
+              }
+            }
+            if (labels.get(z).select("th").text().contains("Color")) {
+              Element f = labels.get(z).select("td").first();
+              color = f.text();
+            }
           }
         }
+        imageResponse = ImageResponse.builder()
+            .name(name)
+            .path(linkImg)
+            .build();
         CollectionItemMetadataResponse collectionItemMetadataFormulaResponse = CollectionItemMetadataResponse.builder()
             .name("Formula")
             .value(formula)
