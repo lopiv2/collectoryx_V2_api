@@ -184,6 +184,7 @@ public class CollectionController {
   public Mono<Void> createItemNewSerie(
       @RequestBody CollectionCreateItemImportApiRequest collectionCreateItemRequest,
       @RequestHeader(value = "Authorization") String token) {
+    //System.out.println(collectionCreateItemRequest);
     try {
       this.collectionService.createItemNewSerie(collectionCreateItemRequest);
     } catch (NotFoundException e) {
