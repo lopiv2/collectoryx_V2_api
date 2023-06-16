@@ -229,11 +229,14 @@ public class ScrapperApiService {
         Element im = p.getElementsByClass("overlay-a").first();
         String linkImg = im.attr("href");
         //Year
-        Element listGroup = p.getElementsByClass("list-group").first();
+        Element listGroup = p.getElementsByClass("list-group").get(1);
         Element yearParsed = listGroup.getElementsByClass("list-group-item").get(1);
-        Integer year = Integer.valueOf(yearParsed.toString()
-            .substring(yearParsed.toString().indexOf("Year</b>: ") + 10,
-                yearParsed.toString().indexOf("Year</b>: ") + 14));
+        Integer year=0;
+        if(StringUtils.isNumeric(yearParsed.toString())){
+          year = Integer.valueOf(yearParsed.toString()
+              .substring(yearParsed.toString().indexOf("Year</b>: ") + 10,
+                  yearParsed.toString().indexOf("Year</b>: ") + 14));
+        }
         Element priceParsed = listGroup.getElementsByClass("list-group-item").get(1);
         int priceString = priceParsed.toString().indexOf("Retail</b>: ");
         //Price
@@ -440,13 +443,16 @@ public class ScrapperApiService {
           Element im = p.getElementsByClass("overlay-a").first();
           String linkImg = im.attr("href");
           //Name
-          Element listGroup = p.getElementsByClass("list-group").first();
+          Element listGroup = p.getElementsByClass("list-group").get(1);
           Element name = listGroup.select("b").first();
           Element yearParsed = listGroup.getElementsByClass("list-group-item").get(1);
           //Year
-          Integer year = Integer.valueOf(yearParsed.toString()
-              .substring(yearParsed.toString().indexOf("Year</b>: ") + 10,
-                  yearParsed.toString().indexOf("Year</b>: ") + 14));
+          Integer year=0;
+          if(StringUtils.isNumeric(yearParsed.toString())){
+            year = Integer.valueOf(yearParsed.toString()
+                .substring(yearParsed.toString().indexOf("Year</b>: ") + 10,
+                    yearParsed.toString().indexOf("Year</b>: ") + 14));
+          }
           Element priceParsed = listGroup.getElementsByClass("list-group-item").get(1);
           int priceString = priceParsed.toString().indexOf("Retail</b>: ");
           //Price
@@ -714,7 +720,6 @@ public class ScrapperApiService {
     doc = Jsoup.connect(url).get();
     Elements e = doc
         .getElementsByAttributeValueContaining("href", "actionfigure411");
-
     for (int v = 0; v < e.size(); v++) {
       if (e.get(v).text().toLowerCase(Locale.ROOT).contains((query))) {
         name = e.get(v).text();
@@ -724,11 +729,14 @@ public class ScrapperApiService {
         Element im = p.getElementsByClass("overlay-a").first();
         String linkImg = im.attr("href");
         //Year
-        Element listGroup = p.getElementsByClass("list-group").first();
+        Element listGroup = p.getElementsByClass("list-group").get(1);
         Element yearParsed = listGroup.getElementsByClass("list-group-item").get(1);
-        Integer year = Integer.valueOf(yearParsed.toString()
-            .substring(yearParsed.toString().indexOf("Year</b>: ") + 10,
-                yearParsed.toString().indexOf("Year</b>: ") + 14));
+        Integer year=0;
+        if(StringUtils.isNumeric(yearParsed.toString())){
+          year = Integer.valueOf(yearParsed.toString()
+              .substring(yearParsed.toString().indexOf("Year</b>: ") + 10,
+                  yearParsed.toString().indexOf("Year</b>: ") + 14));
+        }
         Element priceParsed = listGroup.getElementsByClass("list-group-item").get(1);
         int priceString = priceParsed.toString().indexOf("Retail</b>: ");
         //Price
@@ -828,13 +836,12 @@ public class ScrapperApiService {
           }
           y = y.replace("*", "");
           y = y.replaceAll("[^0-9]", "");
-          year = Integer.valueOf(y.substring(0, 4));
-        /*if (y.length() < 6) {
-          year = Integer.valueOf(y.substring(0, 3));
-        } else {
-
-          //year = Integer.valueOf(y.substring(y.indexOf(" ") + 1).replace(" ", ""));
-        }*/
+          if(StringUtils.isNumeric(y)){
+            year = Integer.valueOf(y.substring(0, 4));
+          }
+          else{
+            year=0;
+          }
           Element pr = it.select("p:contains(Retail)").first();
           if (pr.text().indexOf("Retail:") != -1) {
             price = Float.parseFloat(
@@ -948,11 +955,15 @@ public class ScrapperApiService {
         Element im = p.getElementsByClass("overlay-a").first();
         String linkImg = im.attr("href");
         //Year
-        Element listGroup = p.getElementsByClass("list-group").first();
+        Element listGroup = p.getElementsByClass("list-group").get(1);
         Element yearParsed = listGroup.getElementsByClass("list-group-item").get(1);
-        Integer year = Integer.valueOf(yearParsed.toString()
-            .substring(yearParsed.toString().indexOf("Year</b>: ") + 10,
-                yearParsed.toString().indexOf("Year</b>: ") + 14));
+        Integer year=0;
+        if(StringUtils.isNumeric(yearParsed.toString())){
+          year = Integer.valueOf(yearParsed.toString()
+              .substring(yearParsed.toString().indexOf("Year</b>: ") + 10,
+                  yearParsed.toString().indexOf("Year</b>: ") + 14));
+        }
+
         Element priceParsed = listGroup.getElementsByClass("list-group-item").get(1);
         int priceString = priceParsed.toString().indexOf("Retail</b>: ");
         //Price
